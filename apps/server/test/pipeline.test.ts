@@ -314,7 +314,8 @@ describe("reindex after losing the database", () => {
   it("adopts the old owner's folders after the DB file is deleted and /setup gives the owner a new id", async () => {
     const { t, cookie, upload } = await setup();
     const oldUser = userIdOf(t);
-    const a = await upload({ tags: ["viagem"], note: "nota minha", title: "Título" });
+    const cat = (await (await t.app.request("/api/categories", { method: "POST", headers: { cookie, "content-type": "application/json" }, body: JSON.stringify({ name: "Viagens" }) })).json()) as { id: string };
+    const a = await upload({ tags: ["viagem"], note: "nota minha", title: "Título", categoryId: cat.id });
     const b = await upload({ pageTitle: "No lixo" });
     await t.app.request(`/api/items/${b.id}`, { method: "DELETE", headers: { cookie } });
     const before = (await (await t.app.request(`/api/items/${a.id}`, { headers: { cookie } })).json()) as { user: unknown };
