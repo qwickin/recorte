@@ -23,6 +23,14 @@ type Props = {
 
 const NEW_CATEGORY = "__new__";
 
+/** First Esc in a field only leaves the field (focus back on the dialog); the next one closes the detail. */
+const leaveField = (e: KeyboardEvent<HTMLElement>) => {
+  if (e.key !== "Escape") return;
+  e.stopPropagation();
+  e.preventDefault();
+  e.currentTarget.closest<HTMLElement>('[role="dialog"]')?.focus();
+};
+
 export const isTyping = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
@@ -143,8 +151,11 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
   const removeTag = (tag: string, origin: "user" | "ai") => {
     if (!item) return;
-    if (origin === "user") void save({ tags: item.user.tags.filter((t) => t !== tag) });
-    else void save({ hiddenAiTags: [...item.user.hiddenAiTags, tag] });
+    const fromAi = [...item.ai.tipo, ...item.ai.visual].includes(tag);
+    const hide = fromAi && !item.user.hiddenAiTags.includes(tag) ? { hiddenAiTags: [...item.user.hiddenAiTags, tag] } : {};
+    // A tag can be both the user's and the AI's: one × removes it from both, or it would come back as an AI tag.
+    if (origin === "user") void save({ tags: item.user.tags.filter((t) => t !== tag), ...hide });
+    else void save(hide);
   };
 
   const onCategory = (v: string) => {
@@ -186,9 +197,9 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
     }
   };
 
-  const enter = (fn: () => void) => (e: KeyboardEvent) => {
+  const enter = (fn: () => void) => (e: KeyboardEvent<HTMLElement>) => {
     if (e.key === "Enter" && !e.shiftKey) (e.preventDefault(), fn());
-    if (e.key === "Escape") e.stopPropagation();
+    leaveField(e);
   };
 
   const shown = item ? displayTags(item) : [];
@@ -386,7 +397,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                           placeholder="Escreve uma nota para te lembrares porquê"
                           onChange={(e) => setNote(e.target.value)}
                           onBlur={saveNote}
-                          onKeyDown={(e) => e.key === "Escape" && e.stopPropagation()}
+                          onKeyDown={leaveField}
                           className={`${field} resize-y leading-relaxed`}
                         />
                       </section>
