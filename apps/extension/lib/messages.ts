@@ -76,6 +76,8 @@ export interface DraftInfo {
 
 export interface LocatedImage {
   rect: Rect;
+  /** Scroll position before the element was scrolled into view (restored after the capture). */
+  scroll: { x: number; y: number };
   alt: string;
   caption: string;
 }

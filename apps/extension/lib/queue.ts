@@ -114,6 +114,9 @@ export async function countByAccount(store: QueueStore): Promise<Map<string, num
   return m;
 }
 
+/** Transient failures are retried at most this many times, and for at most this long; then dropped. */
+export const MAX_ATTEMPTS = 20;
+export const MAX_AGE_MS = 7 * 24 * 60 * 60_000;
 const BASE_DELAY_MS = 5_000;
 const MAX_DELAY_MS = 30 * 60_000;
 
@@ -129,7 +132,8 @@ export function isPermanentFailure(status: number): boolean {
 
 export interface DrainResult {
   saved: { item: QueueItem; body: unknown }[];
-  dropped: { item: QueueItem; status: number; error: string }[];
+  /** Rejected by the server (400/413/…) or given up after MAX_ATTEMPTS / MAX_AGE_MS (`expired`). */
+  dropped: { item: QueueItem; status: number; error: string; expired?: boolean }[];
   /** True when the server answered 401: the device token is gone; the queue is kept and paused. */
   authNeeded: boolean;
   /** Items of this account still waiting. */
@@ -146,7 +150,8 @@ export type Uploader = (item: QueueItem) => Promise<UploadResult>;
  * - 2xx → removed.
  * - 401 → kept untouched; draining stops (every other item would fail the same way).
  * - 400/413/415/422 → removed and reported as dropped (not retried).
- * - anything else (network, 5xx, 429…) → kept with exponential backoff.
+ * - anything else (network, 5xx, 429…) → kept with exponential backoff, until MAX_ATTEMPTS failures or
+ *   MAX_AGE_MS since capture; then removed and reported as dropped (`expired`).
  */
 export async function drainQueue(
   store: QueueStore,
@@ -168,6 +173,9 @@ export async function drainQueue(
     } else if (isPermanentFailure(r.status)) {
       await store.delete(item.id);
       result.dropped.push({ item, status: r.status, error: r.error });
+    } else if (item.attempts + 1 >= MAX_ATTEMPTS || now() - item.createdAt >= MAX_AGE_MS) {
+      await store.delete(item.id);
+      result.dropped.push({ item, status: r.status, error: r.error || `HTTP ${r.status}`, expired: true });
     } else {
       const attempts = item.attempts + 1;
       await store.put({ ...item, attempts, nextAttemptAt: now() + backoffMs(attempts), lastError: r.error || `HTTP ${r.status}` });

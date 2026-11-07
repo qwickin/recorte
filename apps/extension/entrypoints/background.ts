@@ -24,6 +24,7 @@ import {
   previewDataUrl,
 } from "@/lib/capture";
 import type { Rect } from "@/lib/extract";
+import { TabChangedError, makeTabGuard } from "@/lib/guard";
 import type {
   BackgroundMessage,
   ContentMessage,
@@ -176,12 +177,13 @@ async function runDrain(force: boolean): Promise<DrainResult | null> {
   const s = await connectedSettings();
   const conn = connectionOf(s);
   const account = accountOf(s);
-  if (!conn || !account) {
+  // Paused after a 401 until the user re-connects; explicit actions (save, retry, login) still try.
+  if (!conn || !account || (s.authNeeded && !force)) {
     await updateBadge();
     return null;
   }
   const version = extensionVersion();
-  const r = await drainQueue(store, (item) => uploadItem(conn, version, item.image, item.mime, item.meta), { account, force });
+  const r = await drainQueue(store, (item) => uploadItem(conn, version, item.image, item.mime, item.meta, item.id), { account, force });
 
   if (r.saved.length && s.authNeeded) await setSettings({ authNeeded: false });
   for (const { item } of r.saved) {
@@ -191,8 +193,12 @@ async function runDrain(force: boolean): Promise<DrainResult | null> {
       () => notify(`recorte-saved-${item.id}`, "Guardado", item.meta.title || item.meta.pageTitle || "Captura guardada no Recorte.", true),
     );
   }
-  for (const { item, status } of r.dropped) {
-    const why = status === 413 ? "A imagem é demasiado grande para o servidor." : "O servidor recusou esta captura.";
+  for (const { item, status, expired } of r.dropped) {
+    const why = expired
+      ? "Desisti de enviar depois de muitas tentativas falhadas."
+      : status === 413
+        ? "A imagem é demasiado grande para o servidor."
+        : "O servidor recusou esta captura.";
     await notify(`recorte-dropped-${item.id}`, "Não foi possível guardar", `${why} (${item.meta.pageTitle || item.meta.url})`);
   }
   if (r.authNeeded) {
@@ -251,7 +257,17 @@ async function startCapture(tab: Tab | undefined, kind: CaptureKind, srcUrl?: st
   }
 }
 
+/** Throws TabChangedError once `tab` is no longer the active tab at the same URL. */
+function guardFor(tab: Tab): () => Promise<void> {
+  return makeTabGuard({ tabId: tab.id!, windowId: tab.windowId!, url: tab.url! }, (id) => browser.tabs.get(id));
+}
+
 async function captureFailed(tab: Tab, e: unknown): Promise<void> {
+  if (e instanceof TabChangedError) {
+    // The user is on another tab now: a system notification, not an in-page toast.
+    await notify("recorte-capture-error", "Recorte", e.message);
+    return;
+  }
   console.error("[recorte] capture failed", e);
   const message = e instanceof Error ? e.message : String(e);
   await toastOrNotify(tab.id, { type: "recorte:toast", text: `Não foi possível capturar: ${message}`, tone: "error" }, () =>
@@ -262,10 +278,11 @@ async function captureFailed(tab: Tab, e: unknown): Promise<void> {
 async function captureKind(tab: Tab, kind: Exclude<CaptureKind, "area">, srcUrl?: string): Promise<Captured> {
   const tabId = tab.id!;
   const windowId = tab.windowId!;
+  const guard = guardFor(tab);
   if (kind === "visible") {
     const m = await toTab<PageMetrics>(tabId, { type: "recorte:metrics" });
     await toTab(tabId, { type: "recorte:prepare-capture" });
-    const bmp = await captureVisible(windowId);
+    const bmp = await captureVisible(windowId, guard);
     const rect = { x: 0, y: 0, width: m.clientWidth, height: m.innerHeight };
     const canvas = cropToRect(bmp, rect, m.innerWidth);
     bmp.close();
@@ -273,24 +290,32 @@ async function captureKind(tab: Tab, kind: Exclude<CaptureKind, "area">, srcUrl?
   }
   if (kind === "full") {
     if (isFirefox) {
+      await guard();
       const m = await toTab<PageMetrics>(tabId, { type: "recorte:metrics" });
-      return captureFullFirefox(tabId, m);
+      const full = await captureFullFirefox(tabId, m);
+      await guard(); // navigated meanwhile?
+      return full;
     }
     return captureFullStitched(windowId, {
       metrics: () => toTab<PageMetrics>(tabId, { type: "recorte:metrics" }),
       scrollTo: (y, hideFixed) => toTab<number>(tabId, { type: "recorte:scroll-to", y, hideFixed }),
       restore: (x, y) => toTab<void>(tabId, { type: "recorte:restore", x, y }),
-    });
+    }, guard);
   }
   // "Guardar esta imagem": scroll to the element, capture, crop to its box. If the element cannot be found
   // (e.g. inside an iframe), fetch the image itself.
   const located = srcUrl ? await toTab<LocatedImage | null>(tabId, { type: "recorte:locate-image", srcUrl }) : null;
   if (located) {
-    const m = await toTab<PageMetrics>(tabId, { type: "recorte:metrics" });
-    const bmp = await captureVisible(windowId);
-    const canvas = cropToRect(bmp, located.rect, m.innerWidth);
-    bmp.close();
-    return { canvas, rect: located.rect, truncated: false, image: { alt: located.alt, caption: located.caption } };
+    try {
+      const m = await toTab<PageMetrics>(tabId, { type: "recorte:metrics" });
+      const bmp = await captureVisible(windowId, guard);
+      const canvas = cropToRect(bmp, located.rect, m.innerWidth);
+      bmp.close();
+      return { canvas, rect: located.rect, truncated: false, image: { alt: located.alt, caption: located.caption } };
+    } finally {
+      // locate-image scrolled the element into view: put the page back where the user had it.
+      await toTab(tabId, { type: "recorte:restore", x: located.scroll.x, y: located.scroll.y }).catch(() => {});
+    }
   }
   if (!srcUrl) throw new Error("imagem não encontrada");
   // No cookies: the page's ambient credentials must not be used by the extension.
@@ -349,7 +374,7 @@ async function onAreaSelected(tab: Tab | undefined, rect: Rect | null): Promise<
   if (!tab?.id || !rect) return;
   try {
     const m = await toTab<PageMetrics>(tab.id, { type: "recorte:metrics" });
-    const bmp = await captureVisible(tab.windowId!);
+    const bmp = await captureVisible(tab.windowId!, guardFor(tab));
     const canvas = cropToRect(bmp, rect, m.innerWidth);
     bmp.close();
     await finishCapture(tab, "area", { canvas, rect, truncated: false });
@@ -453,6 +478,22 @@ async function handleMessage(msg: BackgroundMessage, sender: Browser.runtime.Mes
       void onAreaSelected(sender.tab, msg.rect);
       return { ok: true };
     case "recorte:draft-info":
+    case "recorte:draft-save":
+    case "recorte:draft-cancel":
+      // Only the dialog page may read or settle drafts.
+      if (!sender.url?.startsWith(browser.runtime.getURL("/dialog.html"))) return { ok: false, error: "forbidden" };
+      return handleDraft(msg, sender);
+    default:
+      return handleOther(msg, sender);
+  }
+}
+
+async function handleDraft(
+  msg: Extract<BackgroundMessage, { type: "recorte:draft-info" | "recorte:draft-save" | "recorte:draft-cancel" }>,
+  sender: Browser.runtime.MessageSender,
+): Promise<unknown> {
+  switch (msg.type) {
+    case "recorte:draft-info":
       return draftInfo(msg.draftId);
     case "recorte:draft-save":
       await closeDialog(sender.tab?.id);
@@ -462,6 +503,11 @@ async function handleMessage(msg: BackgroundMessage, sender: Browser.runtime.Mes
       await closeDialog(sender.tab?.id);
       await store.deleteDraft(msg.draftId);
       return { ok: true };
+  }
+}
+
+async function handleOther(msg: BackgroundMessage, sender: Browser.runtime.MessageSender): Promise<unknown> {
+  switch (msg.type) {
     case "recorte:discard-parked": {
       // Drops every capture that is not for the current connection (or all of them when disconnected).
       const current = accountOf(await getSettings());

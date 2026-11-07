@@ -2,7 +2,7 @@ import "fake-indexeddb/auto";
 import type { UploadMeta } from "@recorte/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { UploadResult } from "../lib/api";
-import { IdbQueueStore, accountKey, backoffMs, countByAccount, drainQueue, newQueueItem, openRecorteDb } from "../lib/queue";
+import { IdbQueueStore, MAX_AGE_MS, MAX_ATTEMPTS, accountKey, backoffMs, countByAccount, drainQueue, newQueueItem, openRecorteDb } from "../lib/queue";
 
 const ACC = accountKey("https://a.example", "user-1");
 const OTHER = accountKey("https://b.example", "user-2");
@@ -101,6 +101,28 @@ describe("drainQueue", () => {
     expect(await countByAccount(store)).toEqual(new Map([[OTHER, 1]]));
     // Same account re-connected later (new device token, same server + user) → sent.
     await drainQueue(store, up, { account: OTHER, now: () => 10 });
+    expect(await store.count()).toBe(0);
+  });
+
+  it("drops a transiently failing item after MAX_ATTEMPTS attempts", async () => {
+    await store.put({ ...newQueueItem(image(), "image/webp", meta, ACC, 0), attempts: MAX_ATTEMPTS - 2 });
+    const fail = respond({ ok: false, status: 503, error: "" });
+    let r = await drainQueue(store, fail, { account: ACC, now: () => 1, force: true });
+    expect(r.dropped).toHaveLength(0);
+    expect((await store.all())[0]!.attempts).toBe(MAX_ATTEMPTS - 1);
+    r = await drainQueue(store, fail, { account: ACC, now: () => 2, force: true });
+    expect(r.dropped).toHaveLength(1);
+    expect(r.dropped[0]!.expired).toBe(true);
+    expect(await store.count()).toBe(0);
+  });
+
+  it("drops a transiently failing item older than 7 days, but never on 401", async () => {
+    await store.put(newQueueItem(image(), "image/webp", meta, ACC, 0));
+    let r = await drainQueue(store, respond({ ok: false, status: 401, error: "" }), { account: ACC, now: () => MAX_AGE_MS + 1 });
+    expect(r.authNeeded).toBe(true);
+    expect(await store.count()).toBe(1);
+    r = await drainQueue(store, respond({ ok: false, status: 0, error: "offline" }), { account: ACC, now: () => MAX_AGE_MS + 1 });
+    expect(r.dropped[0]!.expired).toBe(true);
     expect(await store.count()).toBe(0);
   });
 });

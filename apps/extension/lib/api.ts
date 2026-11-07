@@ -181,6 +181,7 @@ export async function uploadItem(
   image: ArrayBuffer,
   mime: string,
   meta: UploadMeta,
+  captureId?: string,
 ): Promise<UploadResult> {
   const form = new FormData();
   const ext = mime === "image/webp" ? "webp" : mime === "image/png" ? "png" : "jpg";
@@ -189,7 +190,8 @@ export async function uploadItem(
   try {
     const res = await fetch(`${conn.server}${API.items}`, {
       method: "POST",
-      headers: headers(conn, version),
+      // Stable per capture across retries (queue item id). The server does not dedupe yet; it is for logs.
+      headers: headers(conn, version, captureId ? { "x-capture-id": captureId } : undefined),
       body: form,
       credentials: "omit",
     });

@@ -117,6 +117,7 @@ export default defineContentScript({
           removeAllUi();
           const img = findImage(msg.srcUrl);
           if (!img) return null;
+          const before = { x: scrollX, y: scrollY };
           img.scrollIntoView({ block: "center", inline: "center", behavior: "instant" });
           await nextFrames(2);
           await new Promise((r) => setTimeout(r, 80));
@@ -126,10 +127,13 @@ export default defineContentScript({
           const x = Math.max(0, r.left);
           const y = Math.max(0, r.top);
           const rect = { x, y, width: Math.min(vw, r.right) - x, height: Math.min(vh, r.bottom) - y };
-          if (rect.width < 2 || rect.height < 2) return null;
+          if (rect.width < 2 || rect.height < 2) {
+            scrollTo({ left: before.x, top: before.y, behavior: "instant" });
+            return null;
+          }
           const fig = img.closest("figure");
           const caption = fig?.querySelector("figcaption")?.textContent ?? img.title ?? "";
-          const out: LocatedImage = { rect, alt: img.alt ?? "", caption };
+          const out: LocatedImage = { rect, alt: img.alt ?? "", caption, scroll: before };
           return out;
         }
         case "recorte:extract": {

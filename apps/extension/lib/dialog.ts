@@ -287,9 +287,7 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     };
     form.addEventListener("submit", (e) => (e.preventDefault(), submit()));
     cancel.addEventListener("click", () => finish(null));
-    backdrop.addEventListener("mousedown", (e) => {
-      if (e.target === backdrop) finish(null);
-    });
+    // A click outside the panel does nothing: only Cancelar / Esc discard the capture.
     container.ownerDocument.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();

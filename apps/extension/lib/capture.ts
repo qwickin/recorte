@@ -13,12 +13,16 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 let lastCaptureAt = 0;
 
-/** `captureVisibleTab`, spaced ≥550 ms apart (Chrome allows 2 calls/s). Returns a decoded bitmap. */
-export async function captureVisible(windowId: number): Promise<ImageBitmap> {
+/** `captureVisibleTab`, spaced ≥550 ms apart (Chrome allows 2 calls/s). Returns a decoded bitmap.
+ *  `guard` (see lib/guard.ts) runs right before and right after the call and throws if the user switched tabs
+ *  or the tab navigated: captureVisibleTab captures whatever tab is active in the window. */
+export async function captureVisible(windowId: number, guard?: () => Promise<void>): Promise<ImageBitmap> {
   const wait = throttleDelay(lastCaptureAt, Date.now(), MIN_CAPTURE_INTERVAL_MS);
   if (wait) await sleep(wait);
+  await guard?.();
   lastCaptureAt = Date.now();
   const dataUrl = await browser.tabs.captureVisibleTab(windowId, { format: "png" });
+  await guard?.();
   return dataUrlToBitmap(dataUrl);
 }
 
@@ -88,6 +92,7 @@ export interface FullPageDriver {
 export async function captureFullStitched(
   windowId: number,
   drive: FullPageDriver,
+  guard?: () => Promise<void>,
 ): Promise<{ canvas: OffscreenCanvas; truncated: boolean }> {
   const m = await drive.metrics();
   const plan = planFullPageStrips(m.pageHeight, m.innerHeight);
@@ -97,7 +102,7 @@ export async function captureFullStitched(
   try {
     for (let i = 0; i < plan.offsets.length; i++) {
       const y = await drive.scrollTo(plan.offsets[i]!, i > 0);
-      const bmp = await captureVisible(windowId);
+      const bmp = await captureVisible(windowId, guard);
       const s = bmp.width / Math.max(1, m.innerWidth);
       if (!canvas) {
         out = outputScale(m.clientWidth, plan.height, s);
