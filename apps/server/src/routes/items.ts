@@ -15,6 +15,8 @@ export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 const MAX_ORIGINAL_WIDTH = 3200;
 const THUMB_WIDTH = 640;
 const WEBP_MAX_DIM = 16383;
+// Full page max 12 000 CSS px x DPR 2 x ~2880 px wide ~ 69M pixels.
+const MAX_INPUT_PIXELS = 120_000_000;
 
 const Bulk = z.object({
   ids: z.array(z.string()).min(1).max(200),
@@ -65,9 +67,16 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
 
       let original: Buffer, thumb: Buffer;
       let width: number, height: number;
+      const input = Buffer.from(await image.arrayBuffer());
       try {
-        const input = Buffer.from(await image.arrayBuffer());
-        const base = () => sharp(input, { limitInputPixels: 400_000_000 }).rotate();
+        // Header-only check, before any pixel decoding.
+        const head = await sharp(input, { limitInputPixels: false }).metadata();
+        if ((head.width ?? 0) * (head.height ?? 0) > MAX_INPUT_PIXELS) return c.json({ error: "image_too_large" }, 413);
+      } catch {
+        return c.json({ error: "invalid_image" }, 400);
+      }
+      try {
+        const base = () => sharp(input, { limitInputPixels: MAX_INPUT_PIXELS }).rotate();
         const o = await base()
           .resize({ width: MAX_ORIGINAL_WIDTH, height: WEBP_MAX_DIM, fit: "inside", withoutEnlargement: true })
           .webp({ quality: 90 })
@@ -104,14 +113,22 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
         text: parsed.text,
         ...(parsed.truncated ? { truncated: true } : {}),
       };
-      deps.storage.writeFile(userId, id, "original.webp", original);
-      deps.storage.writeFile(userId, id, "thumb.webp", thumb);
-      return c.json(await svc.create(meta), 201);
+      try {
+        deps.storage.writeFile(userId, id, "original.webp", original);
+        deps.storage.writeFile(userId, id, "thumb.webp", thumb);
+        return c.json(await svc.create(meta), 201);
+      } catch (e) {
+        // Do not leave an orphan directory (files without a row) behind.
+        try {
+          if (!repo.owns(userId, id)) deps.storage.removeItem(userId, id);
+        } catch {}
+        throw e;
+      }
     },
   );
 
   app.get("/api/items", auth, (c) => {
-    const q = ListQuery.safeParse(c.req.queries() && flatQuery(c.req.queries()));
+    const q = ListQuery.safeParse(flatQuery(c.req.queries()));
     if (!q.success) return c.json({ error: "invalid_query" }, 400);
     try {
       return c.json(repo.list(c.var.userId, q.data));

@@ -1,9 +1,14 @@
-import { existsSync, readFileSync } from "node:fs";
+import { crc32, deflateSync } from "node:zlib";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import type { ItemSummary, UploadMeta } from "@recorte/shared";
+import { createUser } from "../src/auth/users";
+import { EventBus } from "../src/events";
 import { purgeTrash } from "../src/items/purge";
+import { itemsRepo } from "../src/items/repo";
+import { Storage } from "../src/storage";
 import { makeApp, login } from "./helpers";
 
 type T = Awaited<ReturnType<typeof makeApp>>;
@@ -139,15 +144,13 @@ describe("items", () => {
     const { t, cookie } = await setup();
     const a = (await (await upload(t, cookie, { tags: ["lisboa"] })).json()) as ItemSummary;
     // simulate Task 5 having written the ai block
-    t.db.prepare("SELECT 1").get();
-    const dir = (await import("../src/storage")).Storage;
-    const storage = new dir(t.dir);
+    const storage = new Storage(t.dir);
     const row = t.db.prepare("SELECT user_id FROM items WHERE id = ?").get(a.id) as { user_id: string };
     const m = storage.readMeta(row.user_id, a.id)!;
     m.ai.tipo = ["mapa"];
     m.ai.visual = ["modo escuro"];
     storage.writeMeta(m);
-    (await import("../src/items/repo")).itemsRepo(t.db).upsertFromMeta(m);
+    itemsRepo(t.db).upsertFromMeta(m);
     const counts = async () => (await (await get(t, "/api/tags", cookie)).json()) as { tag: string; count: number; origin: string }[];
     expect((await counts()).map((c) => c.tag).sort()).toEqual(["lisboa", "mapa", "modo escuro"]);
     expect((await counts()).find((c) => c.tag === "mapa")!.origin).toBe("ai");
@@ -214,7 +217,6 @@ describe("items", () => {
     expect((await get(t, `/api/items/${a.id}/files/..%2F..%2Frecorte.db`, cookie)).status).toBe(404);
     expect((await get(t, `/api/items/${a.id}/files/original.webp`, cookie)).status).toBe(200);
     // second user
-    const { createUser } = await import("../src/auth/users");
     await createUser(t.db, "two@example.com", "another long password");
     const c2 = (await t.json("/api/login", { email: "two@example.com", password: "another long password" })).headers.get("set-cookie")!.split(";")[0]!;
     expect((await get(t, a.thumb, c2)).status).toBe(404);
@@ -295,7 +297,6 @@ describe("items", () => {
   });
 
   it("SSE sends heartbeat comments", async () => {
-    const { EventBus } = await import("../src/events");
     const { t, cookie } = await setup({ deps: { events: new EventBus(20) } });
     const reader = (await get(t, "/api/events", cookie)).body!.getReader();
     const dec = new TextDecoder();
@@ -305,7 +306,6 @@ describe("items", () => {
   });
 
   it("extension info and downloads", async () => {
-    const { mkdirSync, writeFileSync } = await import("node:fs");
     const { t, cookie } = await setup({ env: { EXTENSION_VERSION: "0.1.7" } });
     expect((await t.app.request("/api/extension")).status).toBe(401);
     expect(await (await get(t, "/api/extension", cookie)).json()).toEqual({
@@ -332,7 +332,6 @@ describe("items", () => {
     const b = (await (await upload(t, cookie)).json()) as ItemSummary;
     await send(t, "DELETE", `/api/items/${a.id}`, cookie);
     await send(t, "DELETE", `/api/items/${b.id}`, cookie);
-    const { Storage } = await import("../src/storage");
     const storage = new Storage(t.dir);
     const uid = (t.db.prepare("SELECT user_id FROM items WHERE id = ?").get(a.id) as { user_id: string }).user_id;
     const dirA = storage.itemDir(uid, a.id);
@@ -342,5 +341,44 @@ describe("items", () => {
     expect(existsSync(dirA)).toBe(false);
     expect(t.db.prepare("SELECT COUNT(*) AS n FROM items").get()).toEqual({ n: 1 });
     expect(existsSync(storage.itemDir(uid, b.id))).toBe(true);
+  });
+
+  it("rejects non-http(s) source urls", async () => {
+    const { t, cookie } = await setup();
+    for (const url of ["javascript:alert(1)", "data:text/html,x", "not a url", "ftp://x.org/a"]) {
+      expect((await upload(t, cookie, { url })).status).toBe(400);
+    }
+    expect((await upload(t, cookie, { url: "http://ok.org/a" })).status).toBe(201);
+  });
+
+  it("rejects oversized images from the header, before decoding", async () => {
+    const { t, cookie } = await setup();
+    const chunk = (type: string, data: Buffer) => {
+      const len = Buffer.alloc(4);
+      len.writeUInt32BE(data.length);
+      const body = Buffer.concat([Buffer.from(type), data]);
+      const crc = Buffer.alloc(4);
+      crc.writeUInt32BE(crc32(body));
+      return Buffer.concat([len, body, crc]);
+    };
+    const ihdr = Buffer.alloc(13);
+    ihdr.writeUInt32BE(20000, 0);
+    ihdr.writeUInt32BE(20000, 4);
+    ihdr[8] = 8;
+    ihdr[9] = 2;
+    const fake = Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", deflateSync(Buffer.alloc(1))), chunk("IEND", Buffer.alloc(0))]);
+    const fd = new FormData();
+    fd.set("image", new Blob([new Uint8Array(fake)]), "x.png");
+    fd.set("meta", JSON.stringify(meta()));
+    expect((await t.app.request("/api/items", { method: "POST", headers: { cookie }, body: fd })).status).toBe(413);
+  });
+
+  it("export streams ~20 items with all entries", async () => {
+    const { t, cookie } = await setup();
+    const ids: string[] = [];
+    for (let i = 0; i < 20; i++) ids.push(((await (await upload(t, cookie, {}, i % 2 ? "#ff0000" : "#00ff00")).json()) as ItemSummary).id);
+    const res = await get(t, "/api/export", cookie);
+    const text = Buffer.from(await res.arrayBuffer()).toString("latin1");
+    for (const id of ids) for (const f of ["meta.json", "original.webp", "thumb.webp"]) expect(text).toContain(`${id}/${f}`);
   });
 });

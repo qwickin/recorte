@@ -1,3 +1,4 @@
+import { createReadStream, existsSync } from "node:fs";
 import { Readable } from "node:stream";
 import { ZipArchive } from "archiver";
 import type { Hono } from "hono";
@@ -18,8 +19,9 @@ export function exportRoutes(app: Hono<AppEnv>, deps: Deps): void {
         if (!meta) continue;
         zip.append(JSON.stringify({ ...meta, schemaVersion: 1 }, null, 2), { name: `${id}/meta.json` });
         for (const file of new Set(meta.media.flatMap((m) => [m.file, m.thumb]))) {
-          const data = deps.storage.readFile(userId, id, file);
-          if (data) zip.append(data, { name: `${id}/${file}` });
+          // Lazy stream: archiver opens/reads one entry at a time and the output applies backpressure.
+          const path = deps.storage.filePath(userId, id, file);
+          if (path && existsSync(path)) zip.append(createReadStream(path), { name: `${id}/${file}` });
         }
       }
       await zip.finalize();

@@ -34,6 +34,12 @@ export class Storage {
     atomicWrite(join(this.ensureItemDir(userId, id), name), data);
   }
 
+  /** Absolute path of a known item file, or null when the name/id is not valid. Does not check existence. */
+  filePath(userId: string, id: string, name: string): string | null {
+    if (!FILE_NAME_RE.test(name) || !ULID_RE.test(id)) return null;
+    return join(this.itemDir(userId, id), name);
+  }
+
   readFile(userId: string, id: string, name: string): Buffer | null {
     if (!FILE_NAME_RE.test(name) || !ULID_RE.test(id)) return null;
     try {
@@ -54,7 +60,8 @@ export class Storage {
     try {
       const raw = JSON.parse(readFileSync(join(this.itemDir(userId, id), "meta.json"), "utf8"));
       return Item.parse(raw);
-    } catch {
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "ENOENT") console.warn(`readMeta ${id} failed:`, (e as Error).message);
       return null;
     }
   }

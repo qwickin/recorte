@@ -98,7 +98,17 @@ export type ItemPage = z.infer<typeof ItemPage>;
 export const UploadMeta = z.object({
   type: ItemType,
   kind: CaptureKind,
-  url: z.string().min(1),
+  url: z
+    .string()
+    .url()
+    .refine((u) => {
+      try {
+        const p = new URL(u).protocol;
+        return p === "http:" || p === "https:";
+      } catch {
+        return false;
+      }
+    }, "url must be http(s)"),
   pageTitle: z.string(),
   title: z.string().optional(),
   note: z.string().optional(),
