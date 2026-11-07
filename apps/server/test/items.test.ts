@@ -381,4 +381,35 @@ describe("items", () => {
     const text = Buffer.from(await res.arrayBuffer()).toString("latin1");
     for (const id of ids) for (const f of ["meta.json", "original.webp", "thumb.webp"]) expect(text).toContain(`${id}/${f}`);
   });
+
+  it("export of 600 items completes without opening all files at once", async () => {
+    const { t, cookie } = await setup();
+    const uid = (t.db.prepare("SELECT id FROM users LIMIT 1").get() as { id: string }).id;
+    const storage = new Storage(t.dir);
+    const repo = itemsRepo(t.db);
+    const { ulid } = await import("../src/ids");
+    const ids: string[] = [];
+    for (let i = 0; i < 600; i++) {
+      const id = ulid();
+      ids.push(id);
+      const now = new Date().toISOString();
+      const m = {
+        id, userId: uid, type: "screenshot" as const, kind: "area" as const,
+        source: { url: "https://a.org/", site: "a.org", pageTitle: "p" },
+        createdAt: now, updatedAt: now, deletedAt: null,
+        media: [{ file: "original.webp", thumb: "thumb.webp", width: 1, height: 1, color: "#000000", role: "main" as const }],
+        user: { tags: [], categoryId: null, hiddenAiTags: [] },
+        ai: { tipo: [], visual: [], keys: [], colors: [], model: "", processedAt: null },
+        text: { selection: "", meta: {}, headings: [], alts: [] },
+      };
+      storage.writeFile(uid, id, "original.webp", Buffer.from("o"));
+      storage.writeFile(uid, id, "thumb.webp", Buffer.from("t"));
+      storage.writeMeta(m);
+      repo.upsertFromMeta(m);
+    }
+    const res = await get(t, "/api/export", cookie);
+    expect(res.status).toBe(200);
+    const text = Buffer.from(await res.arrayBuffer()).toString("latin1");
+    for (const id of ids) for (const f of ["meta.json", "original.webp", "thumb.webp"]) expect(text).toContain(`${id}/${f}`);
+  }, 30_000);
 });

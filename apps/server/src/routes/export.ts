@@ -13,15 +13,30 @@ export function exportRoutes(app: Hono<AppEnv>, deps: Deps): void {
     const zip = new ZipArchive({ store: true });
     zip.on("warning", (e: Error) => console.warn("export warning:", e.message));
     zip.on("error", (e: Error) => console.error("export error:", e));
+    // Entries are appended one at a time: the next file is opened only after archiver finished the
+    // previous one (and the consumer drained enough output), so at most one fd is open at once.
+    const added = (): Promise<void> =>
+      new Promise((resolve, reject) => {
+        const done = () => (zip.off("entry", done), zip.off("error", fail), zip.off("close", done), resolve());
+        const fail = (e: Error) => (zip.off("entry", done), zip.off("close", done), reject(e));
+        zip.once("entry", done);
+        zip.once("error", fail);
+        zip.once("close", done);
+      });
+    const add = async (source: string | NodeJS.ReadableStream, name: string): Promise<void> => {
+      const p = added();
+      zip.append(source as string, { name });
+      await p;
+    };
     (async () => {
       for (const id of repo.liveIds(userId)) {
+        if (zip.destroyed) return;
         const meta = deps.storage.readMeta(userId, id);
         if (!meta) continue;
-        zip.append(JSON.stringify({ ...meta, schemaVersion: 1 }, null, 2), { name: `${id}/meta.json` });
+        await add(JSON.stringify({ ...meta, schemaVersion: 1 }, null, 2), `${id}/meta.json`);
         for (const file of new Set(meta.media.flatMap((m) => [m.file, m.thumb]))) {
-          // Lazy stream: archiver opens/reads one entry at a time and the output applies backpressure.
           const path = deps.storage.filePath(userId, id, file);
-          if (path && existsSync(path)) zip.append(createReadStream(path), { name: `${id}/${file}` });
+          if (path && existsSync(path)) await add(createReadStream(path), `${id}/${file}`);
         }
       }
       await zip.finalize();
