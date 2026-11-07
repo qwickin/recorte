@@ -123,27 +123,47 @@ describe("setup", () => {
     expect(rs.map((r) => r.status).sort()).toEqual([201, 409]);
     expect(countUsers(t.db)).toBe(1);
   });
-  it("closes 15 minutes after start: 403 setup_closed with a restart hint, no owner created", async () => {
+  it("closes 15 minutes after start (injected monotonic clock): 403 setup_closed with a restart hint", async () => {
+    let now = 1_000;
+    const t = await makeApp({ deps: { clock: () => now } });
+    now += 15 * 60_000 - 1;
+    expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: true, open: true });
+    now += 1;
+    expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: true, open: false });
+    const r = await t.json("/api/setup", { password: PASSWORD });
+    expect(r.status).toBe(403);
+    const b = (await r.json()) as { error: string; message: string };
+    expect(b.error).toBe("setup_closed");
+    expect(b.message).toMatch(/Reinicia o container/);
+    expect(countUsers(t.db)).toBe(0);
+  });
+  it("wall-clock steps do not move the window", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     try {
-      const t = await makeApp();
-      vi.setSystemTime(Date.now() + 15 * 60_000 + 1);
-      expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: true, open: false });
-      const r = await t.json("/api/setup", { password: PASSWORD });
-      expect(r.status).toBe(403);
-      const b = (await r.json()) as { error: string; message: string };
-      expect(b.error).toBe("setup_closed");
-      expect(b.message).toMatch(/Reinicia o container/);
-      expect(countUsers(t.db)).toBe(0);
+      let now = 0;
+      const t = await makeApp({ deps: { clock: () => now } });
+      vi.setSystemTime(Date.now() + 24 * 3_600_000); // clock jumps forward a day: still open
+      expect(((await (await t.app.request("/api/setup")).json()) as { open: boolean }).open).toBe(true);
+      now = 15 * 60_000;
+      vi.setSystemTime(Date.now() - 48 * 3_600_000); // jumps back: still closed after 15 monotonic minutes
+      expect(((await (await t.app.request("/api/setup")).json()) as { open: boolean }).open).toBe(false);
     } finally {
       vi.useRealTimers();
     }
   });
   it("honours an injected window (deps.setupOpenUntil)", async () => {
-    const closed = await makeApp({ deps: { setupOpenUntil: Date.now() - 1 } });
+    const closed = await makeApp({ deps: { clock: () => 100, setupOpenUntil: 100 } });
     expect((await closed.json("/api/setup", { password: PASSWORD })).status).toBe(403);
-    const open = await makeApp({ deps: { setupOpenUntil: Date.now() + 60_000 } });
+    const open = await makeApp({ deps: { clock: () => 100, setupOpenUntil: 101 } });
     expect((await open.json("/api/setup", { password: PASSWORD })).status).toBe(201);
+  });
+  it("default clock is monotonic (performance.now)", async () => {
+    const { monotonicMs, resolveDeps, SETUP_WINDOW_MS } = await import("../src/deps");
+    const t = await makeApp();
+    const d = resolveDeps({ db: t.db, config: t.config });
+    expect(d.clock).toBe(monotonicMs);
+    expect(d.setupOpenUntil - performance.now()).toBeGreaterThan(SETUP_WINDOW_MS - 5_000);
+    expect(d.setupOpenUntil - performance.now()).toBeLessThanOrEqual(SETUP_WINDOW_MS);
   });
   it("Origin check applies to setup", async () => {
     const t = await makeApp();

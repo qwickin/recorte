@@ -36,13 +36,11 @@ export interface MeiliPaths {
   db: string;
   dumps: string;
   snapshots: string;
-  /** Meilisearch keeps the embedder model in $HOME/.cache/huggingface; HOME is `root`, so it lives on the volume. */
-  cache: string;
 }
 
 export const meiliPaths = (dataDir: string): MeiliPaths => {
   const root = join(dataDir, "meili");
-  return { root, db: join(root, "data.ms"), dumps: join(root, "dumps"), snapshots: join(root, "snapshots"), cache: join(root, ".cache") };
+  return { root, db: join(root, "data.ms"), dumps: join(root, "dumps"), snapshots: join(root, "snapshots") };
 };
 
 export function meiliArgs(dataDir: string, port: number): string[] {
@@ -64,7 +62,8 @@ export function meiliArgs(dataDir: string, port: number): string[] {
  */
 export function meiliEnv(dataDir: string, key: string, parent: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
   const p = meiliPaths(dataDir);
-  // HOME on the volume: the embedder model (~450 MB, $HOME/.cache/huggingface) is downloaded only once.
+  // HOME on the volume: Meilisearch keeps the embedder model (~450 MB) in $HOME/.cache/huggingface (it ignores
+  // HF_HOME), so it is downloaded only once.
   const env: NodeJS.ProcessEnv = { MEILI_MASTER_KEY: key, HOME: p.root };
   for (const k of ["PATH", "TZ", "LANG", "SSL_CERT_FILE", "SSL_CERT_DIR", "HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy"]) {
     if (parent[k]) env[k] = parent[k];

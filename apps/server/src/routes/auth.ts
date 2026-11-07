@@ -28,7 +28,7 @@ async function body<T extends z.ZodType>(c: { req: { json(): Promise<unknown> } 
   }
 }
 
-export function authRoutes(app: Hono<AppEnv>, { db, config, setupOpenUntil }: Deps): void {
+export function authRoutes(app: Hono<AppEnv>, { db, config, clock, setupOpenUntil }: Deps): void {
   const auth = requireUser(db);
   const limit = bodyLimit({ maxSize: 16 * 1024, onError: (c) => c.json({ error: "payload_too_large" }, 413) });
 
@@ -44,7 +44,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config, setupOpenUntil }: De
 
   app.get(API.health, (c) => c.json({ ok: true, version: config.appVersion }));
 
-  const setupOpen = () => Date.now() < setupOpenUntil;
+  const setupOpen = () => clock() < setupOpenUntil;
 
   app.get(API.setup, (c) => {
     const needsSetup = countUsers(db) === 0;

@@ -13,15 +13,21 @@ export interface Deps {
   search: Search;
   queue: Queue;
   events: EventBus;
-  /** Epoch ms until which `/setup` accepts the owner's password (15 min after start). */
+  /** Monotonic clock in ms (wall-clock steps cannot move it). Injected by tests. */
+  clock: () => number;
+  /** `clock()` value until which `/setup` accepts the owner's password (15 min after start). */
   setupOpenUntil: number;
 }
 
 export const SETUP_WINDOW_MS = 15 * 60_000;
 
+/** Milliseconds since process start, monotonic. */
+export const monotonicMs = (): number => performance.now();
+
 export type DepsInput = Pick<Deps, "db" | "config"> & Partial<Deps>;
 
 export function resolveDeps(d: DepsInput): Deps {
+  const clock = d.clock ?? monotonicMs;
   return {
     db: d.db,
     config: d.config,
@@ -29,6 +35,7 @@ export function resolveDeps(d: DepsInput): Deps {
     search: d.search ?? new NoopSearch(),
     queue: d.queue ?? new SqliteQueue(d.db),
     events: d.events ?? new EventBus(),
-    setupOpenUntil: d.setupOpenUntil ?? Date.now() + SETUP_WINDOW_MS,
+    clock,
+    setupOpenUntil: d.setupOpenUntil ?? clock() + SETUP_WINDOW_MS,
   };
 }
