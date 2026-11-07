@@ -21,3 +21,5 @@ header p { margin: 0; }
 .shortcuts li { display: flex; justify-content: space-between; gap: 12px; }
 .small { font-size: 12px; margin: 0; }
 .error { margin: 0; font-size: 13px; }
+.parked { flex-direction: row; justify-content: space-between; align-items: center; gap: 16px; }
+.parked p { margin: 0; }

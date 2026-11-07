@@ -30,7 +30,7 @@ export default defineConfig({
       "capture-visible": { suggested_key: { default: "Alt+Shift+V" }, description: "Capturar parte visível" },
       "capture-full": { suggested_key: { default: "Alt+Shift+F" }, description: "Capturar página inteira" },
     },
-    web_accessible_resources: [{ resources: ["fonts/*.woff2"], matches: ["<all_urls>"] }],
+    web_accessible_resources: [{ resources: ["fonts/*.woff2", "dialog.html"], matches: ["<all_urls>"] }],
     ...(browser === "firefox"
       ? {
           browser_specific_settings: {

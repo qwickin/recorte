@@ -32,7 +32,8 @@ function render(s: Status, tabOk: boolean): void {
   for (const b of document.querySelectorAll<HTMLButtonElement>(".mode")) b.disabled = !tabOk || !s.configured;
   $<HTMLButtonElement>("gallery").disabled = !s.configured;
   $("queue").textContent =
-    s.pending === 0 ? "Fila vazia" : s.pending === 1 ? "1 captura por enviar" : `${s.pending} capturas por enviar`;
+    (s.pending === 0 ? "Fila vazia" : s.pending === 1 ? "1 captura por enviar" : `${s.pending} capturas por enviar`) +
+    (s.parked ? ` · ${s.parked} de outra ligação` : "");
   $("retry").hidden = s.pending === 0 || s.authNeeded;
 }
 

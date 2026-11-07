@@ -2,7 +2,11 @@ import { type Category, type TagCount, normalizeTag, normalizeTags } from "@reco
 import type { DialogInput } from "./messages";
 import { h, mount } from "./ui";
 
-/** Pre-save dialog (spec §6), drawn in a Shadow DOM with the gallery's look. */
+/**
+ * Pre-save dialog (spec §6) with the gallery's look. It is rendered inside an extension-origin page
+ * (entrypoints/dialog) shown in an iframe over the web page, so the page can neither read the form nor observe
+ * the keystrokes typed into it.
+ */
 
 export interface DialogOptions {
   preview: string;
@@ -14,7 +18,7 @@ export interface DialogOptions {
   createCategory(name: string): Promise<Category>;
 }
 
-const CSS = `
+export const DIALOG_CSS = `
 .backdrop { position: fixed; inset: 0; background: rgb(0 0 0 / .62); backdrop-filter: blur(6px);
   display: grid; place-items: center; padding: 24px; animation: rc-dim .18s ease-out; }
 .panel { position: relative; width: min(920px, 100%); max-height: min(640px, calc(100vh - 48px)); display: grid;
@@ -73,9 +77,8 @@ footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: auto; p
 /** Accent- and case-insensitive key for matching. */
 const fold = (s: string) => normalizeTag(s).normalize("NFD").replace(/\p{M}/gu, "");
 
-/** Opens the dialog; resolves with the user's input, or null when cancelled. */
-export function openSaveDialog(o: DialogOptions): Promise<DialogInput | null> {
-  const ui = mount(CSS, { interactive: true, name: "dialog" });
+/** Renders the dialog into `container`; resolves with the user's input, or null when cancelled. */
+export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Promise<DialogInput | null> {
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
   return new Promise((resolve) => {
@@ -83,7 +86,7 @@ export function openSaveDialog(o: DialogOptions): Promise<DialogInput | null> {
     const finish = (v: DialogInput | null) => {
       if (done) return;
       done = true;
-      ui.destroy();
+      container.replaceChildren();
       resolve(v);
     };
 
@@ -271,7 +274,7 @@ export function openSaveDialog(o: DialogOptions): Promise<DialogInput | null> {
     );
     const panel = h("div", { class: "panel", role: "dialog", "aria-modal": "true", "aria-label": "Guardar no Recorte" }, h("div", { class: "preview" }, img), form);
     const backdrop = h("div", { class: "backdrop" }, panel);
-    ui.container.append(backdrop);
+    container.append(backdrop);
 
     const submit = () => {
       if (tagInput.value.trim()) addTag(tagInput.value);
@@ -287,7 +290,7 @@ export function openSaveDialog(o: DialogOptions): Promise<DialogInput | null> {
     backdrop.addEventListener("mousedown", (e) => {
       if (e.target === backdrop) finish(null);
     });
-    ui.host.addEventListener("keydown", (e) => {
+    container.ownerDocument.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         submit();

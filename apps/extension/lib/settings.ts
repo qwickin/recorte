@@ -1,11 +1,14 @@
 import { browser } from "wxt/browser";
 import type { Connection } from "./api";
+import { accountKey } from "./queue";
 
 /** Everything persisted in `storage.local`. The password is never stored. */
 export interface Settings {
   server: string | null;
   token: string | null;
   deviceId: string | null;
+  /** Account id on the server (from /api/me); with `server` it scopes the offline queue. */
+  userId: string | null;
   email: string | null;
   /** "Guardar sem perguntar": skip the pre-save dialog. */
   saveWithoutAsking: boolean;
@@ -17,6 +20,7 @@ const DEFAULTS: Settings = {
   server: null,
   token: null,
   deviceId: null,
+  userId: null,
   email: null,
   saveWithoutAsking: false,
   authNeeded: false,
@@ -33,6 +37,11 @@ export async function setSettings(patch: Partial<Settings>): Promise<void> {
 
 export function connectionOf(s: Settings): Connection | null {
   return s.server && s.token ? { server: s.server, token: s.token } : null;
+}
+
+/** Queue scope of the current connection, or null when not connected. */
+export function accountOf(s: Settings): string | null {
+  return s.server && s.token && s.userId ? accountKey(s.server, s.userId) : null;
 }
 
 export const extensionVersion = (): string => browser.runtime.getManifest().version;

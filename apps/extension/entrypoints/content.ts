@@ -1,19 +1,13 @@
 import { browser } from "wxt/browser";
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { openSaveDialog, showToast } from "@/lib/dialog";
+import { showToast } from "@/lib/dialog";
 import { extractText } from "@/lib/extract";
-import type {
-  BackgroundMessage,
-  CategoriesResponse,
-  CategoryResponse,
-  ContentMessage,
-  ExtractResult,
-  LocatedImage,
-  PageMetrics,
-  TagsResponse,
-} from "@/lib/messages";
+import type { BackgroundMessage, ContentMessage, ExtractResult, LocatedImage, PageMetrics } from "@/lib/messages";
 import { selectArea } from "@/lib/overlay";
-import { HOST_TAG, nextFrames, removeAllUi } from "@/lib/ui";
+import { HOST_TAG, mount, nextFrames, removeAllUi } from "@/lib/ui";
+
+const FRAME_CSS = `iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; margin: 0; padding: 0;
+  background: transparent; color-scheme: normal; display: block; }`;
 
 /**
  * Injected on demand (scripting.executeScript) into the tab being captured — never on every page.
@@ -143,30 +137,20 @@ export default defineContentScript({
           const out: ExtractResult = { text, pageTitle: document.title || location.hostname };
           return out;
         }
-        case "recorte:dialog":
-          void openSaveDialog({
-            preview: msg.preview,
-            title: msg.title,
-            site: msg.site,
-            truncated: msg.truncated,
-            loadTags: async () => {
-              const r = await send<TagsResponse>({ type: "recorte:tags" });
-              if (!r.ok) throw new Error(r.error);
-              return r.tags;
-            },
-            loadCategories: async () => {
-              const r = await send<CategoriesResponse>({ type: "recorte:categories" });
-              if (!r.ok) throw new Error(r.error);
-              return r.categories;
-            },
-            createCategory: async (name) => {
-              const r = await send<CategoryResponse>({ type: "recorte:create-category", name });
-              if (!r.ok) throw new Error(r.error);
-              return r.category;
-            },
-          }).then((input) =>
-            send(input ? { type: "recorte:draft-save", draftId: msg.draftId, input } : { type: "recorte:draft-cancel", draftId: msg.draftId }),
-          );
+        case "recorte:dialog": {
+          // The form lives in an extension-origin iframe: the page cannot read it or see its keystrokes.
+          removeAllUi();
+          const ui = mount(FRAME_CSS, { interactive: true, name: "dialog" });
+          const frame = document.createElement("iframe");
+          frame.src = `${browser.runtime.getURL("/dialog.html")}#${encodeURIComponent(msg.draftId)}`;
+          frame.setAttribute("allowtransparency", "true");
+          frame.title = "Recorte";
+          frame.addEventListener("load", () => frame.contentWindow?.focus());
+          ui.container.append(frame);
+          return { ok: true };
+        }
+        case "recorte:close-dialog":
+          document.querySelectorAll('recorte-ui[data-recorte="dialog"]').forEach((e) => e.remove());
           return { ok: true };
         case "recorte:toast":
           showToast(

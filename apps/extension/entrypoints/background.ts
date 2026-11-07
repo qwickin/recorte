@@ -9,6 +9,7 @@ import {
   createTicket,
   fetchCategories,
   fetchExtensionInfo,
+  fetchMe,
   fetchTags,
   isHttpUrl,
   uploadItem,
@@ -23,9 +24,18 @@ import {
   previewDataUrl,
 } from "@/lib/capture";
 import type { Rect } from "@/lib/extract";
-import type { BackgroundMessage, ContentMessage, DialogInput, ExtractResult, LocatedImage, PageMetrics, Status } from "@/lib/messages";
-import { type DrainResult, IdbQueueStore, drainQueue, newQueueItem } from "@/lib/queue";
-import { connectionOf, extensionVersion, getSettings, setSettings } from "@/lib/settings";
+import type {
+  BackgroundMessage,
+  ContentMessage,
+  DialogInput,
+  DraftInfo,
+  ExtractResult,
+  LocatedImage,
+  PageMetrics,
+  Status,
+} from "@/lib/messages";
+import { type DrainResult, IdbQueueStore, countByAccount, drainQueue, newQueueItem } from "@/lib/queue";
+import { type Settings, accountOf, connectionOf, extensionVersion, getSettings, setSettings } from "@/lib/settings";
 
 const CONTENT_SCRIPT = "/content-scripts/content.js";
 const MENU_IMAGE = "recorte-save-image";
@@ -99,8 +109,34 @@ async function toastOrNotify(tabId: number | null | undefined, msg: Extract<Cont
 
 // ----------------------------------------------------------------------------------------------- badge / queue
 
+/** Settings with the account id filled in (older connections stored no userId: ask the server once). */
+async function connectedSettings(): Promise<Settings> {
+  const s = await getSettings();
+  const conn = connectionOf(s);
+  if (conn && !s.userId) {
+    try {
+      const me = await fetchMe(conn, extensionVersion());
+      await setSettings({ userId: me.id });
+      s.userId = me.id;
+    } catch {
+      // offline or revoked: the queue stays parked until the account is known
+    }
+  }
+  return s;
+}
+
+async function pendingCounts(s: Settings): Promise<{ pending: number; parked: number }> {
+  const byAccount = await countByAccount(store);
+  const account = accountOf(s);
+  let total = 0;
+  for (const n of byAccount.values()) total += n;
+  const pending = account ? (byAccount.get(account) ?? 0) : 0;
+  return { pending, parked: total - pending };
+}
+
 async function updateBadge(): Promise<void> {
-  const [count, s] = await Promise.all([store.count(), getSettings()]);
+  const s = await getSettings();
+  const { pending: count } = await pendingCounts(s);
   const text = count ? String(count) : s.authNeeded ? "!" : "";
   await action.setBadgeText({ text });
   await action.setBadgeBackgroundColor({ color: s.authNeeded ? "#d33" : "#fff" });
@@ -112,24 +148,40 @@ async function updateBadge(): Promise<void> {
 }
 
 let draining: Promise<DrainResult | null> | null = null;
+let rerun: { force: boolean } | null = null;
 
-/** Single-flight queue drain. `force` ignores backoff (user action, login, coming online). */
+/** Single-flight queue drain. `force` ignores backoff (user action, login, coming online). A request that
+ *  arrives while a drain runs schedules one more pass (and awaits it), so an item saved mid-drain is not left
+ *  waiting for the retry alarm. */
 function drain(force = false): Promise<DrainResult | null> {
-  draining ??= runDrain(force).finally(() => {
+  if (draining) {
+    rerun = { force: force || (rerun?.force ?? false) };
+    return draining;
+  }
+  draining = (async () => {
+    let r = await runDrain(force);
+    while (rerun) {
+      const next = rerun;
+      rerun = null;
+      r = await runDrain(next.force);
+    }
+    return r;
+  })().finally(() => {
     draining = null;
   });
   return draining;
 }
 
 async function runDrain(force: boolean): Promise<DrainResult | null> {
-  const s = await getSettings();
+  const s = await connectedSettings();
   const conn = connectionOf(s);
-  if (!conn) {
+  const account = accountOf(s);
+  if (!conn || !account) {
     await updateBadge();
     return null;
   }
   const version = extensionVersion();
-  const r = await drainQueue(store, (item) => uploadItem(conn, version, item.image, item.mime, item.meta), { force });
+  const r = await drainQueue(store, (item) => uploadItem(conn, version, item.image, item.mime, item.meta), { account, force });
 
   if (r.saved.length && s.authNeeded) await setSettings({ authNeeded: false });
   for (const { item } of r.saved) {
@@ -261,24 +313,36 @@ async function finishCapture(tab: Tab, kind: CaptureKind, c: Captured): Promise<
     truncated: c.truncated,
   });
   const encoded = await encodeImage(c.canvas);
-  const s = await getSettings();
+  const s = await connectedSettings();
+  const account = accountOf(s);
+  if (!account) throw new Error("não foi possível identificar a conta no servidor");
   if (s.saveWithoutAsking) {
-    await store.put({ ...newQueueItem(encoded.data, encoded.mime, meta), tabId });
+    await store.put({ ...newQueueItem(encoded.data, encoded.mime, meta, account), tabId });
     await updateBadge();
     await drain(true);
     return;
   }
   const draftId = crypto.randomUUID();
-  await store.putDraft({ id: draftId, image: encoded.data, mime: encoded.mime, meta, tabId, createdAt: Date.now() });
-  await toTab(tabId, {
-    type: "recorte:dialog",
-    draftId,
+  await store.putDraft({
+    id: draftId,
+    account,
+    image: encoded.data,
+    mime: encoded.mime,
+    meta,
     preview: await previewDataUrl(c.canvas),
-    title: meta.pageTitle,
-    site: siteOf(meta.url),
-    kind,
-    truncated: c.truncated,
+    tabId,
+    createdAt: Date.now(),
   });
+  await toTab(tabId, { type: "recorte:dialog", draftId });
+}
+
+async function draftInfo(draftId: string): Promise<DraftInfo | null> {
+  const d = await store.getDraft(draftId);
+  return d ? { preview: d.preview, title: d.meta.pageTitle, site: siteOf(d.meta.url), truncated: !!d.meta.truncated } : null;
+}
+
+async function closeDialog(tabId: number | undefined): Promise<void> {
+  if (tabId !== undefined) await toTab(tabId, { type: "recorte:close-dialog" }).catch(() => {});
 }
 
 async function onAreaSelected(tab: Tab | undefined, rect: Rect | null): Promise<void> {
@@ -305,7 +369,8 @@ async function saveDraft(draftId: string, input: DialogInput): Promise<void> {
     tags: input.tags,
     categoryId: input.categoryId,
   });
-  await store.put({ ...newQueueItem(d.image, d.mime, meta), tabId: d.tabId });
+  // The draft keeps the account it was captured for, even if the connection changed meanwhile.
+  await store.put({ ...newQueueItem(d.image, d.mime, meta, d.account), tabId: d.tabId });
   await store.deleteDraft(draftId);
   await updateBadge();
   await drain(true);
@@ -361,7 +426,7 @@ async function getStatus(): Promise<Status> {
     configured: !!conn,
     server: s.server,
     email: s.email,
-    pending: await store.count(),
+    ...(await pendingCounts(s)),
     authNeeded: s.authNeeded,
     version,
     update,
@@ -387,12 +452,25 @@ async function handleMessage(msg: BackgroundMessage, sender: Browser.runtime.Mes
     case "recorte:area-selected":
       void onAreaSelected(sender.tab, msg.rect);
       return { ok: true };
+    case "recorte:draft-info":
+      return draftInfo(msg.draftId);
     case "recorte:draft-save":
+      await closeDialog(sender.tab?.id);
       await saveDraft(msg.draftId, msg.input);
       return { ok: true };
     case "recorte:draft-cancel":
+      await closeDialog(sender.tab?.id);
       await store.deleteDraft(msg.draftId);
       return { ok: true };
+    case "recorte:discard-parked": {
+      // Drops every capture that is not for the current connection (or all of them when disconnected).
+      const current = accountOf(await getSettings());
+      for (const i of await store.all()) {
+        if (msg.account ? i.account === msg.account : i.account !== current) await store.delete(i.id);
+      }
+      await updateBadge();
+      return { ok: true };
+    }
     case "recorte:tags":
       return withConn((c, v) => fetchTags(c, v)).then(
         (tags) => ({ ok: true, tags }),
@@ -479,6 +557,7 @@ export default defineBackground(() => {
   // Debug/test hook (used by the Playwright smoke test through the service worker).
   (globalThis as unknown as { recorte: unknown }).recorte = {
     capture: async (kind: CaptureKind) => startCapture(await activeTab(), kind),
+    captureImage: async (srcUrl: string) => startCapture(await activeTab(), "image", srcUrl),
     drain: () => drain(true),
     status: getStatus,
   };

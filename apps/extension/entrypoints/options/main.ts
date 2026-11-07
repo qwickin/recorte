@@ -1,12 +1,12 @@
 import "@/assets/base.css";
 import "./style.css";
 import { browser } from "wxt/browser";
-import { ApiError, normalizeServerUrl, registerDevice, revokeDevice } from "@/lib/api";
-import type { BackgroundMessage } from "@/lib/messages";
-import { type Settings, connectionOf, extensionVersion, getSettings, setSettings } from "@/lib/settings";
+import { ApiError, fetchMe, normalizeServerUrl, registerDevice, revokeDevice } from "@/lib/api";
+import type { BackgroundMessage, Status } from "@/lib/messages";
+import { type Settings, accountOf, connectionOf, extensionVersion, getSettings, setSettings } from "@/lib/settings";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
-const send = (m: BackgroundMessage) => browser.runtime.sendMessage(m);
+const send = <T = unknown>(m: BackgroundMessage) => browser.runtime.sendMessage(m) as Promise<T>;
 const isFirefox = import.meta.env.FIREFOX;
 
 const COMMAND_LABELS: Record<string, string> = {
@@ -24,7 +24,15 @@ function defaultDeviceName(): string {
 
 let forceLogin = false;
 
+async function renderQueue(): Promise<void> {
+  const st = await send<Status>({ type: "recorte:status" });
+  $("parked").hidden = st.parked === 0;
+  $("parked-text").textContent =
+    st.parked === 1 ? "1 captura por enviar de outra ligação (servidor ou conta)." : `${st.parked} capturas por enviar de outra ligação (servidor ou conta).`;
+}
+
 function render(s: Settings): void {
+  void renderQueue();
   const connected = !!connectionOf(s);
   $("connected").hidden = !connected;
   $("login").hidden = connected && !forceLogin;
@@ -96,7 +104,9 @@ async function main(): Promise<void> {
     btn.textContent = "A ligar…";
     try {
       const { token, id } = await registerDevice(server, email, passwordInput.value, name);
-      await setSettings({ server, token, deviceId: id, email, authNeeded: false });
+      // The account id scopes the offline queue: captures are only ever sent to the account they were made for.
+      const me = await fetchMe({ server, token }, extensionVersion());
+      await setSettings({ server, token, deviceId: id, userId: me.id, email: me.email, authNeeded: false });
       passwordInput.value = "";
       forceLogin = false;
       await send({ type: "recorte:connected" });
@@ -128,11 +138,25 @@ async function main(): Promise<void> {
   });
   $("disconnect").addEventListener("click", async () => {
     const s = await getSettings();
+    const { pending } = await send<Status>({ type: "recorte:status" });
+    const discard =
+      pending > 0 &&
+      confirm(
+        `Há ${pending === 1 ? "1 captura" : `${pending} capturas`} por enviar para esta conta.\n\n` +
+          "OK: descartar.\nCancelar: manter na fila (só será enviada se voltares a ligar esta conta neste servidor).",
+      );
+    const account = accountOf(s);
     const conn = connectionOf(s);
     if (conn && s.deviceId && !s.authNeeded) await revokeDevice(conn, extensionVersion(), s.deviceId).catch(() => {});
-    await setSettings({ token: null, deviceId: null, authNeeded: false });
+    await setSettings({ token: null, deviceId: null, userId: null, authNeeded: false });
+    if (discard && account) await send({ type: "recorte:discard-parked", account });
     await send({ type: "recorte:connected" });
     render(await getSettings());
+  });
+  $("discard-parked").addEventListener("click", async () => {
+    if (!confirm("Descartar as capturas de outras ligações? Não há forma de as recuperar.")) return;
+    await send({ type: "recorte:discard-parked" });
+    void renderQueue();
   });
   $<HTMLInputElement>("save-without-asking").addEventListener("change", (e) => {
     void setSettings({ saveWithoutAsking: (e.target as HTMLInputElement).checked });

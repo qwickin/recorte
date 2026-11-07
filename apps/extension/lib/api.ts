@@ -165,6 +165,7 @@ export async function registerDevice(
   return (await res.json()) as { token: string; id: string };
 }
 
+export const fetchMe = (c: Connection, v: string) => getJson<{ id: string; email: string }>(c, v, "/api/me");
 export const fetchTags = (c: Connection, v: string) => getJson<TagCount[]>(c, v, API.tags);
 export const fetchCategories = (c: Connection, v: string) => getJson<Category[]>(c, v, API.categories);
 export const createCategory = (c: Connection, v: string, name: string) => postJson<Category>(c, v, API.categories, { name });
