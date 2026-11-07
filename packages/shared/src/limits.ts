@@ -6,12 +6,18 @@ export const UPLOAD_LIMITS = {
   pageTitle: 500,
   tags: 50,
   selection: 20_000,
-  headings: 20,
+  headings: 40,
   heading: 300,
   alts: 50,
   alt: 300,
   metaValue: 1000,
   ogKeys: 20,
-  /** All text fields together. */
+  /** All text fields together, except `page` (its own budget below). */
   text: 25_000,
+  /** Whole-page Readability text (`text.page.text`). */
+  pageText: 20_000,
+  pageKeywords: 30,
+  nearHeadings: 10,
+  /** A saved link's URL. */
+  url: 4096,
 } as const;

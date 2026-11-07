@@ -1,4 +1,4 @@
-import type { ItemText } from "@recorte/shared";
+import type { CaptureKind, ItemText } from "@recorte/shared";
 import { UPLOAD_LIMITS } from "@recorte/shared/limits";
 import { Readability } from "@mozilla/readability";
 
@@ -178,7 +178,7 @@ export function readableText(doc: Document): string {
 }
 
 export interface ExtractRequest {
-  kind: "area" | "visible" | "full" | "image";
+  kind: CaptureKind;
   /** Viewport rect for area/visible/image; ignored for full. */
   rect?: Rect;
   /** For "image": the element's own text (alt + caption) replaces the rect text. */

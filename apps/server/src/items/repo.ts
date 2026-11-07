@@ -26,7 +26,7 @@ export function summaryFromMeta(m: Item): ItemSummary {
     url: m.source.url,
     title: displayTitle(m),
     createdAt: m.createdAt,
-    thumb: `/api/items/${m.id}/files/thumb.webp`,
+    thumb: media ? `/api/items/${m.id}/files/${media.thumb}` : null,
     width: media?.width ?? 0,
     height: media?.height ?? 0,
     color: media?.color ?? "#000000",
@@ -80,7 +80,8 @@ function summariesFromRows(db: Db, rows: Row[]): ItemSummary[] {
     url: r.url,
     title: r.title,
     createdAt: r.created_at,
-    thumb: `/api/items/${r.id}/files/thumb.webp`,
+    // "" = no image (a link without an OG image).
+    thumb: r.thumb ? `/api/items/${r.id}/files/${r.thumb}` : null,
     width: r.width,
     height: r.height,
     color: r.color,
@@ -116,7 +117,7 @@ export function itemsRepo(db: Db) {
              width = excluded.width, height = excluded.height, color = excluded.color, has_note = excluded.has_note`,
         ).run(
           m.id, m.userId, m.type, m.kind ?? null, m.source.site, m.source.url, displayTitle(m), m.createdAt, m.deletedAt,
-          m.user.categoryId, media?.thumb ?? "thumb.webp", media?.width ?? 0, media?.height ?? 0, media?.color ?? "#000000",
+          m.user.categoryId, media?.thumb ?? "", media?.width ?? 0, media?.height ?? 0, media?.color ?? "#000000",
           m.user.note?.trim() ? 1 : 0,
         );
         db.prepare("DELETE FROM item_tags WHERE item_id = ?").run(m.id);

@@ -39,9 +39,16 @@ export function timeAgo(iso: string, now = Date.now()) {
 export const fullDate = (iso: string) =>
   new Intl.DateTimeFormat("pt-PT", { dateStyle: "long", timeStyle: "short" }).format(new Date(iso));
 
-export const kindLabel = { area: "Área selecionada", visible: "Parte visível", full: "Página inteira", image: "Imagem guardada" } as const;
+export const kindLabel = {
+  area: "Área selecionada",
+  visible: "Parte visível",
+  full: "Página inteira",
+  image: "Imagem guardada",
+  link: "Link guardado",
+  page: "Página guardada (link)",
+} as const;
 
-export const typeLabel = { screenshot: "Captura", post: "Publicação", article: "Artigo" } as const;
+export const typeLabel = { screenshot: "Captura", link: "Link", post: "Publicação", article: "Artigo" } as const;
 
 /** Colour names the server extracts (packages/ai/src/colors.ts), with a swatch for the filter. */
 export const COLORS: { name: string; hex: string }[] = [

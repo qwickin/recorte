@@ -1,6 +1,6 @@
 import { Button, Modal, Spinner } from "@heroui/react";
 import { buttonVariants } from "@heroui/styles";
-import { type Category, type Item, type ItemPatch, type ItemSummary, normalizeTag } from "@recorte/shared";
+import { API, type Category, type Item, type ItemPatch, type ItemSummary, normalizeTag } from "@recorte/shared";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { api, originalUrl } from "../api";
 import { displayTags, displayTitle, hiddenAiTags } from "../lib/item";
@@ -34,9 +34,35 @@ const leaveField = (e: KeyboardEvent<HTMLElement>) => {
 export const isTyping = (t: EventTarget | null) =>
   t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 
-/** Text worth copying: the selection the extension extracted, else headings and the page description. */
+/** Text worth copying: the selection the extension extracted (a link: the page's main text), else headings and the description. */
 const extractedText = (m: Item) =>
-  m.text.selection.trim() || [...m.text.headings, m.text.meta.description ?? ""].filter(Boolean).join("\n");
+  m.text.selection.trim() ||
+  (m.type === "link" ? (m.text.page?.text.trim() ?? "") : "") ||
+  [...m.text.headings, m.link?.description ?? m.text.meta.description ?? ""].filter(Boolean).join("\n");
+
+/** A link's video (x.com): a poster with a play button until clicked, then the embed iframe. */
+function LinkEmbed({ url, title }: { url: string; title: string }) {
+  const [on, setOn] = useState(false);
+  if (on) {
+    return (
+      <iframe
+        src={url}
+        title={title}
+        className="fade-in absolute inset-0 z-[1] block h-full min-h-[320px] w-full border-0 bg-black"
+        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+        referrerPolicy="no-referrer"
+      />
+    );
+  }
+  return (
+    <button type="button" onClick={() => setOn(true)} className="link-play" aria-label="Ver o vídeo">
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+      </svg>
+    </button>
+  );
+}
 
 const field =
   "w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[13.5px] text-white outline-none transition-colors placeholder:text-white/30 hover:border-white/15 focus:border-white/35";
@@ -243,14 +269,24 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                     className="pointer-events-none absolute inset-x-0 top-0 h-48 opacity-40 blur-3xl"
                     style={{ background: `radial-gradient(50% 80% at 50% 0%, ${s.color}, transparent)` }}
                   />
-                  <img
-                    key={s.id}
-                    src={originalUrl(s.id)}
-                    alt={s.title}
-                    width={s.width || undefined}
-                    height={s.height || undefined}
-                    className="fade-in relative my-auto block h-auto w-full"
-                  />
+                  {s.thumb ? (
+                    <img
+                      key={s.id}
+                      src={item?.media[0] ? API.itemFile(s.id, item.media[0].file) : originalUrl(s.id)}
+                      alt={s.title}
+                      width={s.width || undefined}
+                      height={s.height || undefined}
+                      className="fade-in relative my-auto block h-auto w-full"
+                    />
+                  ) : (
+                    // A link without an image.
+                    <div key={s.id} className="fade-in relative my-auto flex min-h-[240px] flex-col justify-center gap-3 px-8 py-12 sm:min-h-[420px] sm:px-12">
+                      <span className="text-[12px] tracking-[0.08em] text-[var(--ink-3)] uppercase">{s.site}</span>
+                      <p className="text-[26px] leading-tight font-extralight text-white">{s.title}</p>
+                      {item?.link?.description && <p className="text-[15px] leading-relaxed text-[var(--ink-2)]">{item.link.description}</p>}
+                    </div>
+                  )}
+                  {item?.link?.embedUrl && <LinkEmbed key={item.id} url={item.link.embedUrl} title={s.title} />}
                   {(onPrev || onNext) && (
                     <div className="pointer-events-none sticky bottom-3 mt-auto flex justify-between px-3">
                       <button type="button" disabled={!onPrev} onClick={onPrev} aria-label="Captura anterior" className="nav-arrow pointer-events-auto">
@@ -286,12 +322,14 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                           onKeyDown={enter(saveTitle)}
                           className="title-edit -mx-2 resize-none rounded-lg border border-transparent bg-transparent px-2 py-1 text-[22px] leading-tight font-light tracking-[-0.015em] text-white outline-none hover:border-white/10 focus:border-white/25"
                         />
-                        {item.ai.description && <p className="text-[14px] leading-relaxed text-[var(--ink-2)]">{item.ai.description}</p>}
+                        {(item.ai.description || (item.media[0] && item.link?.description)) && (
+                          <p className="text-[14px] leading-relaxed text-[var(--ink-2)]">{item.ai.description || item.link?.description}</p>
+                        )}
                       </header>
 
                       <div className="flex flex-wrap gap-2">
                         <a href={item.source.url} target="_blank" rel="noreferrer noopener" className={buttonVariants({ size: "sm", variant: "primary" })}>
-                          <ExternalIcon /> Abrir página
+                          <ExternalIcon /> {item.type === "link" ? "Abrir link" : "Abrir página"}
                         </a>
                         <Button size="sm" variant="ghost" onPress={copy} isDisabled={!text} className="text-[var(--ink-2)]">
                           {copied ? <CheckIcon /> : <CopyIcon />} {copied ? "Texto copiado" : "Copiar texto"}
@@ -308,7 +346,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                             {item.source.site}
                           </button>
                         </dd>
-                        <dt className="text-[var(--ink-3)]">Capturada</dt>
+                        <dt className="text-[var(--ink-3)]">{item.type === "link" ? "Guardado" : "Capturada"}</dt>
                         <dd className="text-[var(--ink-2)]" title={fullDate(item.createdAt)}>
                           {timeAgo(item.createdAt)}
                         </dd>
@@ -443,7 +481,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                                 className="related-thumb"
                                 style={{ "--glow": r.color } as CSSProperties}
                               >
-                                <img src={r.thumb} alt={r.title} loading="lazy" />
+                                {r.thumb ? <img src={r.thumb} alt={r.title} loading="lazy" /> : <span className="related-text">{r.title}</span>}
                               </button>
                             ))}
                           </div>

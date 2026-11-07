@@ -178,7 +178,7 @@ export function CommandPalette({ open, onOpenChange, tags, onPick, onTag }: Prop
                     className="palette-row flex cursor-pointer items-center gap-4 rounded-xl p-2.5 pr-4"
                   >
                     <div className="h-[56px] w-[84px] shrink-0 overflow-hidden rounded-lg bg-white/5 ring-1 ring-white/10" style={{ backgroundColor: o.hit.item.color + "33" }}>
-                      <img src={o.hit.item.thumb} alt="" className="h-full w-full object-cover object-top" />
+                      {o.hit.item.thumb && <img src={o.hit.item.thumb} alt="" className="h-full w-full object-cover object-top" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[14.5px] text-white">

@@ -1,7 +1,7 @@
 import type { ItemSummary } from "@recorte/shared";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { timeAgo } from "../lib/text";
-import { CheckIcon } from "./icons";
+import { CheckIcon, LinkIcon } from "./icons";
 
 type Props = {
   item: ItemSummary;
@@ -28,17 +28,30 @@ export function CaptureTile({ item: c, height, clipped, onOpen, selecting, selec
         aria-label={`${c.title}, ${c.site}`}
         aria-pressed={selecting ? !!selected : undefined}
       >
-        <div className="tile-media" style={{ height }}>
-          <img
-            src={c.thumb}
-            alt=""
-            width={c.width || undefined}
-            height={c.height || undefined}
-            loading="lazy"
-            decoding="async"
-            data-loaded={loaded}
-            onLoad={() => setLoaded(true)}
-          />
+        <div className="tile-media" style={{ height }} data-text={c.thumb ? undefined : true}>
+          {c.thumb ? (
+            <img
+              src={c.thumb}
+              alt=""
+              width={c.width || undefined}
+              height={c.height || undefined}
+              loading="lazy"
+              decoding="async"
+              data-loaded={loaded}
+              onLoad={() => setLoaded(true)}
+            />
+          ) : (
+            // A link without an image: a text card (title + domain).
+            <div className="tile-textcard">
+              <span className="tile-textcard-site">{c.site}</span>
+              <p className="line-clamp-5 text-[17px] leading-snug font-light text-white">{c.title}</p>
+            </div>
+          )}
+          {c.type === "link" && (
+            <span className="tile-badge" aria-hidden="true">
+              <LinkIcon width={12} height={12} /> link
+            </span>
+          )}
           {clipped && <div className="tile-clip-fade" />}
           <div className="tile-caption">
             <p className="line-clamp-2 text-[13.5px] leading-snug font-normal text-white">{c.title}</p>

@@ -2,10 +2,12 @@ import { z } from "zod";
 import { UPLOAD_LIMITS } from "./limits";
 import { normalizeTags } from "./tags";
 
-export const ItemType = z.enum(["screenshot", "post", "article"]);
+/** `link` = "Guardar link" (a URL saved with its OG data); `post`/`article` stay reserved for phases 2-3. */
+export const ItemType = z.enum(["screenshot", "link", "post", "article"]);
 export type ItemType = z.infer<typeof ItemType>;
 
-export const CaptureKind = z.enum(["area", "visible", "full", "image"]);
+/** Screenshot kinds; `link` items use "link" (the context menu on a link) or "page" (the page itself). */
+export const CaptureKind = z.enum(["area", "visible", "full", "image", "link", "page"]);
 export type CaptureKind = z.infer<typeof CaptureKind>;
 
 export const Media = z.object({
@@ -18,16 +20,49 @@ export const Media = z.object({
 });
 export type Media = z.infer<typeof Media>;
 
+/**
+ * Whole-page context sent with every capture (additive, optional for old items/extensions). For a "full"
+ * capture the selection already is the page's main text, so `text` is left empty there.
+ */
+export const PageText = z.object({
+  /** Readability main text of the whole page. */
+  text: z.string(),
+  /** `<meta name="keywords">`, split. */
+  keywords: z.array(z.string()).optional(),
+  /** h1–h3 inside the captured area or the closest ones above it. */
+  nearHeadings: z.array(z.string()).optional(),
+});
+export type PageText = z.infer<typeof PageText>;
+
 export const ItemText = z.object({
   selection: z.string(),
   meta: z.object({
     description: z.string().optional(),
     og: z.record(z.string(), z.string()).optional(),
   }),
+  /** h1–h3 of the whole page (up to UPLOAD_LIMITS.headings). */
   headings: z.array(z.string()),
   alts: z.array(z.string()),
+  page: PageText.optional(),
 });
 export type ItemText = z.infer<typeof ItemText>;
+
+/** What the server learned about a saved link (`type: "link"`). The OG image, when any, is `media[0]`. */
+export const LinkInfo = z.object({
+  /** canonical / og:url, when it differs from `source.url`. */
+  canonicalUrl: z.string().optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  siteName: z.string().optional(),
+  ogType: z.string().optional(),
+  favicon: z.string().optional(),
+  /** Video posts (x.com): the iframe the gallery shows on click. */
+  embedUrl: z.string().optional(),
+  /** Set once the server tried to fetch the URL; `fetchError` when it could not (the client data stays). */
+  fetchedAt: z.string().optional(),
+  fetchError: z.string().optional(),
+});
+export type LinkInfo = z.infer<typeof LinkInfo>;
 
 export const Post = z.object({
   author: z.object({ name: z.string(), handle: z.string(), avatar: z.string().optional() }),
@@ -68,6 +103,7 @@ export const Item = z.object({
     processedAt: z.string().nullable(),
   }),
   text: ItemText,
+  link: LinkInfo.optional(),
   post: Post.optional(),
   truncated: z.boolean().optional(),
 });
@@ -81,7 +117,8 @@ export const ItemSummary = z.object({
   url: z.string(),
   title: z.string(),
   createdAt: z.string(),
-  thumb: z.string(),
+  /** null: no image (a link without an OG image): the gallery shows a text card. width/height are then 0. */
+  thumb: z.string().nullable(),
   width: z.number().int().nonnegative(),
   height: z.number().int().nonnegative(),
   color: z.string(),
@@ -99,7 +136,8 @@ export type ItemPage = z.infer<typeof ItemPage>;
 
 /**
  * Applies UPLOAD_LIMITS to the extracted text. The total budget goes to the selection first, then headings,
- * description, alts and og values. `truncated` is true when anything was cut.
+ * description, alts and og values. `truncated` is true when anything was cut. The whole-page context (`page`)
+ * has its own budget and is expected to be cut: it never sets `truncated`.
  */
 export function clampUploadText(text: ItemText): { text: ItemText; truncated: boolean } {
   const L = UPLOAD_LIMITS;
@@ -137,7 +175,17 @@ export function clampUploadText(text: ItemText): { text: ItemText; truncated: bo
     }
     if (Object.keys(og).length) meta.og = og;
   }
-  return { text: { selection, meta, headings, alts }, truncated };
+  const out: ItemText = { selection, meta, headings, alts };
+  if (text.page) {
+    const p = text.page;
+    const page: PageText = { text: p.text.slice(0, L.pageText) };
+    const kw = (p.keywords ?? []).map((k) => k.trim().slice(0, L.heading)).filter(Boolean).slice(0, L.pageKeywords);
+    if (kw.length) page.keywords = kw;
+    const near = (p.nearHeadings ?? []).map((h) => h.slice(0, L.heading)).filter(Boolean).slice(0, L.nearHeadings);
+    if (near.length) page.nearHeadings = near;
+    out.page = page;
+  }
+  return { text: out, truncated };
 }
 
 const UploadMetaInput = z.object({

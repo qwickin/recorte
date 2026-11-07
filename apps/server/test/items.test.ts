@@ -58,7 +58,7 @@ describe("items", () => {
     const page = (await (await get(t, "/api/items", cookie)).json()) as { items: ItemSummary[]; total: number };
     expect(page.items.map((i) => i.id)).toEqual([b.id, sa.id]);
     expect(page.total).toBe(2);
-    const thumb = await get(t, sa.thumb, cookie);
+    const thumb = await get(t, sa.thumb!, cookie);
     expect(thumb.status).toBe(200);
     expect(thumb.headers.get("content-type")).toBe("image/webp");
     expect((await sharp(Buffer.from(await thumb.arrayBuffer())).metadata()).width).toBe(640);
@@ -215,13 +215,13 @@ describe("items", () => {
   it("files route: 401 without auth, 404 for unknown names, traversal and other users", async () => {
     const { t, cookie } = await setup();
     const a = (await (await upload(t, cookie)).json()) as ItemSummary;
-    expect((await t.app.request(a.thumb)).status).toBe(401);
+    expect((await t.app.request(a.thumb!)).status).toBe(401);
     expect((await get(t, `/api/items/${a.id}/files/meta.json`, cookie)).status).toBe(404);
     expect((await get(t, `/api/items/${a.id}/files/..%2F..%2Frecorte.db`, cookie)).status).toBe(404);
     expect((await get(t, `/api/items/${a.id}/files/original.webp`, cookie)).status).toBe(200);
     // second user
-    const c2 = sessionCookie(t.db, await createUser(t.db, "another long password"));
-    expect((await get(t, a.thumb, c2)).status).toBe(404);
+    const c2 = sessionCookie(t.db, await createUser(t.db, `outro-${Math.random()}@recorte.test`, "another long password"));
+    expect((await get(t, a.thumb!, c2)).status).toBe(404);
     expect((await get(t, `/api/items/${a.id}`, c2)).status).toBe(404);
     expect((await send(t, "DELETE", `/api/items/${a.id}`, c2)).status).toBe(404);
     expect(((await (await get(t, "/api/items", c2)).json()) as { total: number }).total).toBe(0);
@@ -233,7 +233,7 @@ describe("items", () => {
     const res = await upload(t, cookie);
     expect(res.status).toBe(201);
     const a = (await res.json()) as ItemSummary;
-    expect((await get(t, a.thumb, cookie)).status).toBe(200);
+    expect((await get(t, a.thumb!, cookie)).status).toBe(200);
     expect(((await (await get(t, "/api/items", cookie)).json()) as { total: number }).total).toBe(1);
     expect((t.db.prepare("SELECT COUNT(*) AS n FROM jobs WHERE type = 'process'").get() as { n: number }).n).toBe(1);
   });
@@ -253,7 +253,7 @@ describe("items", () => {
 
   it("a stale or foreign categoryId on upload saves the capture without category (never 400)", async () => {
     const { t, cookie } = await setup();
-    const c2 = sessionCookie(t.db, await createUser(t.db, "another long password"));
+    const c2 = sessionCookie(t.db, await createUser(t.db, `outro-${Math.random()}@recorte.test`, "another long password"));
     const foreign = (await (await send(t, "POST", "/api/categories", c2, { name: "Dela" })).json()) as { id: string };
     const mine = (await (await send(t, "POST", "/api/categories", cookie, { name: "Minha" })).json()) as { id: string };
     await send(t, "DELETE", `/api/categories/${mine.id}`, cookie); // deleted while the capture waited in the queue

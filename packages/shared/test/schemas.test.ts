@@ -86,3 +86,34 @@ describe("UploadMeta caps (clamped, never rejected)", () => {
     expect(UploadMeta.parse({ ...validMeta, text }).text).toEqual(text);
   });
 });
+
+describe("whole-page context and links (additive)", () => {
+  it("keeps text.page with its own budget, never flagging truncated", () => {
+    const m = UploadMeta.parse({
+      ...validMeta,
+      text: {
+        selection: "s".repeat(20_000),
+        meta: {},
+        headings: [],
+        alts: [],
+        page: { text: "p".repeat(30_000), keywords: [" a ", "", "b"], nearHeadings: ["Perto"] },
+      },
+    });
+    expect(m.text.selection).toHaveLength(20_000); // the page text does not eat the selection's budget
+    expect(m.text.page?.text).toHaveLength(UPLOAD_LIMITS.pageText);
+    expect(m.text.page?.keywords).toEqual(["a", "b"]);
+    expect(m.text.page?.nearHeadings).toEqual(["Perto"]);
+    expect(m.truncated).toBeUndefined();
+  });
+  it("old payloads without text.page still parse", () => {
+    expect(UploadMeta.parse(validMeta).text.page).toBeUndefined();
+  });
+  it("accepts type link with kind link/page", () => {
+    expect(UploadMeta.parse({ ...validMeta, type: "link", kind: "link" }).type).toBe("link");
+    expect(UploadMeta.parse({ ...validMeta, type: "link", kind: "page" }).kind).toBe("page");
+  });
+  it("allows up to 40 headings", () => {
+    const t = clampUploadText({ selection: "", meta: {}, headings: Array.from({ length: 50 }, (_, i) => `h${i}`), alts: [] });
+    expect(t.text.headings).toHaveLength(40);
+  });
+});
