@@ -9,6 +9,9 @@ import {
   type ItemPatch,
   type ItemType,
   type SearchHit,
+  type ServerSettings,
+  type SettingsPatch,
+  type SetupStatus,
   type TagCount,
 } from "@recorte/shared";
 
@@ -28,6 +31,8 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     readonly code: string,
+    /** The rest of the JSON error body (e.g. `keys` of a settings error). */
+    readonly body: Record<string, unknown> = {},
   ) {
     super(code);
     this.name = "ApiError";
@@ -72,10 +77,12 @@ export function createClient({ fetch: f = (...a) => fetch(...a), onUnauthorized 
     if (res.status === 401 && !opts.no401) onUnauthorized?.();
     if (!res.ok) {
       let code = `http_${res.status}`;
+      let payload: Record<string, unknown> = {};
       try {
-        code = ((await res.json()) as { error?: string }).error ?? code;
+        payload = (await res.json()) as Record<string, unknown>;
+        if (typeof payload.error === "string") code = payload.error;
       } catch {}
-      throw new ApiError(res.status, code);
+      throw new ApiError(res.status, code, payload);
     }
     if (res.status === 204) return undefined as T;
     const type = res.headers.get("content-type") ?? "";
@@ -86,12 +93,14 @@ export function createClient({ fetch: f = (...a) => fetch(...a), onUnauthorized 
 
   return {
     // ---- auth ----
-    setupStatus: (o?: Opts) => req<{ needsSetup: boolean }>("GET", API.setup, undefined, { ...o, no401: true }),
-    setup: (b: { token: string; email: string; password: string }) => req<{ ok: true }>("POST", API.setup, b, { no401: true }),
-    login: (b: { email: string; password: string }) => req<{ ok: true }>("POST", API.login, b, { no401: true }),
+    setupStatus: (o?: Opts) => req<SetupStatus>("GET", API.setup, undefined, { ...o, no401: true }),
+    setup: (b: { password: string }) => req<{ ok: true }>("POST", API.setup, b, { no401: true }),
+    login: (b: { password: string }) => req<{ ok: true }>("POST", API.login, b, { no401: true }),
     logout: () => req<{ ok: true }>("POST", API.logout, {}, { no401: true }),
-    me: (o?: Opts) => get<{ id: string; email: string }>("/api/me", o),
-    changePassword: (b: { currentPassword: string; newPassword: string }) => req<{ ok: true }>("POST", "/api/me/password", b),
+    me: (o?: Opts) => get<{ id: string }>(API.me, o),
+    changePassword: (b: { currentPassword: string; newPassword: string }) => req<{ ok: true }>("POST", API.mePassword, b),
+    getSettings: (o?: Opts) => get<ServerSettings>(API.settings, o),
+    updateSettings: (patch: SettingsPatch) => req<ServerSettings>("PUT", API.settings, patch),
 
     // ---- items ----
     listItems(p: { filters?: Filters; cursor?: string | null; limit?: number; trash?: boolean } & Opts = {}) {

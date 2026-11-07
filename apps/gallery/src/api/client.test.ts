@@ -118,8 +118,30 @@ describe("api client cursor handling", () => {
     const api = createClient({ fetch: fetch as typeof globalThis.fetch, onUnauthorized });
     await expect(api.listTags()).rejects.toMatchObject({ status: 401, code: "unauthorized" });
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
-    await expect(api.login({ email: "a@b", password: "x" })).rejects.toMatchObject({ status: 401 });
+    await expect(api.login({ password: "x" })).rejects.toMatchObject({ status: 401 });
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
+  });
+
+  it("setup and login send only the password", async () => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => json({ ok: true }));
+    const api = createClient({ fetch: fetch as typeof globalThis.fetch });
+    await api.setup({ password: "palavra-passe" });
+    await api.login({ password: "palavra-passe" });
+    expect(fetch.mock.calls.map((c) => [c[0], c[1]?.method, JSON.parse(String(c[1]?.body))])).toEqual([
+      ["/api/setup", "POST", { password: "palavra-passe" }],
+      ["/api/login", "POST", { password: "palavra-passe" }],
+    ]);
+  });
+
+  it("settings: PUT with the patch; errors keep the body (e.g. keys)", async () => {
+    const fetch = vi.fn(async (_url: string, init?: RequestInit) =>
+      init?.method === "PUT" && String(init.body).includes("ftp") ? json({ error: "invalid_url", keys: ["publicUrl"] }, 400) : json({}),
+    );
+    const api = createClient({ fetch: fetch as typeof globalThis.fetch });
+    await api.updateSettings({ aiCloudModel: "m" });
+    expect(fetch.mock.calls[0]![0]).toBe("/api/settings");
+    expect(fetch.mock.calls[0]![1]?.method).toBe("PUT");
+    await expect(api.updateSettings({ publicUrl: "ftp://x" })).rejects.toMatchObject({ status: 400, code: "invalid_url", body: { keys: ["publicUrl"] } });
   });
 });
 

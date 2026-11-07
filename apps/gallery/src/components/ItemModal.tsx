@@ -41,6 +41,23 @@ const extractedText = (m: Item) =>
 const field =
   "w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[13.5px] text-white outline-none transition-colors placeholder:text-white/30 hover:border-white/15 focus:border-white/35";
 
+/** navigator.clipboard only exists in secure contexts; http://<IP>:8080 (the default install) falls back to execCommand. */
+async function copyText(text: string): Promise<void> {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.append(ta);
+  ta.select();
+  try {
+    if (!document.execCommand("copy")) throw new Error("copy refused");
+  } finally {
+    ta.remove();
+  }
+}
+
 export function ItemModal({ summary, categories, onCategoryCreated, onClose, onPrev, onNext, onTag, onSite, onChanged, onDeleted, onOpen }: Props) {
   // Keep the last summary rendered while the exit animation runs.
   const last = useRef<ItemSummary | null>(summary);
@@ -181,7 +198,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
   const copy = async () => {
     if (!item) return;
     try {
-      await navigator.clipboard.writeText(extractedText(item));
+      await copyText(extractedText(item));
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {

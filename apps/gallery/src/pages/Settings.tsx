@@ -5,6 +5,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, api } from "../api";
 import { Devices } from "../components/Devices";
 import { inputClass, Page, Section } from "../components/Page";
+import { ServerSettingsForm } from "../components/ServerSettingsForm";
 import { navigate } from "../lib/router";
 
 const Status = ({ text, error }: { text: string | null; error?: boolean }) => (
@@ -232,7 +233,11 @@ export function SettingsPage() {
   };
   return (
     <Page title="Definições">
-      <Section title="Palavra-passe">
+      <Section title="Servidor" description="Endereço público e IA na cloud. Os campos definidos por variáveis de ambiente no servidor não se mudam aqui.">
+        <ServerSettingsForm />
+      </Section>
+
+      <Section title="Palavra-passe" description="A palavra-passe de acesso à galeria e às extensões.">
         <PasswordForm />
       </Section>
 
@@ -258,8 +263,8 @@ export function SettingsPage() {
       >
         <Maintenance />
         <p className="rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-[13px] leading-relaxed text-[var(--ink-2)]">
-          A IA corre neste servidor e as imagens não saem dele. Se ligares a IA cloud (<code>AI_CLOUD_URL</code>), uma versão reduzida de cada captura e o
-          seu texto são enviados a esse serviço de terceiros para gerar título e descrição.
+          A IA corre neste servidor e as imagens não saem dele. Se ligares a IA na cloud (em <em>Servidor</em>, acima), uma versão reduzida de cada
+          captura e o seu texto são enviados a esse serviço de terceiros para gerar título e descrição.
         </p>
       </Section>
 
