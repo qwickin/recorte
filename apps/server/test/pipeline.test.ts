@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { createApp } from "../src/app";
 import { createUser } from "../src/auth/users";
 import { openDb } from "../src/db";
-import { EMAIL, PASSWORD, cookieOf, makeApp, login } from "./helpers";
+import { PASSWORD, cookieOf, makeApp, login } from "./helpers";
 import { InMemorySearch, fakeClassifier, stubSearch } from "./fakes";
 
 const png = (color = "#3366cc") => sharp({ create: { width: 800, height: 600, channels: 3, background: color } }).png().toBuffer();
@@ -324,11 +324,11 @@ describe("reindex after losing the database", () => {
     t.db.close();
     for (const f of ["recorte.db", "recorte.db-wal", "recorte.db-shm"]) rmSync(join(t.dir, f), { force: true });
     const db = openDb(t.dir);
-    const newUser = await createUser(db, EMAIL, PASSWORD);
+    const newUser = await createUser(db, PASSWORD);
     expect(newUser).not.toBe(oldUser);
     const search = new InMemorySearch();
     const app = createApp({ db, config: t.config, search });
-    const c2 = cookieOf(await app.request("/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: EMAIL, password: PASSWORD }) }));
+    const c2 = cookieOf(await app.request("/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password: PASSWORD }) }));
     const list = async (qs = "") => (await (await app.request(`/api/items${qs}`, { headers: { cookie: c2 } })).json()) as { items: ItemSummary[]; total: number };
     expect((await list()).total).toBe(0);
 
@@ -356,7 +356,7 @@ describe("reindex after losing the database", () => {
     const { cpSync } = await import("node:fs");
     cpSync(join(t.dir, "items", userIdOf(t)), ghost, { recursive: true });
     rmSync(join(t.dir, "items", userIdOf(t)), { recursive: true });
-    await createUser(t.db, "two@example.com", "another long password");
+    await createUser(t.db, "another long password");
     const r = await (await t.app.request("/api/admin/reindex", { method: "POST", headers: { cookie } })).json();
     expect(r).toMatchObject({ adopted: 0, items: 0, removed: 1 });
     expect(existsSync(ghost)).toBe(true);

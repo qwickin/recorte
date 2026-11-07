@@ -1,11 +1,12 @@
 import { type Classifier, createClassifier } from "@recorte/ai";
-import { type CloudAi, createCloudAi } from "./cloud";
+import { type CloudAi, type CloudConfig, createCloudAi } from "./cloud";
 import type { Deps } from "./deps";
 import { createWorker } from "./jobs";
 import { purgeTrash } from "./items/purge";
 import { createPipeline } from "./pipeline";
 import type { SqliteQueue } from "./queue";
 import type { Search } from "./search";
+import { effectiveSettings } from "./settings";
 
 /** Loads the model on first use, once; a failed load is retried on the next job. */
 export function lazyClassifier(load: () => Promise<Classifier>): () => Promise<Classifier> {
@@ -19,8 +20,16 @@ export function lazyClassifier(load: () => Promise<Classifier>): () => Promise<C
   };
 }
 
-export function cloudFromConfig(c: Deps["config"]): CloudAi | null {
-  return c.aiCloudUrl && c.aiCloudKey && c.aiCloudModel ? createCloudAi({ url: c.aiCloudUrl, key: c.aiCloudKey, model: c.aiCloudModel }) : null;
+/** Cloud AI from the effective settings (env over DB), read per job; the client is rebuilt only when they change. */
+export function cloudFromSettings(deps: Pick<Deps, "db" | "config">, make: (c: CloudConfig) => CloudAi = (c) => createCloudAi(c)): () => CloudAi | null {
+  let last: { sig: string; ai: CloudAi } | null = null;
+  return () => {
+    const s = effectiveSettings(deps.db, deps.config);
+    if (!s.aiCloudUrl || !s.aiCloudKey || !s.aiCloudModel) return null;
+    const sig = JSON.stringify([s.aiCloudUrl, s.aiCloudKey, s.aiCloudModel]);
+    if (last?.sig !== sig) last = { sig, ai: make({ url: s.aiCloudUrl, key: s.aiCloudKey, model: s.aiCloudModel }) };
+    return last.ai;
+  };
 }
 
 /** Retries `ensureIndex` in the background (Meilisearch may still be starting) until it succeeds or `signal` aborts. */
@@ -54,7 +63,7 @@ export function startRuntime(deps: Deps & { queue: SqliteQueue }, opts: { classi
   const pipeline = createPipeline({
     deps,
     classifier: opts.classifier ?? lazyClassifier(() => createClassifier({ threads: Number(process.env.RECORTE_AI_THREADS) || 2 })),
-    cloud: opts.cloud === undefined ? cloudFromConfig(deps.config) : opts.cloud,
+    ...(opts.cloud === undefined ? { cloudFrom: cloudFromSettings(deps) } : { cloud: opts.cloud }),
   });
   const worker = createWorker({
     queue: deps.queue,

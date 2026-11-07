@@ -3,29 +3,33 @@ import { hashPassword, newId, sha256 } from "./crypto";
 
 export interface UserRow {
   id: string;
-  email: string;
   password_hash: string;
 }
 
-export const normalizeEmail = (e: string): string => e.trim().toLowerCase();
 export const MIN_PASSWORD = 8;
+
+/**
+ * Access is password-only (one owner). `users.email` is a legacy NOT NULL UNIQUE column that nothing reads any
+ * more; new rows get this unique placeholder. Existing installs keep whatever email they had.
+ */
+const placeholderEmail = (id: string): string => `owner-${id}`;
 
 export const countUsers = (db: Db): number =>
   (db.prepare("SELECT COUNT(*) AS n FROM users").get() as { n: number }).n;
 
-export const findUserByEmail = (db: Db, email: string): UserRow | undefined =>
-  db.prepare("SELECT id, email, password_hash FROM users WHERE email = ?").get(normalizeEmail(email)) as
-    | UserRow
-    | undefined;
+/** The owner: the oldest account (phase 1 has exactly one). */
+export const findOwner = (db: Db): UserRow | undefined =>
+  db.prepare("SELECT id, password_hash FROM users ORDER BY created_at, rowid LIMIT 1").get() as UserRow | undefined;
 
 export const findUserById = (db: Db, id: string): UserRow | undefined =>
-  db.prepare("SELECT id, email, password_hash FROM users WHERE id = ?").get(id) as UserRow | undefined;
+  db.prepare("SELECT id, password_hash FROM users WHERE id = ?").get(id) as UserRow | undefined;
 
-export async function createUser(db: Db, email: string, password: string): Promise<string> {
+/** Inserts an account unconditionally (tests and multi-user isolation checks). Use `createOwner` for setup. */
+export async function createUser(db: Db, password: string): Promise<string> {
   const id = newId();
   db.prepare("INSERT INTO users (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)").run(
     id,
-    normalizeEmail(email),
+    placeholderEmail(id),
     await hashPassword(password),
     new Date().toISOString(),
   );
@@ -55,11 +59,11 @@ export async function setPassword(db: Db, userId: string, password: string, keep
 }
 
 /** Creates the owner only if no user exists yet (atomic, safe against concurrent /setup). Returns null otherwise. */
-export async function createOwner(db: Db, email: string, password: string): Promise<string | null> {
+export async function createOwner(db: Db, password: string): Promise<string | null> {
   const id = newId();
   const h = await hashPassword(password);
   const r = db
     .prepare("INSERT INTO users (id, email, password_hash, created_at) SELECT ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM users)")
-    .run(id, normalizeEmail(email), h, new Date().toISOString());
+    .run(id, placeholderEmail(id), h, new Date().toISOString());
   return r.changes ? id : null;
 }

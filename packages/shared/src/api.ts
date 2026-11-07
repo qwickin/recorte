@@ -23,4 +23,7 @@ export const API = {
   adminReindex: "/api/admin/reindex",
   export: "/api/export",
   health: "/api/health",
+  me: "/api/me",
+  mePassword: "/api/me/password",
+  settings: "/api/settings",
 } as const;

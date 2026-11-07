@@ -9,6 +9,8 @@ import { exportRoutes } from "./routes/export";
 import { extensionRoutes } from "./routes/extension";
 import { itemRoutes } from "./routes/items";
 import { searchRoutes } from "./routes/search";
+import { settingsRoutes } from "./routes/settings";
+import { effectiveSettings } from "./settings";
 import { tagRoutes } from "./routes/tags";
 import { galleryRoutes } from "./static";
 
@@ -26,12 +28,13 @@ export const routeModules: ((app: Hono<AppEnv>, deps: Deps) => void)[] = [
   extensionRoutes,
   searchRoutes,
   adminRoutes,
+  settingsRoutes,
 ];
 
 export function createApp(input: DepsInput): Hono<AppEnv> {
   const deps = resolveDeps(input);
   const app = new Hono<AppEnv>();
-  app.use("*", originCheck(deps.config.publicUrl));
+  app.use("*", originCheck(() => effectiveSettings(deps.db, deps.config).publicUrl));
   for (const register of routeModules) register(app, deps);
   galleryRoutes(app, deps.config.galleryDir); // last: SPA fallback for every non-API path
   app.onError((err, c) => {

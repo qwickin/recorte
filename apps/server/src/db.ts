@@ -90,6 +90,14 @@ export const MIGRATIONS: readonly string[] = [
      created_at TEXT NOT NULL
    );
    CREATE INDEX jobs_pending ON jobs(status, run_at);`,
+  // 3: server settings edited in the gallery (publicUrl, aiCloud*); env vars override them.
+  //    Password-only access: users.email stays (NOT NULL UNIQUE) but is no longer read; new owners get a
+  //    placeholder. The table is not rebuilt: DROP TABLE users would cascade-delete every item row.
+  `CREATE TABLE settings (
+     key TEXT PRIMARY KEY,
+     value TEXT NOT NULL,
+     updated_at TEXT NOT NULL
+   );`,
 ];
 
 export function migrate(db: Db, migrations: readonly string[] = MIGRATIONS): void {

@@ -1,26 +1,23 @@
 import type { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { API, type Device } from "@recorte/shared";
+import { API, type Device, type SetupStatus } from "@recorte/shared";
 import { newId, randomToken, sha256, verifyPassword } from "../auth/crypto";
 import { type AppEnv, isHttps, requireUser, SESSION_COOKIE } from "../auth/middleware";
 import { consumeTicket, createSession, createTicket, destroySession, SESSION_TTL_MS } from "../auth/sessions";
-import { countUsers, createOwner, findUserByEmail, findUserById, MIN_PASSWORD, setPassword } from "../auth/users";
+import { countUsers, createOwner, findOwner, findUserById, MIN_PASSWORD, setPassword } from "../auth/users";
 import type { Deps } from "../deps";
+import { effectiveSettings } from "../settings";
 
-const Email = z.string().trim().max(254).refine((s) => /^[^@\s]+@[^@\s]+$/.test(s));
 const Password = z.string().min(MIN_PASSWORD).max(256);
-const SetupBody = z.object({ token: z.string(), email: Email, password: Password });
-const LoginBody = z.object({ email: z.string().max(256), password: z.string().max(256) });
-const DeviceBody = z.object({ email: z.string().max(256), password: z.string().max(256), name: z.string().trim().min(1).max(80) });
+const SetupBody = z.object({ password: Password });
+const LoginBody = z.object({ password: z.string().max(256) });
+const DeviceBody = z.object({ password: z.string().max(256), name: z.string().trim().min(1).max(80) });
 const PasswordBody = z.object({ currentPassword: z.string().max(256), newPassword: Password });
 
-const safeEqual = (a: string, b: string): boolean => {
-  const x = Buffer.from(sha256(a)), y = Buffer.from(sha256(b));
-  return timingSafeEqual(x, y);
-};
+export const SETUP_CLOSED_MESSAGE =
+  "A configuração inicial só está aberta nos primeiros 15 minutos depois de o servidor arrancar. Reinicia o container (docker restart …) e abre /setup outra vez.";
 
 async function body<T extends z.ZodType>(c: { req: { json(): Promise<unknown> } }, schema: T): Promise<z.infer<T> | null> {
   try {
@@ -31,7 +28,7 @@ async function body<T extends z.ZodType>(c: { req: { json(): Promise<unknown> } 
   }
 }
 
-export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
+export function authRoutes(app: Hono<AppEnv>, { db, config, setupOpenUntil }: Deps): void {
   const auth = requireUser(db);
   const limit = bodyLimit({ maxSize: 16 * 1024, onError: (c) => c.json({ error: "payload_too_large" }, 413) });
 
@@ -47,14 +44,21 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
 
   app.get(API.health, (c) => c.json({ ok: true, version: config.appVersion }));
 
-  app.get(API.setup, (c) => c.json({ needsSetup: countUsers(db) === 0 }));
+  const setupOpen = () => Date.now() < setupOpenUntil;
 
+  app.get(API.setup, (c) => {
+    const needsSetup = countUsers(db) === 0;
+    const s: SetupStatus = { needsSetup, open: needsSetup && setupOpen() };
+    return c.json(s);
+  });
+
+  // First run: the owner's access password, accepted only while there is no owner and within the window.
   app.post(API.setup, limit, async (c) => {
     if (countUsers(db) > 0) return c.json({ error: "already_set_up" }, 409);
+    if (!setupOpen()) return c.json({ error: "setup_closed", message: SETUP_CLOSED_MESSAGE }, 403);
     const b = await body(c, SetupBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
-    if (!config.setupToken || !safeEqual(b.token, config.setupToken)) return c.json({ error: "invalid_setup_token" }, 403);
-    const userId = await createOwner(db, b.email, b.password);
+    const userId = await createOwner(db, b.password);
     if (!userId) return c.json({ error: "already_set_up" }, 409);
     startSession(c, userId);
     return c.json({ ok: true }, 201);
@@ -63,7 +67,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
   app.post(API.login, limit, async (c) => {
     const b = await body(c, LoginBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
-    const user = findUserByEmail(db, b.email);
+    const user = findOwner(db);
     if (!(await verifyPassword(user?.password_hash ?? null, b.password)) || !user) {
       return c.json({ error: "invalid_credentials" }, 401);
     }
@@ -82,7 +86,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
   app.post(API.devices, limit, async (c) => {
     const b = await body(c, DeviceBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
-    const user = findUserByEmail(db, b.email);
+    const user = findOwner(db);
     if (!(await verifyPassword(user?.password_hash ?? null, b.password)) || !user) {
       return c.json({ error: "invalid_credentials" }, 401);
     }
@@ -120,7 +124,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
   // One-time, 60 s hand-off from the extension (Bearer) to a browser session.
   app.post(API.authTicket, auth, (c) => {
     const ticket = createTicket(db, c.var.userId);
-    const base = config.publicUrl ?? new URL(c.req.url).origin;
+    const base = effectiveSettings(db, config).publicUrl ?? new URL(c.req.url).origin;
     return c.json({ ticket, url: `${base}${API.authTicketRedirect}?t=${ticket}` });
   });
 
@@ -132,12 +136,12 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
     return c.redirect("/", 302);
   });
 
-  app.get("/api/me", auth, (c) => {
+  app.get(API.me, auth, (c) => {
     const u = findUserById(db, c.var.userId);
-    return u ? c.json({ id: u.id, email: u.email }) : c.json({ error: "unauthorized" }, 401);
+    return u ? c.json({ id: u.id }) : c.json({ error: "unauthorized" }, 401);
   });
 
-  app.post("/api/me/password", limit, auth, async (c) => {
+  app.post(API.mePassword, limit, auth, async (c) => {
     const b = await body(c, PasswordBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
     const u = findUserById(db, c.var.userId);

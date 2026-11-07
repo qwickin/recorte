@@ -9,7 +9,10 @@ export interface PipelineDeps {
   deps: Deps;
   /** Loaded lazily (and once) by the caller; tests pass a fake. */
   classifier: () => Promise<Classifier>;
+  /** A fixed client (tests). */
   cloud?: CloudAi | null;
+  /** Read at each job instead of `cloud`, so settings changed in the gallery apply at once. */
+  cloudFrom?: () => CloudAi | null;
 }
 
 /** Steps 1-5 of the processing spec. Never touches `user`; the ai block is merged into a fresh read of meta.json. */
@@ -35,9 +38,10 @@ export function createPipeline(p: PipelineDeps) {
     });
 
     let cloud: { title?: string; description?: string; keys: string[] } | null = null;
-    if (p.cloud) {
+    const cloudAi = p.cloudFrom ? p.cloudFrom() : (p.cloud ?? null);
+    if (cloudAi) {
       try {
-        cloud = await p.cloud({ image: original, pageTitle: m0.source.pageTitle, site: m0.source.site, text: m0.text.selection, headings: m0.text.headings });
+        cloud = await cloudAi({ image: original, pageTitle: m0.source.pageTitle, site: m0.source.site, text: m0.text.selection, headings: m0.text.headings });
       } catch (e) {
         console.warn(`cloud ai failed for ${id} (continuing):`, (e as Error).message);
       }

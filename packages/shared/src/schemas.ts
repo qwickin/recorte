@@ -226,6 +226,38 @@ export const Device = z.object({
 });
 export type Device = z.infer<typeof Device>;
 
+/** `GET /api/setup`: `open` is false once the 15-minute setup window after start has passed. */
+export const SetupStatus = z.object({ needsSetup: z.boolean(), open: z.boolean() });
+export type SetupStatus = z.infer<typeof SetupStatus>;
+
+/** Server settings kept in the database; an environment variable of the same name overrides each one. */
+export const SETTING_KEYS = ["publicUrl", "aiCloudUrl", "aiCloudKey", "aiCloudModel"] as const;
+export type SettingKey = (typeof SETTING_KEYS)[number];
+export const SettingSource = z.enum(["env", "db"]);
+export type SettingSource = z.infer<typeof SettingSource>;
+const SettingValue = z.object({ value: z.string().nullable(), source: SettingSource });
+
+/** `GET /api/settings`. `aiCloudKey.value` is masked ("••••abcd"); `set` tells whether a key exists. */
+export const ServerSettings = z.object({
+  publicUrl: SettingValue,
+  aiCloudUrl: SettingValue,
+  aiCloudModel: SettingValue,
+  aiCloudKey: SettingValue.extend({ set: z.boolean() }),
+});
+export type ServerSettings = z.infer<typeof ServerSettings>;
+
+/** `PUT /api/settings`: omitted = unchanged, null or "" = cleared. Keys set by the environment are refused. */
+export const SettingsPatch = z
+  .object({
+    publicUrl: z.string().max(2048).nullable(),
+    aiCloudUrl: z.string().max(2048).nullable(),
+    aiCloudKey: z.string().max(4096).nullable(),
+    aiCloudModel: z.string().max(200).nullable(),
+  })
+  .partial()
+  .strict();
+export type SettingsPatch = z.infer<typeof SettingsPatch>;
+
 // Query-string friendly: numbers arrive as strings, tags as "a,b" or repeated params.
 const tagsParam = z.preprocess(
   (v) => (typeof v === "string" ? v.split(",").map((s) => s.trim()).filter(Boolean) : v),

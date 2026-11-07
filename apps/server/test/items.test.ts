@@ -11,7 +11,7 @@ import { itemsRepo } from "../src/items/repo";
 import { InMemorySearch, stubSearch } from "./fakes";
 import { ulidTime } from "../src/ids";
 import { Storage } from "../src/storage";
-import { makeApp, login } from "./helpers";
+import { makeApp, login, sessionCookie } from "./helpers";
 
 type T = Awaited<ReturnType<typeof makeApp>>;
 
@@ -220,8 +220,7 @@ describe("items", () => {
     expect((await get(t, `/api/items/${a.id}/files/..%2F..%2Frecorte.db`, cookie)).status).toBe(404);
     expect((await get(t, `/api/items/${a.id}/files/original.webp`, cookie)).status).toBe(200);
     // second user
-    await createUser(t.db, "two@example.com", "another long password");
-    const c2 = (await t.json("/api/login", { email: "two@example.com", password: "another long password" })).headers.get("set-cookie")!.split(";")[0]!;
+    const c2 = sessionCookie(t.db, await createUser(t.db, "another long password"));
     expect((await get(t, a.thumb, c2)).status).toBe(404);
     expect((await get(t, `/api/items/${a.id}`, c2)).status).toBe(404);
     expect((await send(t, "DELETE", `/api/items/${a.id}`, c2)).status).toBe(404);
@@ -254,8 +253,7 @@ describe("items", () => {
 
   it("a stale or foreign categoryId on upload saves the capture without category (never 400)", async () => {
     const { t, cookie } = await setup();
-    await createUser(t.db, "two@example.com", "another long password");
-    const c2 = (await t.json("/api/login", { email: "two@example.com", password: "another long password" })).headers.get("set-cookie")!.split(";")[0]!;
+    const c2 = sessionCookie(t.db, await createUser(t.db, "another long password"));
     const foreign = (await (await send(t, "POST", "/api/categories", c2, { name: "Dela" })).json()) as { id: string };
     const mine = (await (await send(t, "POST", "/api/categories", cookie, { name: "Minha" })).json()) as { id: string };
     await send(t, "DELETE", `/api/categories/${mine.id}`, cookie); // deleted while the capture waited in the queue

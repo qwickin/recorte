@@ -2,6 +2,7 @@ import { getCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import type { Context } from "hono";
 import type { Db } from "../db";
+import { hostOf } from "../settings";
 import { sha256 } from "./crypto";
 import { userForSession } from "./sessions";
 
@@ -19,9 +20,11 @@ export function isHttps(c: Context): boolean {
   return c.req.url.startsWith("https:") || c.req.header("x-forwarded-proto")?.split(",")[0]?.trim() === "https";
 }
 
-/** Mutating requests carrying an Origin (i.e. from browsers) must come from our own host. Bearer requests are exempt. */
-export function originCheck(publicUrl: string | null) {
-  const publicHost = publicUrl ? new URL(publicUrl).host : null;
+/**
+ * Mutating requests carrying an Origin (i.e. from browsers) must come from our own host: the request's Host or
+ * the effective public URL (read per request, it can change in Definições). Bearer requests are exempt.
+ */
+export function originCheck(publicUrl: () => string | null) {
   return createMiddleware(async (c, next) => {
     if (SAFE.has(c.req.method) || c.req.header("authorization")?.startsWith("Bearer ")) return next();
     // Extension login: authenticates by body credentials, no cookie, Origin is chrome-/moz-extension://.
@@ -32,13 +35,19 @@ export function originCheck(publicUrl: string | null) {
       try {
         host = new URL(origin).host;
       } catch {}
-      if (!host || (host !== requestHost(c) && host !== publicHost)) {
+      if (!host || (host !== requestHost(c) && host !== hostOf(publicUrl()))) {
         return c.json({ error: "forbidden_origin" }, 403);
       }
     }
     return next();
   });
 }
+
+/** Cookie sessions only: refuses device tokens (used where a stolen extension token must not reach). */
+export const requireSession = createMiddleware<AppEnv>(async (c, next) => {
+  if (c.var.deviceId) return c.json({ error: "session_required" }, 403);
+  return next();
+});
 
 export function requireUser(db: Db) {
   return createMiddleware<AppEnv>(async (c, next) => {

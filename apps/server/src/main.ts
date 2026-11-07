@@ -6,17 +6,22 @@ import { openDb } from "./db";
 import { resolveDeps } from "./deps";
 import { SqliteQueue } from "./queue";
 import { startRuntime } from "./runtime";
-import { NoopSearch } from "./search";
-import { MeiliSearch } from "./search/meili";
+import { startSearch } from "./search/embedded";
 
-const base = loadConfig();
-const db = openDb(base.dataDir);
-const config = await bootstrap(db, base);
+const config = loadConfig();
+const db = openDb(config.dataDir);
+// The setup window counts from here (process start).
+const deps0 = resolveDeps({ db, config });
+await bootstrap(db, config);
+
+const { search, meili, describe } = startSearch(config);
+console.log(describe);
+
 const queue = new SqliteQueue(db);
-const search = config.meiliUrl ? new MeiliSearch({ url: config.meiliUrl, apiKey: config.meiliMasterKey }) : new NoopSearch();
-if (!config.meiliUrl) console.warn("MEILI_URL not set: search is disabled");
-const deps = resolveDeps({ db, config, queue, search });
+const deps = resolveDeps({ ...deps0, queue, search });
 const app = createApp(deps);
 serve({ fetch: app.fetch, port: config.port }, (i) => console.log(`Recorte listening on :${i.port}`));
 const runtime = startRuntime({ ...deps, queue });
-for (const sig of ["SIGINT", "SIGTERM"] as const) process.once(sig, () => void runtime.stop().finally(() => process.exit(0)));
+for (const sig of ["SIGINT", "SIGTERM"] as const) {
+  process.once(sig, () => void Promise.allSettled([runtime.stop(), meili?.stop()]).finally(() => process.exit(0)));
+}

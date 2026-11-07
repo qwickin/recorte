@@ -13,7 +13,11 @@ export interface Deps {
   search: Search;
   queue: Queue;
   events: EventBus;
+  /** Epoch ms until which `/setup` accepts the owner's password (15 min after start). */
+  setupOpenUntil: number;
 }
+
+export const SETUP_WINDOW_MS = 15 * 60_000;
 
 export type DepsInput = Pick<Deps, "db" | "config"> & Partial<Deps>;
 
@@ -25,5 +29,6 @@ export function resolveDeps(d: DepsInput): Deps {
     search: d.search ?? new NoopSearch(),
     queue: d.queue ?? new SqliteQueue(d.db),
     events: d.events ?? new EventBus(),
+    setupOpenUntil: d.setupOpenUntil ?? Date.now() + SETUP_WINDOW_MS,
   };
 }

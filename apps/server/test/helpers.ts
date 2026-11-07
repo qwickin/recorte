@@ -6,21 +6,22 @@ import { createApp, type Deps } from "../src/app";
 import { loadConfig } from "../src/config";
 import { openDb } from "../src/db";
 import { createUser } from "../src/auth/users";
+import { createSession } from "../src/auth/sessions";
+import { SESSION_COOKIE } from "../src/auth/middleware";
 
 const dirs: string[] = [];
 afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
 });
 
-export const EMAIL = "owner@example.com";
 export const PASSWORD = "correct horse battery";
 
 export async function makeApp(opts: { user?: boolean; env?: Record<string, string>; deps?: Partial<Deps> } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "recorte-test-"));
   dirs.push(dir);
-  const config = loadConfig({ DATA_DIR: dir, SETUP_TOKEN: "tok-123", ...opts.env });
+  const config = loadConfig({ DATA_DIR: dir, ...opts.env });
   const db = openDb(dir);
-  if (opts.user) await createUser(db, EMAIL, PASSWORD);
+  if (opts.user) await createUser(db, PASSWORD);
   const app = createApp({ db, config, ...opts.deps });
   const json = (path: string, body: unknown, headers: Record<string, string> = {}, method = "POST") =>
     app.request(path, { method, headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
@@ -32,11 +33,14 @@ export const cookieOf = (res: Response): string => {
   return sc.split(";")[0] ?? "";
 };
 
-export async function login(t: Awaited<ReturnType<typeof makeApp>>): Promise<string> {
-  return cookieOf(await t.json("/api/login", { email: EMAIL, password: PASSWORD }));
+export async function login(t: Awaited<ReturnType<typeof makeApp>>, headers: Record<string, string> = {}): Promise<string> {
+  return cookieOf(await t.json("/api/login", { password: PASSWORD }, headers));
 }
 
+/** A cookie for any account (login only reaches the owner): for the multi-account isolation tests. */
+export const sessionCookie = (db: Parameters<typeof createSession>[0], userId: string): string => `${SESSION_COOKIE}=${createSession(db, userId)}`;
+
 export async function deviceToken(t: Awaited<ReturnType<typeof makeApp>>, name = "Chrome"): Promise<string> {
-  const r = await t.json("/api/devices", { email: EMAIL, password: PASSWORD, name });
+  const r = await t.json("/api/devices", { password: PASSWORD, name });
   return ((await r.json()) as { token: string }).token;
 }
