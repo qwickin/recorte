@@ -1,0 +1,9 @@
+# Used by compose.caddy.yml. Caddy obtains and renews the certificate for $DOMAIN automatically
+# and sets X-Forwarded-Proto/Host, so the app issues Secure cookies.
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:8080 {
+		# SSE (/api/events) must not be buffered.
+		flush_interval -1
+	}
+}

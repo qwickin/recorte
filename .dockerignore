@@ -1,0 +1,23 @@
+# Build context = repo root (docker/compose.yml uses context: ..).
+**/node_modules
+**/.output
+**/.wxt
+**/dist
+**/dist-embed
+**/*.log
+**/.DS_Store
+.git
+.github
+.superpowers
+.remember
+prototype
+docs
+assets
+e2e
+data
+meili
+docker/data
+docker/meili
+docker/.env
+**/.env
+packages/ai/models

@@ -1,0 +1,25 @@
+# HTTPS with a domain (Let's Encrypt via Caddy). Override file:
+#   DOMAIN=recorte.example.com in .env, DNS A/AAAA record pointing here, ports 80 and 443 open.
+#   docker compose -f compose.yml -f compose.caddy.yml up -d
+services:
+  app:
+    # Only Caddy is published; the app stays on the compose network.
+    ports: !reset []
+    environment:
+      PUBLIC_URL: https://${DOMAIN:?set DOMAIN in .env}
+
+  caddy:
+    image: caddy:2.10.2
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config

@@ -10,3 +10,6 @@ meili_data/
 prototype/gallery/scripts/.raw
 prototype/ai-bench/models
 .superpowers/
+meili/
+caddy/
+.env
