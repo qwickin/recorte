@@ -56,7 +56,7 @@ export function ExtensionPage() {
           </ol>
         </div>
         <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">
-          Nas opções da extensão, indica o servidor <code>{server}</code> e a palavra-passe de acesso.
+          Nas opções da extensão, indica o servidor <code>{server}</code>, o teu email e a palavra-passe.
         </p>
       </Section>
 

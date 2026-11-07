@@ -4,9 +4,9 @@
 //
 // - Builds the image from this checkout and runs it like the README does (`docker run -p … -v <volume>:/data`,
 //   no environment at all), on a free 127.0.0.1 port with a throw-away named volume.
-// - Completes /setup through the API with the access password only (inside the 15-minute window), saves the
+// - Completes /setup through the API with email + password (inside the 15-minute window), saves the
 //   public URL, gets a device token, uploads two captures, waits for the AI tags, then drives the gallery in
-//   Chromium: login (password only), tiles, ⌘K/Ctrl+K "doce português", ZIP download. Ends with reset-password.
+//   Chromium: login (email + password), tiles, ⌘K/Ctrl+K "doce português", ZIP download. Ends with reset-password.
 // - Always removes the container and the volume (set E2E_KEEP=1 to leave them).
 // - Chromium: $CHROMIUM_PATH, else the newest Chromium in the Playwright cache, else playwright-core's default.
 // The first run needs internet: Meilisearch downloads its embedding model on first start.
@@ -24,6 +24,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SHOTS = join(ROOT, "prototype/gallery/public/shots");
 const RUN = `recorte-e2e-${Date.now().toString(36)}`;
 const IMAGE = "recorte:e2e";
+const EMAIL = "e2e@recorte.test";
 const PASSWORD = "e2e-palavra-passe-longa";
 const START = Date.now();
 const timings: Record<string, number> = {};
@@ -207,17 +208,17 @@ test("docker run with no configuration: healthy, /setup open, Meilisearch only o
   await until("container healthy", 120_000, async () => docker(["inspect", "-f", "{{.State.Health.Status}}", RUN], { quiet: true }).trim() === "healthy", 2000);
 });
 
-test("setup with the access password only, then the window is spent", async () => {
+test("setup with email + password, then the window is spent", async () => {
   const r = await fetch(`${base}/api/setup`, {
     method: "POST",
     headers: { "content-type": "application/json", origin: base },
-    body: JSON.stringify({ password: PASSWORD }),
+    body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
   });
   assert.equal(r.status, 201, await r.clone().text());
   cookie = (r.headers.get("set-cookie") ?? "").split(";")[0]!;
   assert.match(cookie, /^recorte_session=/);
   assert.deepEqual(await (await fetch(`${base}/api/setup`)).json(), { needsSetup: false, open: false });
-  const again = await fetch(`${base}/api/setup`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ password: "outra-coisa-qualquer" }) });
+  const again = await fetch(`${base}/api/setup`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ email: "outro@recorte.test", password: "outra-coisa-qualquer" }) });
   assert.equal(again.status, 409);
 
   // Wizard step 2: the public address is saved in the database.
@@ -226,11 +227,11 @@ test("setup with the access password only, then the window is spent", async () =
   assert.deepEqual(((await s.json()) as { publicUrl: unknown }).publicUrl, { value: base, source: "db" });
 });
 
-test("device token with the access password (extension login)", async () => {
+test("device token with email + password (extension login)", async () => {
   const r = await fetch(`${base}/api/devices`, {
     method: "POST",
     headers: { "content-type": "application/json", origin: "chrome-extension://e2e" },
-    body: JSON.stringify({ password: PASSWORD, name: "E2E" }),
+    body: JSON.stringify({ email: EMAIL, password: PASSWORD, name: "E2E" }),
   });
   assert.equal(r.status, 201, await r.clone().text());
   token = ((await r.json()) as { token: string }).token;
@@ -289,7 +290,7 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search, ZIP download", { 
 
   await page.goto(base + "/");
   await page.waitForURL(/\/login/);
-  assert.equal(await page.getByLabel("Email").count(), 0, "no email field any more");
+  await page.getByLabel("Email").fill(EMAIL);
   await page.getByLabel("Palavra-passe").fill(PASSWORD);
   await page.getByRole("button", { name: "Entrar" }).click();
 
@@ -378,13 +379,13 @@ test("logs never contain the password or the Meilisearch key", () => {
   assert.ok(!exec("sh", "-c", "cat /proc/[0-9]*/cmdline | tr '\\0' ' '").includes(key), "meili key in a process command line");
 });
 
-test("recorte reset-password inside the container (no email argument)", async () => {
+test("recorte reset-password <email> inside the container", async () => {
   const NEW = "outra-palavra-passe-longa";
-  const out = exec("recorte", "reset-password", "--password", NEW);
+  const out = exec("recorte", "reset-password", EMAIL, "--password", NEW);
   assert.match(out, /Password updated/);
   // Devices are revoked; the new password works, the old one does not.
   assert.equal((await api("/api/items")).status, 401);
-  const login = (password: string) => fetch(`${base}/api/login`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ password }) });
+  const login = (password: string) => fetch(`${base}/api/login`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ email: EMAIL, password }) });
   assert.equal((await login(PASSWORD)).status, 401);
   assert.equal((await login(NEW)).status, 200);
 });

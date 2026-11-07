@@ -154,19 +154,19 @@ async function postJson<T>(conn: Connection, version: string, path: string, body
   return (await res.json()) as T;
 }
 
-/** Exchanges the access password for a device token. The password is not stored anywhere. */
-export async function registerDevice(server: string, password: string, name: string): Promise<{ token: string; id: string }> {
+/** Exchanges the account's email + password for a device token. The password is not stored anywhere. */
+export async function registerDevice(server: string, email: string, password: string, name: string): Promise<{ token: string; id: string }> {
   const res = await fetch(`${server}${API.devices}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ password, name }),
+    body: JSON.stringify({ email: email.trim(), password, name }),
     credentials: "omit",
   });
   if (!res.ok) throw new ApiError(res.status, await errorCode(res));
   return (await res.json()) as { token: string; id: string };
 }
 
-export const fetchMe = (c: Connection, v: string) => getJson<{ id: string }>(c, v, API.me);
+export const fetchMe = (c: Connection, v: string) => getJson<{ id: string; email?: string }>(c, v, API.me);
 export const fetchTags = (c: Connection, v: string) => getJson<TagCount[]>(c, v, API.tags);
 export const fetchCategories = (c: Connection, v: string) => getJson<Category[]>(c, v, API.categories);
 export const createCategory = (c: Connection, v: string, name: string) => postJson<Category>(c, v, API.categories, { name });

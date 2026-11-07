@@ -38,10 +38,14 @@ function render(s: Settings): void {
   $("login").hidden = connected && !forceLogin;
   $("cancel-login").hidden = !connected;
   $("who-server").textContent = s.server ?? "";
+  $("who-email").textContent = s.email ?? "";
+  $("who-email-row").hidden = !s.email;
   $("auth-needed").hidden = !s.authNeeded;
   $<HTMLInputElement>("save-without-asking").checked = s.saveWithoutAsking;
   const server = $<HTMLInputElement>("server");
   if (!server.value && s.server) server.value = s.server;
+  const email = $<HTMLInputElement>("email");
+  if (!email.value && s.email) email.value = s.email;
 }
 
 async function renderShortcuts(): Promise<void> {
@@ -89,6 +93,7 @@ async function main(): Promise<void> {
     err.hidden = true;
     const server = normalizeServerUrl($<HTMLInputElement>("server").value);
     const passwordInput = $<HTMLInputElement>("password");
+    const email = $<HTMLInputElement>("email").value.trim();
     const name = $<HTMLInputElement>("device").value.trim() || defaultDeviceName();
     if (!server) {
       err.textContent = "URL do servidor inválido.";
@@ -99,10 +104,10 @@ async function main(): Promise<void> {
     btn.disabled = true;
     btn.textContent = "A ligar…";
     try {
-      const { token, id } = await registerDevice(server, passwordInput.value, name);
+      const { token, id } = await registerDevice(server, email, passwordInput.value, name);
       // The account id scopes the offline queue: captures are only ever sent to the account they were made for.
       const me = await fetchMe({ server, token }, extensionVersion());
-      await setSettings({ server, token, deviceId: id, userId: me.id, authNeeded: false });
+      await setSettings({ server, token, deviceId: id, userId: me.id, email: me.email ?? email.toLowerCase(), authNeeded: false });
       passwordInput.value = "";
       forceLogin = false;
       await send({ type: "recorte:connected" });
@@ -111,7 +116,7 @@ async function main(): Promise<void> {
       err.textContent =
         e2 instanceof ApiError
           ? e2.status === 401
-            ? "Palavra-passe errada."
+            ? "Email ou palavra-passe errados."
             : e2.status === 429
               ? "Demasiadas tentativas. Espera um pouco."
               : `O servidor respondeu ${e2.status}.`
@@ -126,7 +131,7 @@ async function main(): Promise<void> {
   $("reconnect").addEventListener("click", async () => {
     forceLogin = true;
     render(await getSettings());
-    $<HTMLInputElement>("password").focus();
+    ($<HTMLInputElement>("email").value ? $<HTMLInputElement>("password") : $<HTMLInputElement>("email")).focus();
   });
   $("cancel-login").addEventListener("click", async () => {
     forceLogin = false;

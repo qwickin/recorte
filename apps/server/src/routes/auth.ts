@@ -6,14 +6,15 @@ import { API, type Device, type SetupStatus } from "@recorte/shared";
 import { newId, randomToken, sha256, verifyPassword } from "../auth/crypto";
 import { type AppEnv, isHttps, requireUser, SESSION_COOKIE } from "../auth/middleware";
 import { consumeTicket, createSession, createTicket, destroySession, SESSION_TTL_MS } from "../auth/sessions";
-import { countUsers, createOwner, findOwner, findUserById, MIN_PASSWORD, setPassword } from "../auth/users";
+import { accountForLogin, claimEmail, countUsers, createOwner, findUserById, isEmail, MIN_PASSWORD, setPassword } from "../auth/users";
 import type { Deps } from "../deps";
 import { effectiveSettings } from "../settings";
 
+const Email = z.string().trim().max(254).refine(isEmail);
 const Password = z.string().min(MIN_PASSWORD).max(256);
-const SetupBody = z.object({ password: Password });
-const LoginBody = z.object({ password: z.string().max(256) });
-const DeviceBody = z.object({ password: z.string().max(256), name: z.string().trim().min(1).max(80) });
+const SetupBody = z.object({ email: Email, password: Password });
+const LoginBody = z.object({ email: z.string().max(256), password: z.string().max(256) });
+const DeviceBody = z.object({ email: z.string().max(256), password: z.string().max(256), name: z.string().trim().min(1).max(80) });
 const PasswordBody = z.object({ currentPassword: z.string().max(256), newPassword: Password });
 
 export const SETUP_CLOSED_MESSAGE =
@@ -52,26 +53,32 @@ export function authRoutes(app: Hono<AppEnv>, { db, config, clock, setupOpenUnti
     return c.json(s);
   });
 
-  // First run: the owner's access password, accepted only while there is no owner and within the window.
+  // First run: the owner's email + password, accepted only while there is no owner and within the window.
   app.post(API.setup, limit, async (c) => {
     if (countUsers(db) > 0) return c.json({ error: "already_set_up" }, 409);
     if (!setupOpen()) return c.json({ error: "setup_closed", message: SETUP_CLOSED_MESSAGE }, 403);
     const b = await body(c, SetupBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
-    const userId = await createOwner(db, b.password);
+    const userId = await createOwner(db, b.email, b.password);
     if (!userId) return c.json({ error: "already_set_up" }, 409);
     startSession(c, userId);
     return c.json({ ok: true }, 201);
   });
 
+  /** Email + password check (unknown emails still pay one argon2 verify, for similar timing). */
+  const checkCredentials = async (email: string, password: string): Promise<string | null> => {
+    const user = accountForLogin(db, email);
+    if (!(await verifyPassword(user?.password_hash ?? null, password)) || !user) return null;
+    if (user.claim) claimEmail(db, user.id, email);
+    return user.id;
+  };
+
   app.post(API.login, limit, async (c) => {
     const b = await body(c, LoginBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
-    const user = findOwner(db);
-    if (!(await verifyPassword(user?.password_hash ?? null, b.password)) || !user) {
-      return c.json({ error: "invalid_credentials" }, 401);
-    }
-    startSession(c, user.id);
+    const userId = await checkCredentials(b.email, b.password);
+    if (!userId) return c.json({ error: "invalid_credentials" }, 401);
+    startSession(c, userId);
     return c.json({ ok: true });
   });
 
@@ -86,15 +93,13 @@ export function authRoutes(app: Hono<AppEnv>, { db, config, clock, setupOpenUnti
   app.post(API.devices, limit, async (c) => {
     const b = await body(c, DeviceBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
-    const user = findOwner(db);
-    if (!(await verifyPassword(user?.password_hash ?? null, b.password)) || !user) {
-      return c.json({ error: "invalid_credentials" }, 401);
-    }
+    const userId = await checkCredentials(b.email, b.password);
+    if (!userId) return c.json({ error: "invalid_credentials" }, 401);
     const token = randomToken();
     const id = newId();
     db.prepare("INSERT INTO devices (id, user_id, name, token_hash, created_at) VALUES (?, ?, ?, ?, ?)").run(
       id,
-      user.id,
+      userId,
       b.name,
       sha256(token),
       new Date().toISOString(),
@@ -138,7 +143,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config, clock, setupOpenUnti
 
   app.get(API.me, auth, (c) => {
     const u = findUserById(db, c.var.userId);
-    return u ? c.json({ id: u.id }) : c.json({ error: "unauthorized" }, 401);
+    return u ? c.json({ id: u.id, email: u.email }) : c.json({ error: "unauthorized" }, 401);
   });
 
   app.post(API.mePassword, limit, auth, async (c) => {

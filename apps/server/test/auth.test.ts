@@ -3,7 +3,7 @@ import { bootstrap } from "../src/bootstrap";
 import { loadConfig } from "../src/config";
 import { migrate, MIGRATIONS } from "../src/db";
 import { runCli } from "../src/cli";
-import { countUsers, findOwner } from "../src/auth/users";
+import { countUsers, findOwner, PLACEHOLDER_PREFIX } from "../src/auth/users";
 import { hashPassword } from "../src/auth/crypto";
 import { DatabaseSync } from "node:sqlite";
 import { mkdtempSync, rmSync } from "node:fs";
@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/app";
 import { openDbAt } from "../src/db";
-import { cookieOf, deviceToken, login, makeApp, PASSWORD } from "./helpers";
+import { cookieOf, deviceToken, EMAIL, login, makeApp, PASSWORD } from "./helpers";
 
 describe("config & migrations", () => {
   it("applies defaults for unknown env", () => {
@@ -31,7 +31,7 @@ describe("config & migrations", () => {
 });
 
 describe("migration from an email-account database (schema v2)", () => {
-  it("keeps the owner and its items; the owner signs in with the password only", async () => {
+  it("keeps the owner, its email and its items; the owner signs in with email + password", async () => {
     const dir = mkdtempSync(join(tmpdir(), "recorte-v2-"));
     try {
       const path = join(dir, "recorte.db");
@@ -48,12 +48,50 @@ describe("migration from an email-account database (schema v2)", () => {
       expect((db.prepare("SELECT COUNT(*) AS n FROM items").get() as { n: number }).n).toBe(1);
       expect(findOwner(db)?.id).toBe("u1");
       const app = createApp({ db, config: loadConfig({ DATA_DIR: dir }) });
-      const r = await app.request("/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password: PASSWORD }) });
+      const login = (email: string) =>
+        app.request("/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, password: PASSWORD }) });
+      expect((await login("outro@x.io")).status).toBe(401);
+      const r = await login(" Dono@X.io ");
       expect(r.status).toBe(200);
-      expect(await (await app.request("/api/me", { headers: { cookie: cookieOf(r) } })).json()).toEqual({ id: "u1" });
+      expect(await (await app.request("/api/me", { headers: { cookie: cookieOf(r) } })).json()).toEqual({ id: "u1", email: "dono@x.io" });
       db.close();
     } finally {
       rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("owner from the password-only build (placeholder email)", () => {
+  async function placeholderOwner() {
+    const t = await makeApp();
+    t.db.prepare("INSERT INTO users (id, email, password_hash, created_at) VALUES ('u1', ?, ?, '2026-01-01T00:00:00.000Z')").run(`${PLACEHOLDER_PREFIX}u1`, await hashPassword(PASSWORD));
+    return t;
+  }
+  it("claims the email given on the first correct login; afterwards only that email works", async () => {
+    const t = await placeholderOwner();
+    expect((await t.json("/api/login", { email: "novo@x.io", password: "wrong-password" })).status).toBe(401);
+    expect(findOwner(t.db)?.email).toBe(`${PLACEHOLDER_PREFIX}u1`);
+    expect((await t.json("/api/login", { email: "not-an-email", password: PASSWORD })).status).toBe(401);
+    const r = await t.json("/api/login", { email: "Novo@X.io", password: PASSWORD });
+    expect(r.status).toBe(200);
+    expect(findOwner(t.db)?.email).toBe("novo@x.io");
+    expect((await t.json("/api/login", { email: "outro@x.io", password: PASSWORD })).status).toBe(401);
+    expect((await t.json("/api/login", { email: "novo@x.io", password: PASSWORD })).status).toBe(200);
+  });
+  it("the extension login (devices) claims it too", async () => {
+    const t = await placeholderOwner();
+    expect((await t.json("/api/devices", { email: "novo@x.io", password: PASSWORD, name: "x" })).status).toBe(201);
+    expect(findOwner(t.db)?.email).toBe("novo@x.io");
+  });
+  it("reset-password <email> assigns the email", async () => {
+    const t = await placeholderOwner();
+    process.env.DATA_DIR = t.dir;
+    try {
+      expect(await runCli(["reset-password", "novo@x.io", "--password", "fresh-password-1"], () => {})).toBe(0);
+      expect(findOwner(t.db)?.email).toBe("novo@x.io");
+      expect((await t.json("/api/login", { email: "novo@x.io", password: "fresh-password-1" })).status).toBe(200);
+    } finally {
+      delete process.env.DATA_DIR;
     }
   });
 });
@@ -68,23 +106,30 @@ describe("boot", () => {
     expect(log).toHaveBeenLastCalledWith("Abre https://r.example.pt/setup nos próximos 15 minutos para configurar.");
     expect(countUsers(t.db)).toBe(0);
   });
-  it("creates the owner from ADMIN_PASSWORD, without logging it", async () => {
+  it("creates the owner from ADMIN_EMAIL + ADMIN_PASSWORD, without logging the password", async () => {
     const t = await makeApp();
     const log = vi.fn();
-    await bootstrap(t.db, loadConfig({ ADMIN_PASSWORD: "longpassword" }), log);
+    await bootstrap(t.db, loadConfig({ ADMIN_EMAIL: "Admin@X.io", ADMIN_PASSWORD: "longpassword" }), log);
     expect(countUsers(t.db)).toBe(1);
     expect(JSON.stringify(log.mock.calls)).not.toContain("longpassword");
-    expect((await t.json("/api/login", { password: "longpassword" })).status).toBe(200);
+    expect((await t.json("/api/login", { email: "admin@x.io", password: "longpassword" })).status).toBe(200);
     // Ignored once an owner exists.
-    await bootstrap(t.db, loadConfig({ ADMIN_PASSWORD: "otherpassword" }), log);
+    await bootstrap(t.db, loadConfig({ ADMIN_EMAIL: "b@x.io", ADMIN_PASSWORD: "otherpassword" }), log);
     expect(countUsers(t.db)).toBe(1);
   });
-  it("ignores a too-short ADMIN_PASSWORD and falls back to /setup", async () => {
+  it.each([
+    [{ ADMIN_PASSWORD: "longpassword" }, /both be set/],
+    [{ ADMIN_EMAIL: "a@x.io" }, /both be set/],
+    [{ ADMIN_EMAIL: "nope", ADMIN_PASSWORD: "longpassword" }, /not a valid email/],
+    [{ ADMIN_EMAIL: "a@x.io", ADMIN_PASSWORD: "short" }, /at least 8/],
+  ])("ignores incomplete or invalid ADMIN_* (%o) and falls back to /setup", async (env, why) => {
     const t = await makeApp();
     const log = vi.fn();
-    await bootstrap(t.db, loadConfig({ ADMIN_PASSWORD: "short" }), log);
+    await bootstrap(t.db, loadConfig(env), log);
     expect(countUsers(t.db)).toBe(0);
-    expect(log.mock.calls.flat().join("\n")).toMatch(/\/setup nos próximos 15 minutos/);
+    const out = log.mock.calls.flat().join("\n");
+    expect(out).toMatch(why);
+    expect(out).toMatch(/\/setup nos próximos 15 minutos/);
   });
 });
 
@@ -101,25 +146,27 @@ describe("setup", () => {
     const t = await makeApp();
     expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: true, open: true });
   });
-  it("creates the owner with the password only, signs in, then a second setup is 409", async () => {
+  it("creates the owner with email + password, signs in, then a second setup is 409", async () => {
     const t = await makeApp();
-    const r = await t.json("/api/setup", { password: PASSWORD });
+    const r = await t.json("/api/setup", { email: EMAIL, password: PASSWORD });
     expect(r.status).toBe(201);
     const cookie = cookieOf(r);
     expect((await t.app.request("/api/me", { headers: { cookie } })).status).toBe(200);
-    expect((await t.json("/api/setup", { password: "another-password" })).status).toBe(409);
+    expect((await t.json("/api/setup", { email: "outro@x.io", password: "another-password" })).status).toBe(409);
     expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: false, open: false });
-    expect((await t.json("/api/login", { password: PASSWORD })).status).toBe(200);
+    expect((await t.json("/api/login", { email: EMAIL, password: PASSWORD })).status).toBe(200);
   });
-  it("needs a password of at least 8 characters", async () => {
+  it("needs a valid email and a password of at least 8 characters", async () => {
     const t = await makeApp();
-    expect((await t.json("/api/setup", { password: "short" })).status).toBe(400);
+    expect((await t.json("/api/setup", { email: EMAIL, password: "short" })).status).toBe(400);
+    expect((await t.json("/api/setup", { password: PASSWORD })).status).toBe(400);
+    expect((await t.json("/api/setup", { email: "no-at-sign", password: PASSWORD })).status).toBe(400);
     expect((await t.json("/api/setup", {})).status).toBe(400);
     expect(countUsers(t.db)).toBe(0);
   });
   it("concurrent setups create a single owner", async () => {
     const t = await makeApp();
-    const rs = await Promise.all(["first-password", "second-password"].map((password) => t.json("/api/setup", { password })));
+    const rs = await Promise.all(["first-password", "second-password"].map((password, i) => t.json("/api/setup", { email: `o${i}@x.io`, password })));
     expect(rs.map((r) => r.status).sort()).toEqual([201, 409]);
     expect(countUsers(t.db)).toBe(1);
   });
@@ -130,7 +177,7 @@ describe("setup", () => {
     expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: true, open: true });
     now += 1;
     expect(await (await t.app.request("/api/setup")).json()).toEqual({ needsSetup: true, open: false });
-    const r = await t.json("/api/setup", { password: PASSWORD });
+    const r = await t.json("/api/setup", { email: EMAIL, password: PASSWORD });
     expect(r.status).toBe(403);
     const b = (await r.json()) as { error: string; message: string };
     expect(b.error).toBe("setup_closed");
@@ -153,9 +200,9 @@ describe("setup", () => {
   });
   it("honours an injected window (deps.setupOpenUntil)", async () => {
     const closed = await makeApp({ deps: { clock: () => 100, setupOpenUntil: 100 } });
-    expect((await closed.json("/api/setup", { password: PASSWORD })).status).toBe(403);
+    expect((await closed.json("/api/setup", { email: EMAIL, password: PASSWORD })).status).toBe(403);
     const open = await makeApp({ deps: { clock: () => 100, setupOpenUntil: 101 } });
-    expect((await open.json("/api/setup", { password: PASSWORD })).status).toBe(201);
+    expect((await open.json("/api/setup", { email: EMAIL, password: PASSWORD })).status).toBe(201);
   });
   it("default clock is monotonic (performance.now)", async () => {
     const { monotonicMs, resolveDeps, SETUP_WINDOW_MS } = await import("../src/deps");
@@ -167,7 +214,7 @@ describe("setup", () => {
   });
   it("Origin check applies to setup", async () => {
     const t = await makeApp();
-    expect((await t.json("/api/setup", { password: PASSWORD }, { origin: "https://evil.test", host: "recorte.test" })).status).toBe(403);
+    expect((await t.json("/api/setup", { email: EMAIL, password: PASSWORD }, { origin: "https://evil.test", host: "recorte.test" })).status).toBe(403);
     expect(countUsers(t.db)).toBe(0);
   });
 });
@@ -175,24 +222,26 @@ describe("setup", () => {
 describe("login & session", () => {
   it("login sets httpOnly Lax cookie; Secure only on https", async () => {
     const t = await makeApp({ user: true });
-    const http = await t.json("/api/login", { password: PASSWORD });
+    const http = await t.json("/api/login", { email: EMAIL, password: PASSWORD });
     const sc = http.headers.get("set-cookie")!;
     expect(sc).toMatch(/^recorte_session=/);
     expect(sc).toMatch(/HttpOnly/i);
     expect(sc).toMatch(/SameSite=Lax/i);
     expect(sc).not.toMatch(/Secure/i);
-    const viaProxy = await t.json("/api/login", { password: PASSWORD }, { "x-forwarded-proto": "https" });
+    const viaProxy = await t.json("/api/login", { email: EMAIL, password: PASSWORD }, { "x-forwarded-proto": "https" });
     expect(viaProxy.headers.get("set-cookie")).toMatch(/Secure/i);
     const direct = await t.app.request("https://x.test/api/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ password: PASSWORD }),
+      body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
     });
     expect(direct.headers.get("set-cookie")).toMatch(/Secure/i);
   });
   it("rejects bad credentials and unauthenticated access", async () => {
     const t = await makeApp({ user: true });
-    expect((await t.json("/api/login", { password: "wrong-password" })).status).toBe(401);
+    expect((await t.json("/api/login", { email: EMAIL, password: "wrong-password" })).status).toBe(401);
+    expect((await t.json("/api/login", { email: "outro@recorte.test", password: PASSWORD })).status).toBe(401);
+    expect((await t.json("/api/login", { password: PASSWORD })).status).toBe(400);
     expect((await t.json("/api/login", {})).status).toBe(400);
     const r = await t.app.request("/api/me");
     expect(r.status).toBe(401);
@@ -225,15 +274,15 @@ describe("devices", () => {
   it("POST /api/devices works from extension origins without Bearer", async () => {
     const t = await makeApp({ user: true });
     for (const origin of ["chrome-extension://abc", "moz-extension://abc"]) {
-      const r = await t.json("/api/devices", { password: PASSWORD, name: "x" }, { origin });
+      const r = await t.json("/api/devices", { email: EMAIL, password: PASSWORD, name: "x" }, { origin });
       expect(r.status).toBe(201);
     }
   });
   it("rejects over-long credentials and oversized bodies", async () => {
     const t = await makeApp({ user: true });
-    expect((await t.json("/api/login", { password: "a".repeat(300) })).status).toBe(400);
-    expect((await t.json("/api/devices", { password: "a".repeat(300), name: "x" })).status).toBe(400);
-    const big = await t.json("/api/login", { password: "a", pad: "x".repeat(20_000) });
+    expect((await t.json("/api/login", { email: EMAIL, password: "a".repeat(300) })).status).toBe(400);
+    expect((await t.json("/api/devices", { email: EMAIL, password: "a".repeat(300), name: "x" })).status).toBe(400);
+    const big = await t.json("/api/login", { email: EMAIL, password: "a", pad: "x".repeat(20_000) });
     expect(big.status).toBe(413);
   });
   it("issues a token, stores only its hash, lists with lastSeen/version", async () => {
@@ -251,7 +300,7 @@ describe("devices", () => {
   });
   it("rejects bad credentials", async () => {
     const t = await makeApp({ user: true });
-    expect((await t.json("/api/devices", { password: "nope-nope-nope", name: "x" })).status).toBe(401);
+    expect((await t.json("/api/devices", { email: EMAIL, password: "nope-nope-nope", name: "x" })).status).toBe(401);
   });
   it("revoked device gets 401", async () => {
     const t = await makeApp({ user: true });
@@ -327,8 +376,8 @@ describe("password change", () => {
     expect(short.status).toBe(400);
     const ok = await t.json("/api/me/password", { currentPassword: PASSWORD, newPassword: "brand-new-pass" }, { cookie });
     expect(ok.status).toBe(200);
-    expect((await t.json("/api/login", { password: PASSWORD })).status).toBe(401);
-    expect((await t.json("/api/login", { password: "brand-new-pass" })).status).toBe(200);
+    expect((await t.json("/api/login", { email: EMAIL, password: PASSWORD })).status).toBe(401);
+    expect((await t.json("/api/login", { email: EMAIL, password: "brand-new-pass" })).status).toBe(200);
     expect((await t.app.request("/api/me", { headers: { cookie } })).status).toBe(200);
     expect((await t.app.request("/api/me", { headers: { cookie: other } })).status).toBe(401);
     expect((await t.app.request("/api/me", { headers: { authorization: `Bearer ${token}` } })).status).toBe(200);
@@ -342,23 +391,24 @@ describe("cli reset-password", () => {
     const dev = await deviceToken(t);
     process.env.DATA_DIR = t.dir;
     const out: string[] = [];
-    expect(await runCli(["reset-password", "--password", "fresh-password-1"], (m) => out.push(m))).toBe(0);
+    expect(await runCli(["reset-password", EMAIL, "--password", "fresh-password-1"], (m) => out.push(m))).toBe(0);
     expect(out.join("\n")).not.toContain("fresh-password-1");
     expect((await t.app.request("/api/me", { headers: { cookie } })).status).toBe(401);
     expect((await t.app.request("/api/me", { headers: { authorization: `Bearer ${dev}` } })).status).toBe(401);
-    expect((await t.json("/api/login", { password: "fresh-password-1" })).status).toBe(200);
-    expect(await runCli(["reset-password", "--password", "short"], (m) => out.push(m))).toBe(2);
-    expect(await runCli(["reset-password", "owner@x.io"], (m) => out.push(m))).toBe(2); // no email argument any more
-    expect(await runCli(["reset-password"], (m) => out.push(m))).toBe(0);
+    expect((await t.json("/api/login", { email: EMAIL, password: "fresh-password-1" })).status).toBe(200);
+    expect(await runCli(["reset-password", EMAIL, "--password", "short"], (m) => out.push(m))).toBe(2);
+    expect(await runCli(["reset-password", "--password", "fresh-password-2"], (m) => out.push(m))).toBe(2); // the email is required
+    expect(await runCli(["reset-password", "outro@x.io"], (m) => out.push(m))).toBe(1); // unknown account
+    expect(await runCli(["reset-password", EMAIL], (m) => out.push(m))).toBe(0);
     const generated = out.find((m) => m.startsWith("New password"))!.split("\n")[0]!.split(": ")[1]!;
-    expect((await t.json("/api/login", { password: generated })).status).toBe(200);
+    expect((await t.json("/api/login", { email: EMAIL, password: generated })).status).toBe(200);
     delete process.env.DATA_DIR;
   });
   it("fails when there is no owner yet", async () => {
     const t = await makeApp();
     process.env.DATA_DIR = t.dir;
     const out: string[] = [];
-    expect(await runCli(["reset-password"], (m) => out.push(m))).toBe(1);
+    expect(await runCli(["reset-password", EMAIL], (m) => out.push(m))).toBe(1);
     expect(out[0]).toMatch(/\/setup/);
     delete process.env.DATA_DIR;
   });

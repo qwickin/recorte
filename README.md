@@ -26,10 +26,10 @@ docker run -d --name recorte --restart unless-stopped -p 8080:8080 -v recorte:/d
 Não é preciso `.env` nem configuração. Depois:
 
 1. Abre `http://<IP-do-servidor>:8080` no browser. Aparece o assistente de configuração (`/setup`), em três passos:
-   1. **Palavra-passe de acesso.** É a única credencial: serve para a galeria e para a extensão. Não há email nem contas.
+   1. **Conta.** O teu email e uma palavra-passe (com confirmação). Servem para a galeria e para a extensão. O email é só o nome de utilizador: o servidor nunca envia emails.
    2. **Servidor.** Confirma o endereço público (vem preenchido com o endereço que usaste) e, se quiseres, liga uma IA na cloud compatível com a OpenAI (URL, chave, modelo). Com a IA na cloud, uma versão reduzida de cada captura e o seu texto vão para esse serviço de terceiros.
-   3. **Extensão.** Descarrega o ZIP para Chrome ou Firefox e segue os passos. Na extensão indicas o URL público e a palavra-passe.
-2. **O assistente só fica aberto 15 minutos depois de o container arrancar**, e só enquanto não houver palavra-passe. Os registos dizem-no (`docker logs recorte`: "Abre http://…/setup nos próximos 15 minutos para configurar"). Se o tempo passar, reinicia o container (`docker restart recorte`) e volta a abrir `/setup`.
+   3. **Extensão.** Descarrega o ZIP para Chrome ou Firefox e segue os passos. Na extensão indicas o URL público, o email e a palavra-passe.
+2. **O assistente só fica aberto 15 minutos depois de o container arrancar**, e só enquanto não houver conta. Os registos dizem-no (`docker logs recorte`: "Abre http://…/setup nos próximos 15 minutos para configurar"). Se o tempo passar, reinicia o container (`docker restart recorte`) e volta a abrir `/setup`.
 
 Tudo fica no volume `recorte` (`/data` no container). O endereço público e a IA na cloud mudam-se depois em **Definições → Servidor**.
 
@@ -53,7 +53,7 @@ O `compose.yml` tem um só serviço (`app`) e guarda tudo em `docker/data`. O `.
 |---|---|
 | `PUBLIC_URL` | Endereço público. Se estiver definida, manda sobre o valor guardado na galeria (e o campo fica bloqueado). |
 | `AI_CLOUD_URL`, `AI_CLOUD_KEY`, `AI_CLOUD_MODEL` | IA na cloud. Idem: mandam sobre as Definições. |
-| `ADMIN_PASSWORD` | Cria a palavra-passe no primeiro arranque, sem o assistente. Apaga-a depois: já não é usada e assim não fica em texto simples. |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Os dois juntos criam a conta no primeiro arranque, sem o assistente. Apaga depois a `ADMIN_PASSWORD`: já não é usada e assim não fica em texto simples. |
 | `MEILI_URL`, `MEILI_MASTER_KEY` | Meilisearch externo (ver abaixo). Sem `MEILI_URL`, a app arranca o Meilisearch embutido. |
 
 ### Avançado: HTTPS com um domínio (Caddy)
@@ -92,7 +92,7 @@ As extensões descarregam-se da própria galeria: página **Extensão**, com ses
 1. Descarrega o ZIP do Chrome e descompacta-o numa pasta que vais manter.
 2. Abre `chrome://extensions` e ativa o **Modo de programador**.
 3. Clica em **Carregar expandida** e escolhe a pasta.
-4. Nas opções da extensão, indica o URL público do servidor (p. ex. `http://192.168.1.20:8080`) e a palavra-passe de acesso. O nome do dispositivo é opcional. A palavra-passe não fica guardada: é trocada por um token do dispositivo.
+4. Nas opções da extensão, indica o URL público do servidor (p. ex. `http://192.168.1.20:8080`) o teu email e a palavra-passe. O nome do dispositivo é opcional. A palavra-passe não fica guardada: é trocada por um token do dispositivo.
 
 **Firefox**
 - Uma extensão sem assinatura só carrega como **extra temporário**: abre `about:debugging#/runtime/this-firefox`, clica em **Carregar extra temporário…** e escolhe o ZIP. O extra desaparece quando o Firefox reinicia.
@@ -104,11 +104,11 @@ Nenhum browser atualiza estas extensões sozinho. Quando o servidor traz uma ver
 
 ## Repor a palavra-passe
 
-Não há email. No servidor:
+O servidor não envia emails. Repõe-se no próprio servidor:
 
 ```sh
-docker exec recorte recorte reset-password                        # gera e mostra uma nova
-docker exec recorte recorte reset-password --password '<nova>'    # define-a tu
+docker exec recorte recorte reset-password tu@exemplo.pt                        # gera e mostra uma nova
+docker exec recorte recorte reset-password tu@exemplo.pt --password '<nova>'    # define-a tu
 # com compose: docker compose exec app recorte reset-password …
 ```
 
@@ -129,7 +129,7 @@ git pull && ../scripts/up.sh                 # compose, a partir do checkout
 docker compose pull && docker compose up -d  # compose, com a imagem publicada
 ```
 
-**Vindo da versão com dois serviços (`app` + `search`) e email:** a conta mantém-se e passa a entrar só com a palavra-passe (o email deixa de ser pedido; `ADMIN_EMAIL` e `SETUP_TOKEN` já não existem). O Meilisearch passa a correr dentro do container, com um índice novo em `docker/data/meili`: depois de atualizar, carrega uma vez em **Definições → Reconstruir índice**. Na primeira atualização, remove também o serviço `search` antigo, que de outro modo continua a correr sozinho: `docker compose up -d --remove-orphans` (com o Caddy: `docker compose -f compose.yml -f compose.caddy.yml up -d --remove-orphans`). A pasta antiga `docker/meili` pode ser apagada. As extensões têm de voltar a ligar-se só se a palavra-passe mudar.
+**Vindo da versão com dois serviços (`app` + `search`):** a conta mantém-se, com o mesmo email e a mesma palavra-passe (`SETUP_TOKEN` já não existe). Se a conta foi criada pela versão que pedia só a palavra-passe, o primeiro login com a palavra-passe certa fica com o email que indicares (ou usa `recorte reset-password <email>`). O Meilisearch passa a correr dentro do container, com um índice novo em `docker/data/meili`: depois de atualizar, carrega uma vez em **Definições → Reconstruir índice**. Na primeira atualização, remove também o serviço `search` antigo, que de outro modo continua a correr sozinho: `docker compose up -d --remove-orphans` (com o Caddy: `docker compose -f compose.yml -f compose.caddy.yml up -d --remove-orphans`). A pasta antiga `docker/meili` pode ser apagada. As extensões têm de voltar a ligar-se só se a palavra-passe mudar.
 
 ## Desenvolvimento
 
@@ -147,7 +147,7 @@ pnpm --filter @recorte/extension dev        # extensão em modo de desenvolvimen
 pnpm --filter @recorte/e2e e2e              # E2E: imagem real (docker run) + Chromium
 ```
 
-O E2E constrói a imagem e corre-a como no `docker run` acima, sem configuração, numa porta livre e com um volume próprio; faz o `/setup` só com a palavra-passe e no fim apaga o container e o volume. Usa o Chromium da cache do Playwright, ou o caminho em `CHROMIUM_PATH`.
+O E2E constrói a imagem e corre-a como no `docker run` acima, sem configuração, numa porta livre e com um volume próprio; faz o `/setup` com email e palavra-passe e no fim apaga o container e o volume. Usa o Chromium da cache do Playwright, ou o caminho em `CHROMIUM_PATH`.
 
 Estrutura:
 

@@ -23,6 +23,7 @@ services:
     # All optional: each one, when set, overrides what the gallery saved in Definições → Servidor.
     environment:
       PUBLIC_URL: ${PUBLIC_URL:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       AI_CLOUD_URL: ${AI_CLOUD_URL:-}
       AI_CLOUD_KEY: ${AI_CLOUD_KEY:-}

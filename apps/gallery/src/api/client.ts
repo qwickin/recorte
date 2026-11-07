@@ -94,10 +94,10 @@ export function createClient({ fetch: f = (...a) => fetch(...a), onUnauthorized 
   return {
     // ---- auth ----
     setupStatus: (o?: Opts) => req<SetupStatus>("GET", API.setup, undefined, { ...o, no401: true }),
-    setup: (b: { password: string }) => req<{ ok: true }>("POST", API.setup, b, { no401: true }),
-    login: (b: { password: string }) => req<{ ok: true }>("POST", API.login, b, { no401: true }),
+    setup: (b: { email: string; password: string }) => req<{ ok: true }>("POST", API.setup, b, { no401: true }),
+    login: (b: { email: string; password: string }) => req<{ ok: true }>("POST", API.login, b, { no401: true }),
     logout: () => req<{ ok: true }>("POST", API.logout, {}, { no401: true }),
-    me: (o?: Opts) => get<{ id: string }>(API.me, o),
+    me: (o?: Opts) => get<{ id: string; email: string }>(API.me, o),
     changePassword: (b: { currentPassword: string; newPassword: string }) => req<{ ok: true }>("POST", API.mePassword, b),
     getSettings: (o?: Opts) => get<ServerSettings>(API.settings, o),
     updateSettings: (patch: SettingsPatch) => req<ServerSettings>("PUT", API.settings, patch),

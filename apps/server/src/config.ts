@@ -9,7 +9,8 @@ export interface Config {
   port: number;
   /** Env overrides of the DB settings (settings.ts): null = not set in the environment. */
   publicUrl: string | null;
-  /** Creates the owner at boot when there is none yet. Optional: the /setup wizard does the same. */
+  /** Both create the owner at boot when there is none yet. Optional: the /setup wizard does the same. */
+  adminEmail: string | null;
   adminPassword: string | null;
   /** External Meilisearch. When unset, the embedded one (`meiliBin`) is started as a child process. */
   meiliUrl: string | null;
@@ -35,6 +36,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     dataDir: resolve(opt(env.DATA_DIR) ?? "./data"),
     port: Number.isInteger(port) && port > 0 && port < 65536 ? port : 8080,
     publicUrl: opt(env.PUBLIC_URL)?.replace(/\/+$/, "") ?? null,
+    adminEmail: opt(env.ADMIN_EMAIL),
     adminPassword: env.ADMIN_PASSWORD ? env.ADMIN_PASSWORD : null,
     meiliUrl: opt(env.MEILI_URL),
     meiliMasterKey: opt(env.MEILI_MASTER_KEY),

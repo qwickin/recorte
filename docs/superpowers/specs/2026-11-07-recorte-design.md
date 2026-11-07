@@ -164,7 +164,7 @@ type Media = { file: string; thumb: string; width: number; height: number; color
 **Tecnologia:** WXT. Um só build genérico: o URL do servidor configura-se em runtime, nas opções.
 
 **Ligação ao servidor**
-1. Nas opções, o utilizador mete o URL público do servidor e a palavra-passe de acesso (o nome do dispositivo é
+1. Nas opções, o utilizador mete o URL público do servidor, o email e a palavra-passe da conta (o nome do dispositivo é
    opcional; por defeito, o do browser e sistema).
 2. A extensão chama `POST /api/devices` e recebe um **token de dispositivo**: aleatório, guardado no servidor só
    em hash, e revogável.
@@ -221,19 +221,21 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
 ## 7. Servidor (fase 1)
 
 **Contas e acesso**
-- **Acesso só por palavra-passe** (§16, 4): um dono, sem email. `POST /api/login {password}`,
-  `POST /api/devices {password, name}`.
-- **Primeiro arranque:** sem dono, o assistente `/setup` (3 passos: palavra-passe; endereço público e IA cloud
-  opcional; descarregar a extensão) só aceita a palavra-passe **nos 15 minutos a seguir ao arranque do processo**.
+- **Acesso por email + palavra-passe** (§16, 4 e 5): um dono. O email é só o nome de utilizador (nunca se envia
+  email). `POST /api/login {email, password}`, `POST /api/devices {email, password, name}`. Sem limites de pedidos.
+- **Primeiro arranque:** sem dono, o assistente `/setup` (3 passos: email e palavra-passe; endereço público e IA cloud
+  opcional; descarregar a extensão) só aceita a conta **nos 15 minutos a seguir ao arranque do processo**.
   Depois responde `403 setup_closed` e manda reiniciar o container. O arranque escreve nos logs "Abre
   http://<host>:<porta>/setup nos próximos 15 minutos para configurar". Não há token de setup. A criação do dono é
   atómica (um só dono mesmo com pedidos concorrentes).
-  - Alternativa: `ADMIN_PASSWORD` por variável de ambiente cria o dono no arranque.
-  - Palavras-passe guardadas com argon2id. Bases de dados antigas mantêm o dono; a coluna `users.email` fica sem uso.
+  - Alternativa: `ADMIN_EMAIL` + `ADMIN_PASSWORD` (as duas) por variável de ambiente criam o dono no arranque.
+  - Palavras-passe guardadas com argon2id. Bases de dados antigas mantêm o dono e o email. Um dono criado pela
+    versão só com palavra-passe (email `owner-<id>`, sem "@") fica com o email do primeiro login certo, ou do
+    `reset-password <email>`.
 - **Gestão de contas na fase 1:** só a conta do dono (§16). Além disso:
   - o dono muda a palavra-passe em Definições;
-  - uma palavra-passe esquecida repõe-se com `recorte reset-password [--password …]` dentro do container (termina
-    sessões e revoga dispositivos), porque não há email.
+  - uma palavra-passe esquecida repõe-se com `recorte reset-password <email> [--password …]` dentro do container
+    (termina sessões e revoga dispositivos), porque o servidor não envia emails.
 - **Definições do servidor na base de dados** (tabela `settings`): `publicUrl`, `aiCloudUrl`, `aiCloudKey`,
   `aiCloudModel`. As variáveis `PUBLIC_URL` e `AI_CLOUD_*` mandam sobre a BD quando definidas. `GET /api/settings`
   devolve cada valor com `source` (`env`|`db`) e a chave mascarada; `PUT /api/settings` (só sessão de browser, com
@@ -398,14 +400,14 @@ Esta é a leitura de "Version Control pelo Git, de forma automática". É uma es
 5. A leitura das versões em §10: tags `vX.Y` mais o número de commits, e CI no GitHub com imagem no GHCR.
 6. Na fase 1, a seleção de área fica limitada ao ecrã visível. A página inteira tem máximo de 12 000 px.
 7. WebP codificado no cliente. O servidor guarda o original em WebP com largura máxima de 3200 px.
-8. A ligação da extensão é por URL e palavra-passe de acesso nas opções, trocados por um token de dispositivo. Não
-   há email nem código de emparelhamento.
+8. A ligação da extensão é por URL, email e palavra-passe nas opções, trocados por um token de dispositivo. Não
+   há código de emparelhamento.
 9. Os ZIPs só se descarregam com sessão iniciada.
 10. O nome "Recorte" e os textos da interface em pt-PT.
 11. As etiquetas da IA podem ser removidas por item (`hiddenAiTags`) e a remoção sobrevive ao reprocessamento. A IA
     cloud não cria etiquetas.
 12. Há duas versões automáticas, a da app e a da extensão (§10).
-13. A palavra-passe repõe-se por um comando no container (`recorte reset-password`), sem email.
+13. A palavra-passe repõe-se por um comando no container (`recorte reset-password <email>`), sem email.
 14. O assistente `/setup` fecha 15 minutos depois do arranque; reabri-lo é reiniciar o container.
 
 ## 12. Limitações conhecidas
@@ -476,6 +478,9 @@ Esta é a leitura de "Version Control pelo Git, de forma automática". É uma es
 2. Atualizações: só o aviso de nova versão da extensão (§10). O servidor não faz pedidos ao GitHub.
 3. Execução: tudo de uma vez ("one-shot"), sem pausas para revisão intermédia.
 4. Instalação sem configuração (decisão posterior): `docker run -d -p 8080:8080 -v recorte:/data
-   ghcr.io/qwickin/screenshotextension`, abrir `http://IP:8080` e seguir o assistente. Sem `.env` e sem email em
-   lado nenhum: acesso só por palavra-passe (um dono), Meilisearch embutido, endereço público e IA cloud guardados na
+   ghcr.io/qwickin/screenshotextension`, abrir `http://IP:8080` e seguir o assistente. Sem `.env`: um dono,
+   Meilisearch embutido, endereço público e IA cloud guardados na
    BD e editáveis na galeria, `/setup` aberto só 15 minutos depois do arranque.
+5. Ronda 2 (2026-11-07): volta o **email + palavra-passe** (substitui o acesso só por palavra-passe), sem limites de
+   pedidos; o resto da instalação sem configuração mantém-se. Novo tipo de item `link` ("Guardar link", §5 e §6) e
+   contexto da página inteira em todas as capturas (`text.page`).

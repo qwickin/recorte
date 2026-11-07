@@ -14,6 +14,7 @@ afterEach(() => {
   for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
 });
 
+export const EMAIL = "dono@recorte.test";
 export const PASSWORD = "correct horse battery";
 
 export async function makeApp(opts: { user?: boolean; env?: Record<string, string>; deps?: Partial<Deps> } = {}) {
@@ -21,7 +22,7 @@ export async function makeApp(opts: { user?: boolean; env?: Record<string, strin
   dirs.push(dir);
   const config = loadConfig({ DATA_DIR: dir, ...opts.env });
   const db = openDb(dir);
-  if (opts.user) await createUser(db, PASSWORD);
+  if (opts.user) await createUser(db, EMAIL, PASSWORD);
   const app = createApp({ db, config, ...opts.deps });
   const json = (path: string, body: unknown, headers: Record<string, string> = {}, method = "POST") =>
     app.request(path, { method, headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
@@ -34,13 +35,13 @@ export const cookieOf = (res: Response): string => {
 };
 
 export async function login(t: Awaited<ReturnType<typeof makeApp>>, headers: Record<string, string> = {}): Promise<string> {
-  return cookieOf(await t.json("/api/login", { password: PASSWORD }, headers));
+  return cookieOf(await t.json("/api/login", { email: EMAIL, password: PASSWORD }, headers));
 }
 
-/** A cookie for any account (login only reaches the owner): for the multi-account isolation tests. */
+/** A cookie for any account, without a login: for the multi-account isolation tests. */
 export const sessionCookie = (db: Parameters<typeof createSession>[0], userId: string): string => `${SESSION_COOKIE}=${createSession(db, userId)}`;
 
 export async function deviceToken(t: Awaited<ReturnType<typeof makeApp>>, name = "Chrome"): Promise<string> {
-  const r = await t.json("/api/devices", { password: PASSWORD, name });
+  const r = await t.json("/api/devices", { email: EMAIL, password: PASSWORD, name });
   return ((await r.json()) as { token: string }).token;
 }

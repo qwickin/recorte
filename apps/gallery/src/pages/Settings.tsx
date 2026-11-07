@@ -237,7 +237,7 @@ export function SettingsPage() {
         <ServerSettingsForm />
       </Section>
 
-      <Section title="Palavra-passe" description="A palavra-passe de acesso à galeria e às extensões.">
+      <Section title="Palavra-passe" description="A palavra-passe da tua conta, para a galeria e para as extensões.">
         <PasswordForm />
       </Section>
 

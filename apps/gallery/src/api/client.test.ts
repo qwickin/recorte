@@ -118,18 +118,18 @@ describe("api client cursor handling", () => {
     const api = createClient({ fetch: fetch as typeof globalThis.fetch, onUnauthorized });
     await expect(api.listTags()).rejects.toMatchObject({ status: 401, code: "unauthorized" });
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
-    await expect(api.login({ password: "x" })).rejects.toMatchObject({ status: 401 });
+    await expect(api.login({ email: "a@x.io", password: "x" })).rejects.toMatchObject({ status: 401 });
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
   });
 
-  it("setup and login send only the password", async () => {
+  it("setup and login send email + password", async () => {
     const fetch = vi.fn(async (_url: string, _init?: RequestInit) => json({ ok: true }));
     const api = createClient({ fetch: fetch as typeof globalThis.fetch });
-    await api.setup({ password: "palavra-passe" });
-    await api.login({ password: "palavra-passe" });
+    await api.setup({ email: "dono@x.io", password: "palavra-passe" });
+    await api.login({ email: "dono@x.io", password: "palavra-passe" });
     expect(fetch.mock.calls.map((c) => [c[0], c[1]?.method, JSON.parse(String(c[1]?.body))])).toEqual([
-      ["/api/setup", "POST", { password: "palavra-passe" }],
-      ["/api/login", "POST", { password: "palavra-passe" }],
+      ["/api/setup", "POST", { email: "dono@x.io", password: "palavra-passe" }],
+      ["/api/login", "POST", { email: "dono@x.io", password: "palavra-passe" }],
     ]);
   });
 

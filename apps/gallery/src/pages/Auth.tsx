@@ -33,6 +33,7 @@ function Field({ label, ...p }: { label: string } & React.InputHTMLAttributes<HT
 }
 
 export function LoginPage() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -46,21 +47,20 @@ export function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      await api.login({ password });
+      await api.login({ email: email.trim(), password });
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? "Palavra-passe errada." : "Não foi possível entrar. Tenta de novo.");
+      setError(err instanceof ApiError && err.status === 401 ? "Email ou palavra-passe errados." : "Não foi possível entrar. Tenta de novo.");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <AuthCard title="Entrar" intro="As tuas capturas ficam neste servidor. Entra com a palavra-passe de acesso.">
+    <AuthCard title="Entrar" intro="As tuas capturas ficam neste servidor. Entra com o teu email e a palavra-passe.">
       <form onSubmit={submit} className="flex flex-col gap-4">
-        {/* Hidden username: lets password managers file the password under this server. */}
-        <input type="text" name="username" autoComplete="username" value="recorte" readOnly hidden />
-        <Field label="Palavra-passe" type="password" autoComplete="current-password" required autoFocus value={password} onChange={(e) => setPassword(e.target.value)} />
+        <Field label="Email" type="email" name="email" autoComplete="username" inputMode="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
+        <Field label="Palavra-passe" type="password" name="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         <p className="min-h-5 text-[13px] text-[#ff8a8a]" role="alert">
           {error}
         </p>
@@ -72,7 +72,7 @@ export function LoginPage() {
   );
 }
 
-const STEPS = ["Palavra-passe", "Servidor", "Extensão"] as const;
+const STEPS = ["Conta", "Servidor", "Extensão"] as const;
 
 function StepDots({ step }: { step: number }) {
   return (
@@ -95,7 +95,8 @@ function StepDots({ step }: { step: number }) {
   );
 }
 
-function PasswordStep({ onDone, onClosed }: { onDone: () => void; onClosed: () => void }) {
+function AccountStep({ onDone, onClosed }: { onDone: () => void; onClosed: () => void }) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -103,18 +104,19 @@ function PasswordStep({ onDone, onClosed }: { onDone: () => void; onClosed: () =
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password.length < 8) return setError("Usa pelo menos 8 caracteres.");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError("Indica um email válido.");
+    if (password.length < 8) return setError("Usa pelo menos 8 caracteres na palavra-passe.");
     if (password !== confirm) return setError("As palavras-passe não coincidem.");
     setBusy(true);
     setError(null);
     try {
-      await api.setup({ password });
+      await api.setup({ email: email.trim(), password });
       onDone();
     } catch (err) {
       const code = err instanceof ApiError ? err.code : "";
       if (code === "setup_closed") return onClosed();
       if (code === "already_set_up") return navigate("/login", { replace: true });
-      setError(code === "invalid_request" ? "Usa uma palavra-passe com pelo menos 8 caracteres." : "Não foi possível guardar. Tenta de novo.");
+      setError(code === "invalid_request" ? "Confirma o email e usa uma palavra-passe com pelo menos 8 caracteres." : "Não foi possível guardar. Tenta de novo.");
     } finally {
       setBusy(false);
     }
@@ -122,11 +124,12 @@ function PasswordStep({ onDone, onClosed }: { onDone: () => void; onClosed: () =
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <input type="text" name="username" autoComplete="username" value="recorte" readOnly hidden />
-      <Field label="Palavra-passe de acesso" type="password" autoComplete="new-password" required minLength={8} autoFocus value={password} onChange={(e) => setPassword(e.target.value)} />
+      <Field label="Email" type="email" name="email" autoComplete="username" inputMode="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
+      <Field label="Palavra-passe" type="password" name="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
       <Field label="Confirmar palavra-passe" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
       <p className="text-[12.5px] leading-relaxed text-[var(--ink-3)]">
-        Serve para entrar na galeria e para ligar a extensão. Se a esqueceres, repõe-na no servidor com <code>recorte reset-password</code>.
+        Servem para entrar na galeria e para ligar a extensão. O email é só o teu nome de utilizador: o servidor não envia emails. Se esqueceres a
+        palavra-passe, repõe-na no servidor com <code>recorte reset-password &lt;email&gt;</code>.
       </p>
       <p className="min-h-5 text-[13px] text-[#ff8a8a]" role="alert">
         {error}
@@ -164,7 +167,7 @@ function ExtensionStep() {
         </li>
       </ol>
       <p className="rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-[13px] leading-relaxed text-[var(--ink-2)]">
-        Na extensão: URL público <code>{server}</code> + palavra-passe.
+        Na extensão: URL público <code>{server}</code>, o teu email e a palavra-passe.
       </p>
       <Button variant="secondary" className="h-11" onPress={() => navigate("/", { replace: true })}>
         Abrir a galeria
@@ -188,7 +191,7 @@ function SetupClosed() {
 }
 
 const STEP_TEXT: { title: string; intro: string }[] = [
-  { title: "Bem-vindo ao Recorte", intro: "Escolhe a palavra-passe de acesso. É a única coisa de que precisas para entrar." },
+  { title: "Bem-vindo ao Recorte", intro: "Cria a conta do dono: o teu email e uma palavra-passe." },
   { title: "Servidor", intro: "Confirma o endereço com que abres o Recorte. A IA na cloud é opcional e podes mudá-la depois em Definições." },
   { title: "Extensão", intro: "Instala a extensão no browser para começares a guardar capturas." },
 ];
@@ -215,7 +218,7 @@ export function SetupPage() {
   return (
     <AuthCard title={t.title} intro={t.intro} wide={step > 0}>
       <StepDots step={step} />
-      {step === 0 && <PasswordStep onDone={() => setStep(1)} onClosed={() => setClosed(true)} />}
+      {step === 0 && <AccountStep onDone={() => setStep(1)} onClosed={() => setClosed(true)} />}
       {step === 1 && (
         <ServerSettingsForm
           prefillOrigin
