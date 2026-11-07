@@ -45,6 +45,7 @@ COPY packages/shared/package.json packages/shared/
 # The other workspace manifests must exist for the frozen lockfile check.
 COPY apps/gallery/package.json apps/gallery/
 COPY apps/extension/package.json apps/extension/
+COPY e2e/package.json e2e/
 RUN --mount=type=cache,id=recorte-pnpm,target=/pnpm-store \
     pnpm install --frozen-lockfile --prod --filter "@recorte/server..." --store-dir /pnpm-store \
  # onnxruntime-node ships binaries for every OS/arch (~280 MB): keep only this platform's.
@@ -54,7 +55,7 @@ RUN --mount=type=cache,id=recorte-pnpm,target=/pnpm-store \
     done \
  # transformers.js bundles the onnxruntime-web code it needs; the package's browser builds (~140 MB) are unused in Node.
  && rm -rf node_modules/.pnpm/onnxruntime-web@*/node_modules/onnxruntime-web/dist \
- && rm -rf apps/gallery apps/extension
+ && rm -rf apps/gallery apps/extension e2e
 COPY tsconfig.base.json ./
 COPY apps/server/tsconfig.json apps/server/
 COPY apps/server/bin apps/server/bin
