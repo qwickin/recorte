@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-embed
+.output
+.wxt
+*.log
+.DS_Store
+data/
+meili_data/
+prototype/gallery/scripts/.raw
+prototype/ai-bench/models
