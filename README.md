@@ -122,12 +122,14 @@ Repor a palavra-passe termina todas as sessões e desliga todas as extensões. C
 ## Atualizar
 
 ```sh
-docker pull ghcr.io/qwickin/screenshotextension && docker rm -f recorte && docker run -d --name recorte --restart unless-stopped -p 8080:8080 -v recorte:/data ghcr.io/qwickin/screenshotextension
+docker pull ghcr.io/qwickin/screenshotextension
+docker stop recorte && docker rm recorte     # paragem limpa (SQLite e Meilisearch); os dados ficam no volume
+docker run -d --name recorte --restart unless-stopped -p 8080:8080 -v recorte:/data ghcr.io/qwickin/screenshotextension
 git pull && ../scripts/up.sh                 # compose, a partir do checkout
 docker compose pull && docker compose up -d  # compose, com a imagem publicada
 ```
 
-**Vindo da versão com dois serviços (`app` + `search`) e email:** a conta mantém-se e passa a entrar só com a palavra-passe (o email deixa de ser pedido; `ADMIN_EMAIL` e `SETUP_TOKEN` já não existem). O Meilisearch passa a correr dentro do container, com um índice novo em `docker/data/meili`: depois de atualizar, carrega uma vez em **Definições → Reconstruir índice**. A pasta antiga `docker/meili` pode ser apagada. As extensões têm de voltar a ligar-se só se a palavra-passe mudar.
+**Vindo da versão com dois serviços (`app` + `search`) e email:** a conta mantém-se e passa a entrar só com a palavra-passe (o email deixa de ser pedido; `ADMIN_EMAIL` e `SETUP_TOKEN` já não existem). O Meilisearch passa a correr dentro do container, com um índice novo em `docker/data/meili`: depois de atualizar, carrega uma vez em **Definições → Reconstruir índice**. Na primeira atualização, remove também o serviço `search` antigo, que de outro modo continua a correr sozinho: `docker compose up -d --remove-orphans` (com o Caddy: `docker compose -f compose.yml -f compose.caddy.yml up -d --remove-orphans`). A pasta antiga `docker/meili` pode ser apagada. As extensões têm de voltar a ligar-se só se a palavra-passe mudar.
 
 ## Desenvolvimento
 

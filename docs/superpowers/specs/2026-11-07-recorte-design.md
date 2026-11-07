@@ -55,7 +55,8 @@ dados precisa para não mudar depois.
 - **Browsers:** Chrome atual e Firefox desktop atual.
 - **Distribuição das extensões:** só ZIP descarregado da galeria (decisão do utilizador). Ver §12, limitações.
 - **Versões:** derivadas automaticamente do Git (decisão do utilizador; a leitura está em §10).
-- **HTTPS:** os cookies `Secure` exigem HTTPS fora de `localhost`. O compose traz um exemplo com reverse proxy.
+- **HTTPS:** opcional. Em `http://<IP>:8080` a sessão funciona (o cookie só leva `Secure` quando o pedido vem por
+  HTTPS). Para um domínio com HTTPS, o compose traz um exemplo com reverse proxy (Caddy).
 - **Internet no primeiro arranque:** o Meilisearch descarrega aí o modelo de embeddings.
 
 ## 4. Arquitetura

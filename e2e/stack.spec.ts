@@ -324,6 +324,51 @@ test("resources: image size and container memory", async () => {
   assert.ok(size > 0);
 });
 
+test("lifecycle: clean stop, restart, re-create on the same volume, Meilisearch crash → restarted", { timeout: 10 * 60_000 }, async () => {
+  const keySha = () => exec("sha256sum", "/data/secrets/meili.key").split(" ")[0];
+  const cacheStamp = () => exec("sh", "-c", "du -sk /data/meili/.cache | cut -f1; find /data/meili/.cache -type f | wc -l").trim();
+  const key0 = keySha();
+  const cache0 = cacheStamp();
+  const searchable = (what: string) =>
+    until(what, 120_000, async () => {
+      const r = await api(`/api/search?q=${encodeURIComponent("doce português")}`);
+      return r.ok && ((await r.json()) as { item: { id: string } }[]).some((h) => h.item.id === ids.nata);
+    }, 1000);
+  const healthy = () => until("health", 120_000, async () => (await fetch(`${base}/api/health`)).ok);
+
+  // SIGTERM: node stops the worker and Meilisearch, well inside Docker's 10 s grace period.
+  let t = Date.now();
+  docker(["stop", RUN], { quiet: true });
+  mark("stop", t);
+  assert.ok(timings.stop! < 9, `docker stop took ${timings.stop} s`);
+  assert.equal(docker(["inspect", "-f", "{{.State.ExitCode}}", RUN], { quiet: true }).trim(), "0");
+
+  t = Date.now();
+  docker(["start", RUN], { quiet: true });
+  await healthy();
+  assert.deepEqual(await (await fetch(`${base}/api/setup`)).json(), { needsSetup: false, open: false });
+  await searchable("search after restart");
+  mark("restartToSearchable", t);
+  assert.equal(keySha(), key0);
+
+  // Re-create (image upgrade path): same volume, same key, embedder model not downloaded again.
+  docker(["rm", "-f", RUN], { quiet: true });
+  t = Date.now();
+  docker(["run", "-d", "--name", RUN, "-p", `${base.replace("http://", "")}:8080`, "-v", `${RUN}:/data`, IMAGE], { quiet: true });
+  await healthy();
+  await searchable("search after re-create");
+  mark("recreateToSearchable", t);
+  assert.equal(keySha(), key0);
+  assert.equal(cacheStamp(), cache0, "embedder model cache changed (re-downloaded?)");
+
+  // The real binary crashes: the supervisor starts it again and search comes back.
+  exec("sh", "-c", 'for p in /proc/[0-9]*; do if tr "\\0" " " < $p/cmdline 2>/dev/null | grep -q "^/usr/local/bin/meilisearch "; then kill -9 ${p#/proc/}; fi; done');
+  await until("restart logged", 30_000, async () => /meilisearch exited \(SIGKILL\); restarting in/.test(logs()), 500);
+  t = Date.now();
+  await searchable("search after Meilisearch crash");
+  mark("crashToSearchable", t);
+});
+
 test("logs never contain the password or the Meilisearch key", () => {
   const key = exec("cat", "/data/secrets/meili.key").trim();
   assert.ok(key.length >= 32);
