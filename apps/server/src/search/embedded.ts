@@ -36,13 +36,13 @@ export interface MeiliPaths {
   db: string;
   dumps: string;
   snapshots: string;
-  /** Hugging Face cache: the embedder model downloaded on first start survives container re-creation. */
+  /** Meilisearch keeps the embedder model in $HOME/.cache/huggingface; HOME is `root`, so it lives on the volume. */
   cache: string;
 }
 
 export const meiliPaths = (dataDir: string): MeiliPaths => {
   const root = join(dataDir, "meili");
-  return { root, db: join(root, "data.ms"), dumps: join(root, "dumps"), snapshots: join(root, "snapshots"), cache: join(root, "cache") };
+  return { root, db: join(root, "data.ms"), dumps: join(root, "dumps"), snapshots: join(root, "snapshots"), cache: join(root, ".cache") };
 };
 
 export function meiliArgs(dataDir: string, port: number): string[] {
@@ -64,7 +64,8 @@ export function meiliArgs(dataDir: string, port: number): string[] {
  */
 export function meiliEnv(dataDir: string, key: string, parent: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
   const p = meiliPaths(dataDir);
-  const env: NodeJS.ProcessEnv = { MEILI_MASTER_KEY: key, HF_HOME: p.cache, HOME: p.root };
+  // HOME on the volume: the embedder model (~450 MB, $HOME/.cache/huggingface) is downloaded only once.
+  const env: NodeJS.ProcessEnv = { MEILI_MASTER_KEY: key, HOME: p.root };
   for (const k of ["PATH", "TZ", "LANG", "SSL_CERT_FILE", "SSL_CERT_DIR", "HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy"]) {
     if (parent[k]) env[k] = parent[k];
   }
@@ -102,7 +103,7 @@ export function superviseMeili(o: SupervisorOptions): Supervisor {
   const killAfter = o.killAfterMs ?? 8_000;
   const spawnFn = o.spawnFn ?? spawn;
   const p = meiliPaths(o.dataDir);
-  for (const d of [p.root, p.cache]) mkdirSync(d, { recursive: true });
+  mkdirSync(p.root, { recursive: true });
 
   let child: ChildProcess | null = null;
   let stopping = false;

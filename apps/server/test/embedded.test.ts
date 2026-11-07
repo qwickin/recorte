@@ -65,7 +65,7 @@ describe("embedded Meilisearch", () => {
       "--http-addr 127.0.0.1:7700 --db-path /data/meili/data.ms --dump-dir /data/meili/dumps --snapshot-dir /data/meili/snapshots --env production --no-analytics --log-level WARN",
     );
     const env = meiliEnv("/data", "the-key", { PATH: "/bin", MEILI_HTTP_ADDR: "0.0.0.0:7700", ADMIN_PASSWORD: "x", AI_CLOUD_KEY: "y" });
-    expect(env).toEqual({ MEILI_MASTER_KEY: "the-key", HF_HOME: "/data/meili/cache", HOME: "/data/meili", PATH: "/bin" });
+    expect(env).toEqual({ MEILI_MASTER_KEY: "the-key", HOME: "/data/meili", PATH: "/bin" });
   });
 
   it("restarts the child with backoff when it exits", async () => {
