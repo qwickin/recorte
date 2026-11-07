@@ -47,3 +47,68 @@ export function createPager(load: (cursor: string | null) => Promise<ItemPage>):
     },
   };
 }
+
+export type FeedState = {
+  items: ItemSummary[];
+  hasMore: boolean;
+  loading: boolean;
+  stale: boolean; // showing the previous filter's items while the new first page loads
+  total: number | null;
+  error: string | null;
+};
+
+export const INITIAL_FEED: FeedState = { items: [], hasMore: true, loading: false, stale: false, total: null, error: null };
+
+/**
+ * Feed state machine behind useItemFeed, free of React so it can be tested.
+ * Only `reset` aborts: it replaces the pager and its AbortController. `loadMore` reuses the live
+ * controller, so a second page is never requested with an already aborted signal.
+ */
+export function createFeedLoader(
+  list: (cursor: string | null, signal: AbortSignal) => Promise<ItemPage>,
+  onChange: (s: FeedState) => void,
+) {
+  let state = INITIAL_FEED;
+  let ctrl = new AbortController();
+  let pager: Pager | null = null;
+  const set = (s: FeedState) => {
+    state = s;
+    onChange(s);
+  };
+
+  async function run(reset: boolean) {
+    if (reset) {
+      ctrl.abort();
+      ctrl = new AbortController();
+      const signal = ctrl.signal;
+      pager = createPager((cursor) => list(cursor, signal));
+      set({ ...INITIAL_FEED, items: state.items, stale: state.items.length > 0, loading: true, total: state.total });
+    } else {
+      if (!pager || state.loading || !state.hasMore || state.stale) return;
+      set({ ...state, loading: true, error: null });
+    }
+    const p = pager!;
+    try {
+      const page = await p.next();
+      if (p !== pager) return; // a reset happened meanwhile
+      if (!page) return set({ ...state, loading: false, hasMore: false });
+      set({ items: mergePage(state.items, page, reset), hasMore: !p.done, loading: false, stale: false, total: page.total, error: null });
+    } catch (e) {
+      if (p !== pager || (e as Error).name === "AbortError") return;
+      set({ ...state, loading: false, stale: false, error: "Não foi possível carregar mais capturas." });
+    }
+  }
+
+  return {
+    get state() {
+      return state;
+    },
+    reset: () => run(true),
+    loadMore: () => run(false),
+    dispose: () => ctrl.abort(),
+    /** Local edits / SSE: patch the items without touching the cursor. */
+    update(fn: (s: FeedState) => FeedState) {
+      set(fn(state));
+    },
+  };
+}

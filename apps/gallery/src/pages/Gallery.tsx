@@ -14,12 +14,16 @@ import { SelectIcon } from "../components/icons";
 import { useEvents } from "../hooks/useEvents";
 import { useItemFeed } from "../hooks/useItemFeed";
 import { displayTags, displayTitle, matchesFilters } from "../lib/item";
+import { newerFirst } from "../api/feed";
 import { Link } from "../lib/router";
 import { isMac, typeLabel } from "../lib/text";
 
 const ratio = (c: ItemSummary) => (c.width > 0 ? c.height / c.width : 0.62);
 const keyOf = (c: ItemSummary) => c.id;
 const andList = new Intl.ListFormat("pt-PT", { type: "conjunction" });
+/** The server's /api/items/bulk limit; larger selections go in several requests. */
+const BULK_MAX = 200;
+const chunks = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 export function GalleryPage() {
@@ -73,8 +77,15 @@ export function GalleryPage() {
     },
     onUpdated: (it) => {
       scheduleTags();
-      if (!feed.items.some((x) => x.id === it.id)) return;
-      if (matchesFilters(it, filtersRef.current) === false) feed.remove([it.id]);
+      const match = matchesFilters(it, filtersRef.current);
+      if (!feed.items.some((x) => x.id === it.id)) {
+        // Now matches the filter (e.g. a tag was just added): insert it, but only inside the loaded range
+        // so later pages still append in keyset order.
+        const last = feed.items.at(-1);
+        if (match === true && (!feed.hasMore || (last && newerFirst(it, last) < 0))) feed.upsert(it);
+        return;
+      }
+      if (match === false) feed.remove([it.id]);
       else feed.upsert(it);
       setDetail((d) => (d?.id === it.id ? it : d));
     },
@@ -295,8 +306,9 @@ export function GalleryPage() {
         <BulkBar
           ids={[...selected]}
           categories={categories}
-          onDone={(removed) => {
+          onDone={(removed, refresh) => {
             if (removed.length) feed.remove(removed);
+            if (refresh) feed.reload(); // e.g. category changed under a category filter
             setSelected(new Set());
             scheduleTags();
           }}
@@ -326,7 +338,7 @@ export function GalleryPage() {
 type BulkProps = {
   ids: string[];
   categories: Category[];
-  onDone: (removedIds: string[]) => void;
+  onDone: (removedIds: string[], refresh?: boolean) => void;
   onSelectAll: () => void;
   onCancel: () => void;
 };
@@ -337,13 +349,13 @@ function BulkBar({ ids, categories, onDone, onSelectAll, onCancel }: BulkProps) 
   const [msg, setMsg] = useState<string | null>(null);
   const none = ids.length === 0;
 
-  const run = async (fn: () => Promise<string[]>, ok: (n: number) => string) => {
+  const run = async (fn: () => Promise<string[]>, ok: (n: number) => string, refresh = false) => {
     setBusy(true);
     setMsg(null);
     try {
       const removed = await fn();
       setMsg(ok(ids.length));
-      onDone(removed);
+      onDone(removed, refresh);
     } catch {
       setMsg("Algo falhou. Tenta de novo.");
     } finally {
@@ -352,7 +364,11 @@ function BulkBar({ ids, categories, onDone, onSelectAll, onCancel }: BulkProps) 
   };
 
   const del = () =>
-    run(async () => (await api.bulk({ ids, action: "delete" })).ids, (n) => `${plural(n, "captura movida", "capturas movidas")} para o lixo`);
+    run(async () => {
+      const done: string[] = [];
+      for (const part of chunks(ids, BULK_MAX)) done.push(...(await api.bulk({ ids: part, action: "delete" })).ids);
+      return done;
+    }, (n) => `${plural(n, "captura movida", "capturas movidas")} para o lixo`);
 
   // PATCH replaces user.tags, so each item is merged on its own (summary tags also hold AI tags).
   const addTag = () => {
@@ -372,9 +388,9 @@ function BulkBar({ ids, categories, onDone, onSelectAll, onCancel }: BulkProps) 
 
   const setCategory = (categoryId: string) =>
     run(async () => {
-      await api.bulk({ ids, action: "patch", patch: { categoryId: categoryId || null } });
+      for (const part of chunks(ids, BULK_MAX)) await api.bulk({ ids: part, action: "patch", patch: { categoryId: categoryId || null } });
       return [];
-    }, (n) => `Categoria mudada em ${plural(n, "captura", "capturas")}`);
+    }, (n) => `Categoria mudada em ${plural(n, "captura", "capturas")}`, true);
 
   return (
     <div className="bulk-bar fade-in" role="toolbar" aria-label="Ações para as capturas selecionadas">

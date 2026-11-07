@@ -51,6 +51,8 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
   const [loaded, setItem] = useState<Item | null>(null);
   // Never edit a previous item while the next one loads (←/→ swap the summary first).
   const item = loaded && loaded.id === s?.id ? loaded : null;
+  const shownId = useRef<string | null>(null);
+  shownId.current = s?.id ?? null;
   const [loadError, setLoadError] = useState(false);
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
@@ -118,7 +120,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
     setError(null);
     try {
       const next = await api.patchItem(item.id, patch);
-      setItem(next);
+      if (shownId.current === next.id) setItem(next); // the user may have moved on with ←/→
       onChanged(next);
     } catch {
       setError("Não foi possível guardar. Tenta de novo.");

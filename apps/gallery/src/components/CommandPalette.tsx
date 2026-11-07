@@ -94,7 +94,7 @@ export function CommandPalette({ open, onOpenChange, tags, onPick, onTag }: Prop
   }, [q]);
 
   const options: Option[] = q.trim() ? (hits ?? []).map((hit) => ({ kind: "hit", hit })) : SUGGESTIONS.map((text) => ({ kind: "suggestion", text }));
-  const top = hits?.[0]?.score ?? 1;
+  const top = hits?.[0]?.score || 1;
 
   useEffect(() => {
     listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest" });

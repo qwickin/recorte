@@ -196,9 +196,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^6.2.1
         version: 6.2.1(vite@8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
-      playwright-core:
-        specifier: ^1.65.0
-        version: 1.65.0
       tailwindcss:
         specifier: ^4.3.5
         version: 4.3.5
@@ -1724,11 +1721,6 @@ packages:
   platform@1.3.6:
     resolution: {integrity: sha512-fnWVljUchTro6RiCFvCXBbNhJc2NijN7oIQxbwsyL0buWJPG85v81ehlHI9fXrJsMNgTofEoWIQeClKpgxFLrg==}
 
-  playwright-core@1.65.0:
-    resolution: {integrity: sha512-vNSKgH6YqtN7cdT/L334zo0a+YwkrpicyrHJlWWPIm/Q+Nn2SWInil01oT0mbu96U4GgoRtCYQD9CzJQgju+lA==}
-    engines: {node: '>=20'}
-    hasBin: true
-
   postcss@8.5.32:
     resolution: {integrity: sha512-LJlKCCAUFKOuZxipUdYw1NzIITEsPcgyOG9LkvRJvuKj/bRzbuRY0ARXvL0pWGpsZvn8jku+LMep2eU0seHp8g==}
     engines: {node: ^10 || ^12 || >=14}
@@ -3111,8 +3103,6 @@ snapshots:
   picomatch@4.0.7: {}
 
   platform@1.3.6: {}
-
-  playwright-core@1.65.0: {}
 
   postcss@8.5.32:
     dependencies:

@@ -145,6 +145,7 @@ function DeviceList() {
   const [devices, setDevices] = useState<Device[] | null>(null);
   const [info, setInfo] = useState<ExtensionInfo | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     api.listDevices().then(setDevices, () => setDevices([]));
     api.extensionInfo().then(setInfo, () => {});
@@ -152,14 +153,22 @@ function DeviceList() {
   const revoke = async (d: Device) => {
     if (!window.confirm(`Revogar “${d.name}”? Essa extensão terá de voltar a entrar.`)) return;
     setBusy(d.id);
+    setError(null);
     try {
       await api.revokeDevice(d.id);
       setDevices((ds) => ds?.filter((x) => x.id !== d.id) ?? null);
+    } catch {
+      setError(`Não foi possível revogar “${d.name}”. Tenta de novo.`);
     } finally {
       setBusy(null);
     }
   };
-  return <Devices devices={devices} latest={info?.version} onRevoke={revoke} busyId={busy} />;
+  return (
+    <div className="flex flex-col gap-2">
+      <Devices devices={devices} latest={info?.version} onRevoke={revoke} busyId={busy} />
+      <Status text={error} error />
+    </div>
+  );
 }
 
 function Maintenance() {
