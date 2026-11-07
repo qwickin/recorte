@@ -96,7 +96,7 @@ worker:   miniatura + cores → SigLIP2 (tipo, visual) → palavras-chave → [I
 | O quê | Onde | Notas |
 |---|---|---|
 | Fonte de verdade de cada item | `meta.json` na pasta do item | Campos do utilizador e da IA em blocos separados. Tem `schemaVersion`. |
-| Listagem, filtros, contagens de etiquetas, contas, categorias, tarefas | SQLite (`/data/app.db`) | O scroll infinito usa keyset (`createdAt DESC, id DESC`). |
+| Listagem, filtros, contagens de etiquetas, contas, categorias, tarefas | SQLite (`/data/recorte.db`) | O scroll infinito usa keyset (`createdAt DESC, id DESC`). |
 | Pesquisa ⌘K (texto + semântica) | Meilisearch | Só pesquisa. Não lista o feed: o limite `maxTotalHits` (1000 por defeito) cortaria o scroll infinito. |
 
 O SQLite e o Meilisearch reconstroem-se a partir dos `meta.json` (ação "Reconstruir índice"). É também esse o

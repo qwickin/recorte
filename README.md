@@ -101,7 +101,7 @@ Repor a palavra-passe termina todas as sessões e desliga todas as extensões. C
 
 ## Cópias de segurança
 
-- **Tudo o que importa está em `docker/data`** (`/data` no container): as imagens, um `meta.json` por captura e o SQLite (`app.db`). Copia essa pasta, de preferência com a app parada (`docker compose stop app`). A galeria também exporta tudo num ZIP: **Definições → Exportar**.
+- **Tudo o que importa está em `docker/data`** (`/data` no container): as imagens, um `meta.json` por captura e o SQLite (`recorte.db`). Copia essa pasta, de preferência com a app parada (`docker compose stop app`). A galeria também exporta tudo num ZIP: **Definições → Exportar**.
 - **`docker/meili` não precisa de cópia.** O índice de pesquisa reconstrói-se a partir dos `meta.json`: **Definições → Reconstruir índice**. É também assim que se atualiza o Meilisearch: para o serviço, apaga `docker/meili`, arranca e reconstrói o índice.
 
 ## Atualizar
