@@ -449,7 +449,6 @@ async function getStatus(): Promise<Status> {
   return {
     configured: !!conn,
     server: s.server,
-    email: s.email,
     ...(await pendingCounts(s)),
     authNeeded: s.authNeeded,
     version,

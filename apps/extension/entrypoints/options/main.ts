@@ -37,14 +37,11 @@ function render(s: Settings): void {
   $("connected").hidden = !connected;
   $("login").hidden = connected && !forceLogin;
   $("cancel-login").hidden = !connected;
-  $("who-email").textContent = s.email ?? "";
   $("who-server").textContent = s.server ?? "";
   $("auth-needed").hidden = !s.authNeeded;
   $<HTMLInputElement>("save-without-asking").checked = s.saveWithoutAsking;
   const server = $<HTMLInputElement>("server");
   if (!server.value && s.server) server.value = s.server;
-  const email = $<HTMLInputElement>("email");
-  if (!email.value && s.email) email.value = s.email;
 }
 
 async function renderShortcuts(): Promise<void> {
@@ -91,7 +88,6 @@ async function main(): Promise<void> {
     const err = $("login-error");
     err.hidden = true;
     const server = normalizeServerUrl($<HTMLInputElement>("server").value);
-    const email = $<HTMLInputElement>("email").value.trim();
     const passwordInput = $<HTMLInputElement>("password");
     const name = $<HTMLInputElement>("device").value.trim() || defaultDeviceName();
     if (!server) {
@@ -103,10 +99,10 @@ async function main(): Promise<void> {
     btn.disabled = true;
     btn.textContent = "A ligar…";
     try {
-      const { token, id } = await registerDevice(server, email, passwordInput.value, name);
+      const { token, id } = await registerDevice(server, passwordInput.value, name);
       // The account id scopes the offline queue: captures are only ever sent to the account they were made for.
       const me = await fetchMe({ server, token }, extensionVersion());
-      await setSettings({ server, token, deviceId: id, userId: me.id, email: me.email, authNeeded: false });
+      await setSettings({ server, token, deviceId: id, userId: me.id, authNeeded: false });
       passwordInput.value = "";
       forceLogin = false;
       await send({ type: "recorte:connected" });
@@ -115,7 +111,7 @@ async function main(): Promise<void> {
       err.textContent =
         e2 instanceof ApiError
           ? e2.status === 401
-            ? "Email ou password errados."
+            ? "Palavra-passe errada."
             : e2.status === 429
               ? "Demasiadas tentativas. Espera um pouco."
               : `O servidor respondeu ${e2.status}.`

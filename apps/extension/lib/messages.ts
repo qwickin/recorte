@@ -24,7 +24,6 @@ export interface PageMetrics {
 export interface Status {
   configured: boolean;
   server: string | null;
-  email: string | null;
   /** Captures waiting for the current connection. */
   pending: number;
   /** Captures parked for another server/account (never sent to the current one). */

@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { absoluteUrl, buildUploadMeta, capItemText, normalizeServerUrl } from "../lib/api";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { ApiError, absoluteUrl, buildUploadMeta, capItemText, fetchMe, normalizeServerUrl, registerDevice } from "../lib/api";
 
 const text = { selection: "olá", meta: {}, headings: [], alts: [] };
 
@@ -63,8 +63,38 @@ describe("server URLs", () => {
     expect(normalizeServerUrl("http://localhost:8788/")).toBe("http://localhost:8788");
     expect(normalizeServerUrl("ftp://x")).toBeNull();
   });
+  it("bare IPs and localhost default to http:// (the plain docker run install), names to https://", () => {
+    expect(normalizeServerUrl("192.168.1.20:8080")).toBe("http://192.168.1.20:8080");
+    expect(normalizeServerUrl("10.0.0.5")).toBe("http://10.0.0.5");
+    expect(normalizeServerUrl("localhost:8080/")).toBe("http://localhost:8080");
+    expect(normalizeServerUrl("[::1]:8080")).toBe("http://[::1]:8080");
+    expect(normalizeServerUrl("nas.local:8080")).toBe("https://nas.local:8080");
+    expect(normalizeServerUrl("https://192.168.1.20")).toBe("https://192.168.1.20");
+  });
   it("resolves relative ticket URLs", () => {
     expect(absoluteUrl("https://r.pt", "/auth/ticket?t=1")).toBe("https://r.pt/auth/ticket?t=1");
     expect(absoluteUrl("https://r.pt", "https://other/auth/ticket?t=1")).toBe("https://other/auth/ticket?t=1");
+  });
+});
+
+describe("device registration (password only)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  it("POSTs {password, name} without credentials and returns the token", async () => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => new Response(JSON.stringify({ token: "t", id: "d" }), { status: 201 }));
+    vi.stubGlobal("fetch", fetch);
+    expect(await registerDevice("http://10.0.0.5:8080", "palavra-passe", "Chrome em macOS")).toEqual({ token: "t", id: "d" });
+    const [url, init] = fetch.mock.calls[0]!;
+    expect(url).toBe("http://10.0.0.5:8080/api/devices");
+    expect(init?.method).toBe("POST");
+    expect(init?.credentials).toBe("omit");
+    expect(JSON.parse(String(init?.body))).toEqual({ password: "palavra-passe", name: "Chrome em macOS" });
+  });
+  it("throws ApiError(401) on a wrong password", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ error: "invalid_credentials" }), { status: 401 })));
+    await expect(registerDevice("http://x", "nope", "n")).rejects.toEqual(new ApiError(401, "invalid_credentials"));
+  });
+  it("/api/me gives the account id", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ id: "u1" }), { status: 200 })));
+    expect(await fetchMe({ server: "http://x", token: "t" }, "1.0.0")).toEqual({ id: "u1" });
   });
 });

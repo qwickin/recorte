@@ -28,11 +28,17 @@ export function isHttpUrl(url: string | undefined | null): url is string {
   }
 }
 
-/** "recorte.example.com/" → "https://recorte.example.com". Returns null when it cannot be a server URL. */
+/** A host typed without a scheme that is an IP literal or localhost: the plain `docker run` install serves http. */
+const PLAIN_HTTP_HOST = /^(localhost|\d{1,3}(\.\d{1,3}){3}|\[[0-9a-f:.]+\])(:\d+)?(\/|$)/i;
+
+/**
+ * "recorte.example.com/" → "https://recorte.example.com"; "192.168.1.20:8080" → "http://192.168.1.20:8080".
+ * Returns null when it cannot be a server URL.
+ */
 export function normalizeServerUrl(input: string): string | null {
   let s = input.trim();
   if (!s) return null;
-  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) s = `https://${s}`;
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) s = `${PLAIN_HTTP_HOST.test(s) ? "http" : "https"}://${s}`;
   try {
     const u = new URL(s);
     if (u.protocol !== "http:" && u.protocol !== "https:") return null;
@@ -148,24 +154,19 @@ async function postJson<T>(conn: Connection, version: string, path: string, body
   return (await res.json()) as T;
 }
 
-/** Exchanges credentials for a device token. The password is not stored anywhere. */
-export async function registerDevice(
-  server: string,
-  email: string,
-  password: string,
-  name: string,
-): Promise<{ token: string; id: string }> {
+/** Exchanges the access password for a device token. The password is not stored anywhere. */
+export async function registerDevice(server: string, password: string, name: string): Promise<{ token: string; id: string }> {
   const res = await fetch(`${server}${API.devices}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ email, password, name }),
+    body: JSON.stringify({ password, name }),
     credentials: "omit",
   });
   if (!res.ok) throw new ApiError(res.status, await errorCode(res));
   return (await res.json()) as { token: string; id: string };
 }
 
-export const fetchMe = (c: Connection, v: string) => getJson<{ id: string; email: string }>(c, v, "/api/me");
+export const fetchMe = (c: Connection, v: string) => getJson<{ id: string }>(c, v, API.me);
 export const fetchTags = (c: Connection, v: string) => getJson<TagCount[]>(c, v, API.tags);
 export const fetchCategories = (c: Connection, v: string) => getJson<Category[]>(c, v, API.categories);
 export const createCategory = (c: Connection, v: string, name: string) => postJson<Category>(c, v, API.categories, { name });

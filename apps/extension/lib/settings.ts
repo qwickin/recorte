@@ -9,7 +9,6 @@ export interface Settings {
   deviceId: string | null;
   /** Account id on the server (from /api/me); with `server` it scopes the offline queue. */
   userId: string | null;
-  email: string | null;
   /** "Guardar sem perguntar": skip the pre-save dialog. */
   saveWithoutAsking: boolean;
   /** Set when the server answered 401 (token revoked/expired). Cleared on a new login. */
@@ -21,7 +20,6 @@ const DEFAULTS: Settings = {
   token: null,
   deviceId: null,
   userId: null,
-  email: null,
   saveWithoutAsking: false,
   authNeeded: false,
 };

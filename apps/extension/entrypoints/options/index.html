@@ -10,13 +10,13 @@
     <main class="options">
       <header>
         <h1>Recorte</h1>
-        <p class="muted">Liga a extensão ao teu servidor. A password serve só para criar um token deste dispositivo e nunca fica guardada.</p>
+        <p class="muted">Liga a extensão ao teu servidor com o URL público e a palavra-passe de acesso. A palavra-passe serve só para criar um token deste dispositivo e nunca fica guardada.</p>
       </header>
 
       <section class="card" id="connected" hidden>
         <div>
           <span class="label">Ligado</span>
-          <p class="who"><span id="who-email"></span> <span class="muted">em</span> <span id="who-server"></span></p>
+          <p class="who"><span class="muted">Servidor</span> <span id="who-server"></span></p>
           <p class="error" id="auth-needed" hidden>O servidor recusou o token deste dispositivo. Volta a ligar a extensão — as capturas pendentes ficam na fila.</p>
         </div>
         <div class="actions">
@@ -26,16 +26,13 @@
       </section>
 
       <form class="card" id="login" autocomplete="on">
-        <label class="field"><span class="label">Servidor</span>
-          <input class="input" id="server" name="server" type="url" placeholder="https://recorte.exemplo.pt" required autocomplete="url" />
+        <label class="field"><span class="label">URL do servidor</span>
+          <input class="input" id="server" name="server" type="text" inputmode="url" placeholder="http://192.168.1.20:8080" required autocomplete="url" spellcheck="false" />
         </label>
-        <label class="field"><span class="label">Email</span>
-          <input class="input" id="email" name="email" type="email" required autocomplete="username" />
-        </label>
-        <label class="field"><span class="label">Password</span>
+        <label class="field"><span class="label">Palavra-passe de acesso</span>
           <input class="input" id="password" name="password" type="password" required autocomplete="current-password" />
         </label>
-        <label class="field"><span class="label">Nome deste dispositivo</span>
+        <label class="field"><span class="label">Nome deste dispositivo <span class="muted">(opcional)</span></span>
           <input class="input" id="device" name="device" type="text" maxlength="80" />
         </label>
         <p class="error" id="login-error" hidden></p>
