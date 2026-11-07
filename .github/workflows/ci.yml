@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  PNPM_VERSION: 12.16.1
+
+jobs:
+  check:
+    name: Typecheck, test, build
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.version.outputs.app }}
+      extension: ${{ steps.version.outputs.extension }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # full history + tags: versions count commits since the last vX.Y tag
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        run: npm install -g pnpm@${{ env.PNPM_VERSION }} && pnpm --version
+
+      - name: Versions
+        id: version
+        run: |
+          echo "app=$(node scripts/version.mjs --app)" >> "$GITHUB_OUTPUT"
+          echo "extension=$(node scripts/version.mjs --extension)" >> "$GITHUB_OUTPUT"
+          node scripts/version.mjs
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        env:
+          EXTENSION_VERSION: ${{ steps.version.outputs.extension }}
+        run: |
+          pnpm build
+          pnpm --filter @recorte/extension zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extensions-${{ steps.version.outputs.extension }}
+          path: |
+            apps/extension/.output/recorte-chrome.zip
+            apps/extension/.output/recorte-firefox.zip
+          if-no-files-found: error
+
+  image:
+    name: Image (linux/amd64, linux/arm64) → GHCR
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            APP_VERSION=${{ needs.check.outputs.app }}
+            EXTENSION_VERSION=${{ needs.check.outputs.extension }}
+          tags: |
+            ${{ steps.image.outputs.name }}:${{ needs.check.outputs.app }}
+            ${{ steps.image.outputs.name }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
