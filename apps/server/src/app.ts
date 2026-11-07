@@ -10,6 +10,7 @@ import { extensionRoutes } from "./routes/extension";
 import { itemRoutes } from "./routes/items";
 import { searchRoutes } from "./routes/search";
 import { tagRoutes } from "./routes/tags";
+import { galleryRoutes } from "./static";
 
 export type { Deps, DepsInput } from "./deps";
 export type { AppEnv } from "./auth/middleware";
@@ -32,6 +33,7 @@ export function createApp(input: DepsInput): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
   app.use("*", originCheck(deps.config.publicUrl));
   for (const register of routeModules) register(app, deps);
+  galleryRoutes(app, deps.config.galleryDir); // last: SPA fallback for every non-API path
   app.onError((err, c) => {
     console.error(err);
     return c.json({ error: "internal_error" }, 500);

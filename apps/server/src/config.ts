@@ -1,4 +1,8 @@
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+/** Dev default: the gallery build next to this package (Docker sets GALLERY_DIR=/app/gallery). */
+const DEV_GALLERY_DIR = fileURLToPath(new URL("../../gallery/dist", import.meta.url));
 
 export interface Config {
   dataDir: string;
@@ -15,6 +19,7 @@ export interface Config {
   appVersion: string;
   extensionVersion: string;
   downloadsDir: string;
+  galleryDir: string;
 }
 
 const opt = (v: string | undefined): string | null => (v && v.trim() ? v.trim() : null);
@@ -36,5 +41,6 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     appVersion: opt(env.APP_VERSION) ?? "0.0.0",
     extensionVersion: opt(env.EXTENSION_VERSION) ?? "0.0.0",
     downloadsDir: resolve(opt(env.DOWNLOADS_DIR) ?? "/app/downloads"),
+    galleryDir: resolve(opt(env.GALLERY_DIR) ?? DEV_GALLERY_DIR),
   };
 }

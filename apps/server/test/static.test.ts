@@ -1,0 +1,90 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterAll, describe, expect, it } from "vitest";
+import { GALLERY_CSP } from "../src/static";
+import { login, makeApp } from "./helpers";
+
+const base = mkdtempSync(join(tmpdir(), "recorte-gallery-"));
+const gallery = join(base, "dist");
+mkdirSync(join(gallery, "assets"), { recursive: true });
+writeFileSync(join(gallery, "index.html"), "<!doctype html><title>Recorte</title><div id=root></div>");
+writeFileSync(join(gallery, "assets", "index-abc.js"), "console.log(1)");
+writeFileSync(join(gallery, "assets", "index-abc.css"), "body{}");
+writeFileSync(join(base, "secret.txt"), "nope"); // outside the gallery dir
+afterAll(() => rmSync(base, { recursive: true, force: true }));
+
+describe("gallery static serving", () => {
+  const make = (user = false) => makeApp({ user, env: { GALLERY_DIR: gallery } });
+
+  it("serves index.html with the CSP for the app routes (SPA fallback)", async () => {
+    const t = await make();
+    for (const path of ["/", "/lixo", "/extensao", "/definicoes", "/login", "/setup", "/some/deep/link"]) {
+      const r = await t.app.request(path);
+      expect(r.status, path).toBe(200);
+      expect(r.headers.get("content-type")).toContain("text/html");
+      expect(await r.text()).toContain('<div id=root>');
+      const csp = r.headers.get("content-security-policy");
+      expect(csp).toBe(GALLERY_CSP);
+      expect(csp).toContain("img-src 'self' data: blob:");
+      expect(csp).toContain("connect-src 'self'");
+      expect(csp).toContain("frame-src https://platform.twitter.com");
+      expect(csp).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
+      expect(csp).toContain("font-src https://fonts.gstatic.com");
+      expect(r.headers.get("cache-control")).toBe("no-cache");
+    }
+  });
+
+  it("serves built assets with their type and long cache", async () => {
+    const t = await make();
+    const js = await t.app.request("/assets/index-abc.js");
+    expect(js.status).toBe(200);
+    expect(js.headers.get("content-type")).toContain("text/javascript");
+    expect(js.headers.get("cache-control")).toContain("immutable");
+    expect(await js.text()).toBe("console.log(1)");
+    const css = await t.app.request("/assets/index-abc.css");
+    expect(css.headers.get("content-type")).toContain("text/css");
+  });
+
+  it("does not answer missing assets with HTML", async () => {
+    const t = await make();
+    const r = await t.app.request("/assets/missing.js");
+    expect(r.status).toBe(404);
+    expect(r.headers.get("content-type")).not.toContain("text/html");
+  });
+
+  it("never falls back to HTML for /api, /downloads or /auth", async () => {
+    const t = await make();
+    for (const path of ["/api/nope", "/api", "/downloads/other.zip", "/auth/unknown"]) {
+      const r = await t.app.request(path);
+      expect(r.status, path).toBeGreaterThanOrEqual(400);
+      expect(r.headers.get("content-type") ?? "", path).not.toContain("text/html");
+    }
+  });
+
+  it("keeps API routes working (and 401 stays JSON)", async () => {
+    const t = await make(true);
+    const anon = await t.app.request("/api/items");
+    expect(anon.status).toBe(401);
+    expect(anon.headers.get("content-type")).toContain("application/json");
+    const cookie = await login(t);
+    const r = await t.app.request("/api/tags", { headers: { cookie } });
+    expect(r.status).toBe(200);
+    expect(await r.json()).toEqual([]);
+  });
+
+  it("blocks path traversal", async () => {
+    const t = await make();
+    for (const path of ["/..%2fsecret.txt", "/%2e%2e/secret.txt", "/assets/..%2f..%2fsecret.txt"]) {
+      const r = await t.app.request(path);
+      expect(await r.text(), path).not.toContain("nope");
+    }
+  });
+
+  it("reports a missing build instead of crashing", async () => {
+    const t = await makeApp({ env: { GALLERY_DIR: join(gallery, "does-not-exist") } });
+    const r = await t.app.request("/");
+    expect(r.status).toBe(404);
+    expect(await r.json()).toEqual({ error: "gallery_not_built" });
+  });
+});
