@@ -51,7 +51,7 @@ export function categoryRoutes(app: Hono<AppEnv>, deps: Deps): void {
     return c.json(out({ id: cur.id, name, color }));
   });
 
-  app.delete("/api/categories/:id", auth, (c) => {
+  app.delete("/api/categories/:id", auth, async (c) => {
     const userId = c.var.userId;
     const cur = find(userId, c.req.param("id"));
     if (!cur) return c.json({ error: "not_found" }, 404);
@@ -62,7 +62,9 @@ export function categoryRoutes(app: Hono<AppEnv>, deps: Deps): void {
       if (!m) continue;
       const next = { ...m, user: { ...m.user, categoryId: null }, updatedAt: new Date().toISOString() };
       svc.persist(next);
-      if (!next.deletedAt) deps.events.emit(userId, { type: "item.updated", data: summaryFromMeta(next) });
+      if (next.deletedAt) continue; // trashed: not in the gallery nor in search
+      deps.events.emit(userId, { type: "item.updated", data: summaryFromMeta(next) });
+      await svc.syncSearch(next, "index"); // best effort; enqueues an `index` retry when search is down
     }
     db.prepare("DELETE FROM categories WHERE id = ?").run(cur.id);
     return c.body(null, 204);

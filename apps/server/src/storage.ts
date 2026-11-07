@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, rmdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Item } from "@recorte/shared";
 import { ULID_RE, ulidTime } from "./ids";
@@ -80,6 +80,58 @@ export class Storage {
     const root = join(this.dataDir, "items", userId);
     for (const y of ls(root)) for (const mo of ls(join(root, y))) for (const id of ls(join(root, y, mo))) if (ULID_RE.test(id)) out.push(id);
     return out.sort();
+  }
+
+  /** Names of the user directories under `items/`. */
+  listUserDirs(): string[] {
+    try {
+      return readdirSync(join(this.dataDir, "items"), { withFileTypes: true })
+        .filter((d) => d.isDirectory() && SAFE_ID.test(d.name))
+        .map((d) => d.name);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Moves every item directory of `from` to `to` (same year/month layout), then removes the emptied folders of
+   * `from`. An id that already exists under `to` is left where it is. Returns the moved ids. meta.json is not
+   * touched here: the caller rewrites `userId` (a crash in between is repaired by the next run).
+   */
+  moveUserItems(from: string, to: string): { moved: string[]; skipped: string[] } {
+    if (!SAFE_ID.test(from) || !SAFE_ID.test(to) || from === to) throw new Error("invalid user id");
+    const moved: string[] = [];
+    const skipped: string[] = [];
+    for (const id of this.listItemIds(from)) {
+      const src = this.itemDir(from, id);
+      const dst = this.itemDir(to, id);
+      if (existsSync(dst)) {
+        skipped.push(id);
+        continue;
+      }
+      mkdirSync(join(dst, ".."), { recursive: true });
+      renameSync(src, dst);
+      moved.push(id);
+    }
+    // Drop the empty month/year/user folders left behind (anything not empty stays).
+    const root = join(this.dataDir, "items", from);
+    const rmEmpty = (dir: string): void => {
+      let names: string[];
+      try {
+        names = readdirSync(dir);
+      } catch {
+        return;
+      }
+      for (const n of names) rmEmpty(join(dir, n));
+      try {
+        rmdirSync(dir);
+      } catch {}
+    };
+    try {
+      for (const y of readdirSync(root)) rmEmpty(join(root, y));
+      rmdirSync(root);
+    } catch {}
+    return { moved, skipped };
   }
 
   removeItem(userId: string, id: string): void {

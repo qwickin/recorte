@@ -8,7 +8,12 @@ import { SqliteQueue } from "../src/queue";
 import { resolveDeps } from "../src/deps";
 import { ensureIndexWithRetry, lazyClassifier } from "../src/runtime";
 import { buildFilter, filterValue, safeHighlight, toMeiliDoc } from "../src/search/meili";
-import { makeApp, login } from "./helpers";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { createApp } from "../src/app";
+import { createUser } from "../src/auth/users";
+import { openDb } from "../src/db";
+import { EMAIL, PASSWORD, cookieOf, makeApp, login } from "./helpers";
 import { InMemorySearch, fakeClassifier, stubSearch } from "./fakes";
 
 const png = (color = "#3366cc") => sharp({ create: { width: 800, height: 600, channels: 3, background: color } }).png().toBuffer();
@@ -83,6 +88,27 @@ describe("pipeline", () => {
     await expect(p.process(userId, a.id)).rejects.toThrow(/original\.webp/);
   });
 
+  it("a trashed item gets its ai block (for a later restore) but no item.updated and no search index", async () => {
+    const { t, cookie, search, upload, deps } = await setup();
+    const a = await upload();
+    await t.app.request(`/api/items/${a.id}`, { method: "DELETE", headers: { cookie } });
+    expect(search.docs.has(a.id)).toBe(false);
+    const d = deps();
+    const userId = userIdOf(t);
+    const events: string[] = [];
+    d.events.subscribe(userId, (e) => events.push(e.type));
+    await createPipeline({ deps: d, classifier: async () => fakeClassifier() }).process(userId, a.id);
+    expect(events).toEqual([]);
+    expect(search.docs.has(a.id)).toBe(false);
+    const m = d.storage.readMeta(userId, a.id)!;
+    expect(m.deletedAt).not.toBeNull();
+    expect(m.ai.tipo).toEqual(["mapa"]);
+    // Restore brings it back with the AI tags.
+    await t.app.request(`/api/items/${a.id}/restore`, { method: "POST", headers: { cookie } });
+    const list = (await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { items: ItemSummary[] };
+    expect(list.items.find((i) => i.id === a.id)?.tags).toContain("mapa");
+  });
+
   it("cloud step adds title/description/keys; a cloud failure does not fail the job", async () => {
     const { t, upload, deps } = await setup();
     const a = await upload();
@@ -148,6 +174,25 @@ describe("worker", () => {
     expect(row()).toMatchObject({ status: "failed", attempts: 6 });
     expect(calls).toBe(6);
     expect(await w.runOnce()).toBe(false);
+  });
+
+  it("a job never stays running: odd throwables are recorded, and a throwing queue.fail is contained", async () => {
+    const { t } = await setup();
+    const q = new SqliteQueue(t.db);
+    const status = () => (t.db.prepare("SELECT status, last_error FROM jobs").get() as { status: string; last_error: string });
+    const w = createWorker({ queue: q, handlers: { nul: async () => { throw null; }, obj: async () => { throw { message: 5 }; } } });
+    q.enqueue("nul", {});
+    await expect(w.runOnce()).resolves.toBe(true);
+    expect(status()).toMatchObject({ status: "pending", last_error: "null" });
+    t.db.prepare("DELETE FROM jobs").run();
+    q.enqueue("obj", {});
+    await expect(w.runOnce()).resolves.toBe(true);
+    expect(status()).toMatchObject({ status: "pending", last_error: "[object Object]" });
+    // The failure bookkeeping itself throws: runOnce still resolves (the loop keeps going).
+    t.db.prepare("DELETE FROM jobs").run();
+    const broken = Object.assign(Object.create(Object.getPrototypeOf(q)), q, { fail: () => { throw new Error("db busy"); } }) as SqliteQueue;
+    q.enqueue("nul", {});
+    await expect(createWorker({ queue: broken, handlers: { nul: async () => { throw null; } } }).runOnce()).resolves.toBe(true);
   });
 
   it("completed jobs are removed; unknown types fail; running jobs are recovered on start", async () => {
@@ -246,7 +291,7 @@ describe("admin", () => {
     search.docs.clear();
     expect(((await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { total: number }).total).toBe(1); // only the ghost
     const res = await t.app.request("/api/admin/reindex", { method: "POST", headers: { cookie } });
-    expect(await res.json()).toEqual({ items: 2, removed: 1, indexed: true });
+    expect(await res.json()).toEqual({ items: 2, removed: 1, indexed: true, adopted: 0, unreadable: 0 });
     const after = (await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { items: ItemSummary[] };
     expect(after.items).toEqual(snapshot.items);
     expect(after.items[0]!.tags).toEqual(["viagem", "mapa"]);
@@ -261,7 +306,71 @@ describe("admin", () => {
     await upload();
     t.db.exec("DELETE FROM items");
     const res = await t.app.request("/api/admin/reindex", { method: "POST", headers: { cookie } });
-    expect(await res.json()).toEqual({ items: 1, removed: 0, indexed: false });
+    expect(await res.json()).toEqual({ items: 1, removed: 0, indexed: false, adopted: 0, unreadable: 0 });
+  });
+});
+
+describe("reindex after losing the database", () => {
+  it("adopts the old owner's folders after the DB file is deleted and /setup gives the owner a new id", async () => {
+    const { t, cookie, upload } = await setup();
+    const oldUser = userIdOf(t);
+    const a = await upload({ tags: ["viagem"], note: "nota minha", title: "Título" });
+    const b = await upload({ pageTitle: "No lixo" });
+    await t.app.request(`/api/items/${b.id}`, { method: "DELETE", headers: { cookie } });
+    const before = (await (await t.app.request(`/api/items/${a.id}`, { headers: { cookie } })).json()) as { user: unknown };
+
+    // The whole database is gone (file + WAL + SHM); the data folder with the items stays.
+    t.db.close();
+    for (const f of ["recorte.db", "recorte.db-wal", "recorte.db-shm"]) rmSync(join(t.dir, f), { force: true });
+    const db = openDb(t.dir);
+    const newUser = await createUser(db, EMAIL, PASSWORD);
+    expect(newUser).not.toBe(oldUser);
+    const search = new InMemorySearch();
+    const app = createApp({ db, config: t.config, search });
+    const c2 = cookieOf(await app.request("/api/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: EMAIL, password: PASSWORD }) }));
+    const list = async (qs = "") => (await (await app.request(`/api/items${qs}`, { headers: { cookie: c2 } })).json()) as { items: ItemSummary[]; total: number };
+    expect((await list()).total).toBe(0);
+
+    const res = await app.request("/api/admin/reindex", { method: "POST", headers: { cookie: c2 } });
+    expect(await res.json()).toEqual({ items: 2, removed: 0, indexed: true, adopted: 2, unreadable: 0 });
+    expect((await list()).items.map((i) => i.id)).toEqual([a.id]);
+    expect((await list("?trash=1")).items.map((i) => i.id)).toEqual([b.id]);
+    expect((await app.request(`/api/items/${a.id}/files/thumb.webp`, { headers: { cookie: c2 } })).status).toBe(200);
+    const after = (await (await app.request(`/api/items/${a.id}`, { headers: { cookie: c2 } })).json()) as { userId: string; user: unknown };
+    expect(after.user).toEqual(before.user); // user fields intact
+    expect(after.userId).toBe(newUser);
+    expect(existsSync(join(t.dir, "items", oldUser))).toBe(false);
+    expect(JSON.parse(readFileSync(join(t.dir, "items", newUser, "2026", "01", a.id, "meta.json"), "utf8")).userId).toBe(newUser);
+    expect([...search.docs.keys()]).toEqual([a.id]);
+    // Idempotent.
+    expect(await (await app.request("/api/admin/reindex", { method: "POST", headers: { cookie: c2 } })).json()).toEqual({
+      items: 2, removed: 0, indexed: true, adopted: 0, unreadable: 0,
+    });
+  });
+
+  it("does not adopt folders when there is more than one account", async () => {
+    const { t, cookie, upload } = await setup();
+    await upload();
+    const ghost = join(t.dir, "items", "ghostuser");
+    const { cpSync } = await import("node:fs");
+    cpSync(join(t.dir, "items", userIdOf(t)), ghost, { recursive: true });
+    rmSync(join(t.dir, "items", userIdOf(t)), { recursive: true });
+    await createUser(t.db, "two@example.com", "another long password");
+    const r = await (await t.app.request("/api/admin/reindex", { method: "POST", headers: { cookie } })).json();
+    expect(r).toMatchObject({ adopted: 0, items: 0, removed: 1 });
+    expect(existsSync(ghost)).toBe(true);
+  });
+
+  it("keeps the row of an item whose meta.json is unreadable", async () => {
+    const { t, cookie, upload, deps } = await setup();
+    const a = await upload();
+    const b = await upload();
+    const userId = userIdOf(t);
+    writeFileSync(join(deps().storage.itemDir(userId, a.id), "meta.json"), "{ broken");
+    const r = await (await t.app.request("/api/admin/reindex", { method: "POST", headers: { cookie } })).json();
+    expect(r).toEqual({ items: 1, removed: 0, indexed: true, adopted: 0, unreadable: 1 });
+    const ids = ((await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { items: ItemSummary[] }).items.map((i) => i.id);
+    expect(ids.sort()).toEqual([a.id, b.id].sort());
   });
 });
 

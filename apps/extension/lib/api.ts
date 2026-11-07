@@ -1,4 +1,4 @@
-import { API, type CaptureKind, type Category, type ExtensionInfo, type ItemText, type TagCount, UploadMeta, normalizeTags } from "@recorte/shared";
+import { API, type CaptureKind, type Category, type ExtensionInfo, type ItemText, type TagCount, UPLOAD_LIMITS, UploadMeta, normalizeTags } from "@recorte/shared";
 
 /** Hard cap on extracted text sent with an item (spec §6). */
 export const MAX_TEXT_CHARS = 20_000;
@@ -103,14 +103,14 @@ export function buildUploadMeta(input: MetaInput): UploadMeta {
     type: "screenshot",
     kind: input.kind,
     url: input.url,
-    pageTitle: input.pageTitle.trim().slice(0, 500),
-    tags: normalizeTags(input.tags ?? []),
+    pageTitle: input.pageTitle.trim().slice(0, UPLOAD_LIMITS.pageTitle),
+    tags: normalizeTags(input.tags ?? []).slice(0, UPLOAD_LIMITS.tags),
     categoryId: input.categoryId ?? null,
     text: capItemText(input.text),
     capturedAt: input.capturedAt ?? new Date().toISOString(),
   };
-  if (title) meta.title = title.slice(0, 500);
-  if (note) meta.note = note;
+  if (title) meta.title = title.slice(0, UPLOAD_LIMITS.title);
+  if (note) meta.note = note.slice(0, UPLOAD_LIMITS.note);
   if (input.truncated) meta.truncated = true;
   return UploadMeta.parse(meta);
 }

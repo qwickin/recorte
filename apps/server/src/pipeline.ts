@@ -62,9 +62,13 @@ export function createPipeline(p: PipelineDeps) {
     if (description) ai.description = description;
 
     const next: Item = { ...fresh, ai, updatedAt: now };
+    // Persisted even when trashed, so a restore brings the AI tags back.
     svc.persist(next);
+    // A trashed item stays out of the gallery and of search: an `item.updated` would re-insert it in open
+    // galleries, and the delete already removed it from the index.
+    if (next.deletedAt) return;
     deps.events.emit(userId, { type: "item.updated", data: summaryFromMeta(next) });
-    await svc.syncSearch(next, next.deletedAt ? "remove" : "index");
+    await svc.syncSearch(next, "index");
   }
 
   /** `index` job: sync Meilisearch to the item's current state (idempotent). Throws so the worker retries. */

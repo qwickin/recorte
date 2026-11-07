@@ -20,6 +20,17 @@ export function upsertItem(items: ItemSummary[], it: ItemSummary): ItemSummary[]
   return [...items.slice(0, pos), it, ...items.slice(pos)];
 }
 
+/**
+ * Whether a live item (SSE) belongs inside the loaded part of the feed. Past the last loaded item it must wait
+ * for its page, or later pages would append after it out of keyset order (e.g. a capture that waited offline
+ * and is dated when it was taken, or a restored old item).
+ */
+export function inLoadedRange(items: ItemSummary[], hasMore: boolean, it: ItemSummary): boolean {
+  if (!hasMore) return true;
+  const last = items.at(-1);
+  return !!last && newerFirst(it, last) < 0;
+}
+
 export type Pager = {
   readonly cursor: string | null;
   readonly done: boolean;

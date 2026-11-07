@@ -1,7 +1,7 @@
 import type { ItemPage, ItemSummary } from "@recorte/shared";
 import { describe, expect, it, vi } from "vitest";
 import { ApiError, createClient, filtersToQuery } from "./client";
-import { createPager, mergePage, upsertItem } from "./feed";
+import { createPager, inLoadedRange, mergePage, upsertItem } from "./feed";
 
 const summary = (id: string, createdAt: string): ItemSummary => ({
   id,
@@ -137,5 +137,56 @@ describe("feed merging", () => {
     items = upsertItem(items, { ...summary("C", "2026-11-07T10:00:00.000Z"), title: "editado" });
     expect(items.map((i) => i.id)).toEqual(["D", "C", "B", "A"]);
     expect(items[1]!.title).toBe("editado");
+  });
+});
+
+describe("restoreAllTrash", () => {
+  it("lists every trashed page (not only the loaded ones) and restores in chunks of 200", async () => {
+    const all = Array.from({ length: 450 }, (_, i) => summary(`id${String(i).padStart(3, "0")}`, "2026-01-01T00:00:00.000Z"));
+    const bulks: string[][] = [];
+    const f = vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
+      const u = new URL(String(url), "http://x");
+      if (u.pathname === "/api/items" && init?.method === "GET") {
+        expect(u.searchParams.get("trash")).toBe("1");
+        const start = Number(u.searchParams.get("cursor") ?? 0);
+        const limit = Number(u.searchParams.get("limit"));
+        const items = all.slice(start, start + limit);
+        const next = start + limit < all.length ? String(start + limit) : null;
+        return json({ items, nextCursor: next, total: all.length });
+      }
+      if (u.pathname === "/api/items/bulk") {
+        const b = JSON.parse(String(init!.body)) as { ids: string[]; action: string };
+        expect(b.action).toBe("restore");
+        bulks.push(b.ids);
+        return json({ ids: b.ids });
+      }
+      throw new Error(`unexpected ${u.pathname}`);
+    });
+    const r = await createClient({ fetch: f as typeof fetch }).restoreAllTrash();
+    expect(r.ids).toHaveLength(450);
+    expect(bulks.map((b) => b.length)).toEqual([200, 200, 50]);
+    expect(new Set(bulks.flat()).size).toBe(450);
+  });
+
+  it("stops when the server does not advance the cursor", async () => {
+    const f = vi.fn(async (url: RequestInfo | URL) =>
+      String(url).includes("bulk") ? json({ ids: ["a"] }) : json({ items: [summary("a", "2026-01-01T00:00:00.000Z")], nextCursor: "same", total: 5 }),
+    );
+    const r = await createClient({ fetch: f as typeof fetch }).restoreAllTrash();
+    expect(r.ids).toEqual(["a"]);
+    expect(f.mock.calls.length).toBeLessThan(5);
+  });
+});
+
+describe("inLoadedRange", () => {
+  const a = summary("B", "2026-03-01T00:00:00.000Z");
+  const b = summary("A", "2026-02-01T00:00:00.000Z");
+  it("accepts anything when every page is loaded", () => {
+    expect(inLoadedRange([a, b], false, summary("Z", "2020-01-01T00:00:00.000Z"))).toBe(true);
+  });
+  it("rejects an item older than the last loaded one while more pages remain (backdated capture, restore)", () => {
+    expect(inLoadedRange([a, b], true, summary("Z", "2020-01-01T00:00:00.000Z"))).toBe(false);
+    expect(inLoadedRange([a, b], true, summary("Z", "2026-02-15T00:00:00.000Z"))).toBe(true);
+    expect(inLoadedRange([], true, a)).toBe(false);
   });
 });

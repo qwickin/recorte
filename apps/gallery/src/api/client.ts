@@ -50,6 +50,8 @@ export function filtersToQuery(f: Filters, extra: Record<string, string | number
 export const hasFilters = (f: Filters) => f.tags.length > 0 || !!(f.site || f.type || f.color || f.category || f.from || f.to);
 
 type Opts = { signal?: AbortSignal };
+/** The server's /api/items/bulk limit. */
+export const BULK_MAX = 200;
 type Fetch = typeof fetch;
 
 export type ClientOptions = {
@@ -101,6 +103,27 @@ export function createClient({ fetch: f = (...a) => fetch(...a), onUnauthorized 
     deleteItem: (id: string) => req<void>("DELETE", API.item(id)),
     restoreItem: (id: string) => req<Item>("POST", API.itemRestore(id), {}),
     bulk: (b: { ids: string[]; action: "delete" | "restore" | "patch"; patch?: ItemPatch }) => req<{ ids: string[] }>("POST", API.itemsBulk, b),
+    /**
+     * Restores the whole bin, not only the loaded tiles: lists every trashed id first (keyset pages of 100,
+     * nothing changes while listing), then restores them in chunks of BULK_MAX. Returns the restored ids.
+     */
+    async restoreAllTrash(): Promise<{ ids: string[] }> {
+      const ids: string[] = [];
+      const seen = new Set<string>();
+      let cursor: string | null = null;
+      do {
+        const page: ItemPage = await get<ItemPage>(API.items + filtersToQuery(EMPTY_FILTERS, { cursor, limit: 100, trash: 1 }));
+        for (const it of page.items) if (!seen.has(it.id)) (seen.add(it.id), ids.push(it.id));
+        if (page.nextCursor === cursor) break; // a server that does not advance: stop instead of looping
+        cursor = page.nextCursor;
+      } while (cursor);
+      const done: string[] = [];
+      for (let i = 0; i < ids.length; i += BULK_MAX) {
+        const r = await req<{ ids: string[] }>("POST", API.itemsBulk, { ids: ids.slice(i, i + BULK_MAX), action: "restore" });
+        done.push(...r.ids);
+      }
+      return { ids: done };
+    },
     listTags: (o?: Opts) => get<TagCount[]>(API.tags, o),
     search(q: string, p: { filters?: Filters; limit?: number } & Opts = {}) {
       return get<SearchHit[]>(API.search + filtersToQuery(p.filters ?? EMPTY_FILTERS, { q, limit: p.limit }), p);
@@ -117,7 +140,7 @@ export function createClient({ fetch: f = (...a) => fetch(...a), onUnauthorized 
     revokeDevice: (id: string) => req<{ ok: true }>("DELETE", API.device(id)),
     extensionInfo: (o?: Opts) => get<ExtensionInfo>(API.extension, o),
     reprocess: () => req<{ queued: number }>("POST", API.adminReprocess, {}),
-    reindex: () => req<{ items: number; removed: number; indexed: boolean }>("POST", API.adminReindex, {}),
+    reindex: () => req<{ items: number; removed: number; indexed: boolean; adopted?: number; unreadable?: number }>("POST", API.adminReindex, {}),
   };
 }
 

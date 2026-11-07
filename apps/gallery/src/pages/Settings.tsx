@@ -206,9 +206,14 @@ function Maintenance() {
           onPress={() =>
             run(async () => {
               const r = await api.reindex();
-              return r.indexed
-                ? `Índice reconstruído com ${r.items} ${r.items === 1 ? "captura" : "capturas"}.`
-                : `Lista reconstruída (${r.items}), mas a pesquisa não respondeu. Tenta de novo mais tarde.`;
+              const extra = r.unreadable
+                ? ` ${r.unreadable} ${r.unreadable === 1 ? "captura tem" : "capturas têm"} o meta.json ilegível (ver os registos do servidor).`
+                : "";
+              return (
+                (r.indexed
+                  ? `Índice reconstruído com ${r.items} ${r.items === 1 ? "captura" : "capturas"}.`
+                  : `Lista reconstruída (${r.items}), mas a pesquisa não respondeu. Tenta de novo mais tarde.`) + extra
+              );
             })
           }
         >

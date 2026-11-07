@@ -4,6 +4,22 @@ import { absoluteUrl, buildUploadMeta, capItemText, normalizeServerUrl } from ".
 const text = { selection: "olá", meta: {}, headings: [], alts: [] };
 
 describe("buildUploadMeta", () => {
+  it("applies the shared field caps (title 300, note 5000, 50 tags)", () => {
+    const m = buildUploadMeta({
+      kind: "visible",
+      url: "https://example.com/",
+      pageTitle: "p".repeat(800),
+      title: "t".repeat(600),
+      note: "n".repeat(9000),
+      tags: Array.from({ length: 70 }, (_, i) => `t${i}`),
+      text: { selection: "", meta: {}, headings: [], alts: [] },
+    });
+    expect(m.title).toHaveLength(300);
+    expect(m.note).toHaveLength(5000);
+    expect(m.pageTitle).toHaveLength(500);
+    expect(m.tags).toHaveLength(50);
+  });
+
   it("rejects non-http pages", () => {
     for (const url of ["chrome://extensions", "file:///tmp/a.html", "about:blank", "data:text/html,x", "moz-extension://x/y"]) {
       expect(() => buildUploadMeta({ kind: "visible", url, pageTitle: "x", text })).toThrow();

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { UPLOAD_LIMITS } from "./limits";
+import { normalizeTags } from "./tags";
 
 export const ItemType = z.enum(["screenshot", "post", "article"]);
 export type ItemType = z.infer<typeof ItemType>;
@@ -95,7 +97,50 @@ export const ItemPage = z.object({
 });
 export type ItemPage = z.infer<typeof ItemPage>;
 
-export const UploadMeta = z.object({
+/**
+ * Applies UPLOAD_LIMITS to the extracted text. The total budget goes to the selection first, then headings,
+ * description, alts and og values. `truncated` is true when anything was cut.
+ */
+export function clampUploadText(text: ItemText): { text: ItemText; truncated: boolean } {
+  const L = UPLOAD_LIMITS;
+  let budget: number = L.text;
+  let truncated = false;
+  const take = (s: string, max: number): string => {
+    const out = s.slice(0, Math.max(0, Math.min(max, budget)));
+    if (out.length < s.length) truncated = true;
+    budget -= out.length;
+    return out;
+  };
+  const list = (a: string[], n: number, max: number): string[] => {
+    if (a.length > n) truncated = true;
+    const out: string[] = [];
+    for (const v of a.slice(0, n)) {
+      const t = take(v, max);
+      if (t) out.push(t);
+      else if (v) truncated = true;
+    }
+    return out;
+  };
+  const selection = take(text.selection, L.selection);
+  const headings = list(text.headings, L.headings, L.heading);
+  const meta: ItemText["meta"] = {};
+  if (text.meta.description !== undefined) meta.description = take(text.meta.description, L.metaValue);
+  const alts = list(text.alts, L.alts, L.alt);
+  if (text.meta.og) {
+    const entries = Object.entries(text.meta.og);
+    if (entries.length > L.ogKeys) truncated = true;
+    const og: Record<string, string> = {};
+    for (const [k, v] of entries.slice(0, L.ogKeys)) {
+      const t = take(v, L.metaValue);
+      if (t) og[k.slice(0, 100)] = t;
+      else if (v) truncated = true;
+    }
+    if (Object.keys(og).length) meta.og = og;
+  }
+  return { text: { selection, meta, headings, alts }, truncated };
+}
+
+const UploadMetaInput = z.object({
   type: ItemType,
   kind: CaptureKind,
   url: z
@@ -117,6 +162,21 @@ export const UploadMeta = z.object({
   text: ItemText,
   truncated: z.boolean().optional(),
   capturedAt: z.string(),
+});
+
+export const UploadMeta = UploadMetaInput.transform((m) => {
+  const L = UPLOAD_LIMITS;
+  const { text, truncated } = clampUploadText(m.text);
+  const out = {
+    ...m,
+    pageTitle: m.pageTitle.slice(0, L.pageTitle),
+    tags: normalizeTags(m.tags.slice(0, 500)).slice(0, L.tags),
+    text,
+  };
+  if (m.title !== undefined) out.title = m.title.slice(0, L.title);
+  if (m.note !== undefined) out.note = m.note.slice(0, L.note);
+  if (truncated) out.truncated = true;
+  return out;
 });
 export type UploadMeta = z.infer<typeof UploadMeta>;
 

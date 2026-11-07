@@ -36,10 +36,22 @@ export function createWorker(opts: WorkerOptions) {
       await handler(job.payload);
       queue.complete(job.id);
     } catch (e) {
-      const msg = (e as Error).message ?? String(e);
+      // Anything can be thrown (null, a string, an object whose message is not a string): never let the
+      // bookkeeping itself throw, or the job would stay "running" until the next restart.
+      let msg: string;
+      try {
+        const m = e instanceof Error ? e.message : (e as { message?: unknown } | null)?.message;
+        msg = typeof m === "string" ? m : String(e);
+      } catch {
+        msg = "unknown error";
+      }
       const retry = job.attempts <= retries ? now() + backoffMs(job.attempts) : null;
       console.warn(`job ${job.id} (${job.type}) attempt ${job.attempts} failed${retry === null ? " for good" : ""}:`, msg);
-      queue.fail(job.id, msg.slice(0, 1000), retry);
+      try {
+        queue.fail(job.id, msg.slice(0, 1000), retry);
+      } catch (fe) {
+        console.error(`job ${job.id}: could not record the failure:`, (fe as Error)?.message ?? fe);
+      }
     }
     return true;
   }

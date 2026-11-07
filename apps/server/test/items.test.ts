@@ -8,7 +8,8 @@ import { createUser } from "../src/auth/users";
 import { EventBus } from "../src/events";
 import { purgeTrash } from "../src/items/purge";
 import { itemsRepo } from "../src/items/repo";
-import { stubSearch } from "./fakes";
+import { InMemorySearch, stubSearch } from "./fakes";
+import { ulidTime } from "../src/ids";
 import { Storage } from "../src/storage";
 import { makeApp, login } from "./helpers";
 
@@ -249,6 +250,92 @@ describe("items", () => {
     fd2.set("meta", JSON.stringify({ ...meta(), url: undefined }));
     expect((await t.app.request("/api/items", { method: "POST", headers: { cookie }, body: fd2 })).status).toBe(400);
     expect((await t.app.request("/api/items", { method: "POST", body: fd2 })).status).toBe(401);
+  });
+
+  it("a stale or foreign categoryId on upload saves the capture without category (never 400)", async () => {
+    const { t, cookie } = await setup();
+    await createUser(t.db, "two@example.com", "another long password");
+    const c2 = (await t.json("/api/login", { email: "two@example.com", password: "another long password" })).headers.get("set-cookie")!.split(";")[0]!;
+    const foreign = (await (await send(t, "POST", "/api/categories", c2, { name: "Dela" })).json()) as { id: string };
+    const mine = (await (await send(t, "POST", "/api/categories", cookie, { name: "Minha" })).json()) as { id: string };
+    await send(t, "DELETE", `/api/categories/${mine.id}`, cookie); // deleted while the capture waited in the queue
+    for (const categoryId of [mine.id, foreign.id, "01ARZ3NDEKTSV4RRFFQ69G5FAV"]) {
+      const res = await upload(t, cookie, { categoryId, note: "fica" });
+      expect(res.status).toBe(201);
+      const id = ((await res.json()) as ItemSummary).id;
+      const full = (await (await get(t, `/api/items/${id}`, cookie)).json()) as { user: { categoryId: string | null; note: string } };
+      expect(full.user).toMatchObject({ categoryId: null, note: "fica" });
+    }
+  });
+
+  it("orders uploads by capture time (validated), so offline-queued captures land where they were taken", async () => {
+    const { t, cookie } = await setup();
+    const ids = async (qs = "") => ((await (await get(t, `/api/items${qs}`, cookie)).json()) as { items: ItemSummary[] }).items;
+    const fresh = (await (await upload(t, cookie, { capturedAt: new Date().toISOString() })).json()) as ItemSummary;
+    // Taken in June 2025, sent much later (offset string normalised to UTC ISO).
+    const old = (await (await upload(t, cookie, { capturedAt: "2025-06-01T12:00:00+01:00" })).json()) as ItemSummary;
+    expect(old.createdAt).toBe("2025-06-01T11:00:00.000Z");
+    expect(ulidTime(old.id)).toBe(Date.parse("2025-06-01T11:00:00.000Z"));
+    expect(existsSync(join(t.dir, "items", (t.db.prepare("SELECT id FROM users").get() as { id: string }).id, "2025", "06", old.id))).toBe(true);
+    // Future, before 2000 and garbage fall back to the upload time (and are still saved).
+    const t0 = Date.now();
+    const bad: ItemSummary[] = [];
+    for (const capturedAt of ["2999-01-01T00:00:00.000Z", "1990-01-01T00:00:00.000Z", "não é data"]) {
+      const r = await upload(t, cookie, { capturedAt });
+      expect(r.status).toBe(201);
+      bad.push((await r.json()) as ItemSummary);
+    }
+    for (const b of bad) expect(Math.abs(Date.parse(b.createdAt) - t0)).toBeLessThan(60_000);
+    const list = await ids();
+    expect(list.at(-1)!.id).toBe(old.id);
+    expect(list.map((i) => i.id).indexOf(fresh.id)).toBeLessThan(list.length - 1);
+    // Keyset stays consistent across the backdated item.
+    const p1 = (await (await get(t, "/api/items?limit=2", cookie)).json()) as { items: ItemSummary[]; nextCursor: string };
+    const p2 = (await (await get(t, `/api/items?limit=2&cursor=${p1.nextCursor}`, cookie)).json()) as { items: ItemSummary[]; nextCursor: string };
+    const p3 = (await (await get(t, `/api/items?limit=2&cursor=${p2.nextCursor}`, cookie)).json()) as { items: ItemSummary[]; nextCursor: string | null };
+    expect([...p1.items, ...p2.items, ...p3.items].map((i) => i.id)).toEqual(list.map((i) => i.id));
+  });
+
+  it("accepts an over-long meta (old queued capture) and clamps it instead of rejecting it", async () => {
+    const { t, cookie } = await setup();
+    const res = await upload(t, cookie, {
+      title: "t".repeat(500),
+      note: "n".repeat(8000),
+      tags: Array.from({ length: 70 }, (_, i) => `tag${i}`),
+      text: { selection: "s".repeat(19_000), meta: { description: "d".repeat(4000) }, headings: [], alts: Array.from({ length: 60 }, () => "a".repeat(500)) },
+    });
+    expect(res.status).toBe(201);
+    const id = ((await res.json()) as ItemSummary).id;
+    const full = (await (await get(t, `/api/items/${id}`, cookie)).json()) as {
+      user: { title: string; note: string; tags: string[] };
+      text: { alts: string[]; meta: { description: string } };
+      truncated?: boolean;
+    };
+    expect(full.user.title).toHaveLength(300);
+    expect(full.user.note).toHaveLength(5000);
+    expect(full.user.tags).toHaveLength(50);
+    expect(full.text.alts.every((a) => a.length <= 300)).toBe(true);
+    expect(full.text.meta.description).toHaveLength(1000);
+    expect(full.truncated).toBe(true);
+  });
+
+  it("deleting a category also updates the search index of its items", async () => {
+    const search = new InMemorySearch();
+    const { t, cookie } = await setup({ deps: { search } });
+    const c = (await (await send(t, "POST", "/api/categories", cookie, { name: "Viagens" })).json()) as { id: string };
+    const a = (await (await upload(t, cookie, { categoryId: c.id })).json()) as ItemSummary;
+    expect(search.docs.get(a.id)?.categoryId).toBe(c.id);
+    search.failIndex = 0;
+    expect((await send(t, "DELETE", `/api/categories/${c.id}`, cookie)).status).toBe(204);
+    expect(search.docs.get(a.id)?.categoryId).toBeNull();
+    // Search down: the category is still deleted and an index retry is queued.
+    const c2 = (await (await send(t, "POST", "/api/categories", cookie, { name: "Outra" })).json()) as { id: string };
+    const b = (await (await upload(t, cookie, { categoryId: c2.id })).json()) as ItemSummary;
+    t.db.prepare("DELETE FROM jobs WHERE type = 'index'").run();
+    search.failIndex = 1;
+    expect((await send(t, "DELETE", `/api/categories/${c2.id}`, cookie)).status).toBe(204);
+    const job = t.db.prepare("SELECT payload FROM jobs WHERE type = 'index'").get() as { payload: string };
+    expect(JSON.parse(job.payload)).toMatchObject({ id: b.id, op: "index" });
   });
 
   it("categories CRUD; deleting a category clears it on items", async () => {

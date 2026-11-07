@@ -1,4 +1,5 @@
 import type { ItemText } from "@recorte/shared";
+import { UPLOAD_LIMITS } from "@recorte/shared/limits";
 import { Readability } from "@mozilla/readability";
 
 /** DOM text extraction for the content script (spec §6). No raw HTML is ever sent. */
@@ -13,7 +14,8 @@ export interface Rect {
 /** Margin (CSS px) added around the captured rect when collecting text. */
 export const TEXT_MARGIN = 48;
 export const MAX_HEADINGS = 20;
-const MAX_ALTS = 60;
+const MAX_ALTS = UPLOAD_LIMITS.alts;
+const MAX_OG = UPLOAD_LIMITS.ogKeys;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE", "SVG", "CANVAS", "IFRAME", "OBJECT", "SELECT"]);
 
 /** Strict overlap: rects that only touch at an edge do not intersect; empty rects never intersect. */
@@ -48,12 +50,13 @@ function tidy(s: string): string {
 function pageMeta(doc: Document): ItemText["meta"] {
   const meta: ItemText["meta"] = {};
   const desc = doc.querySelector<HTMLMetaElement>('meta[name="description" i]')?.content;
-  if (desc && collapse(desc)) meta.description = collapse(desc);
+  if (desc && collapse(desc)) meta.description = collapse(desc).slice(0, UPLOAD_LIMITS.metaValue);
   const og: Record<string, string> = {};
   for (const m of doc.querySelectorAll<HTMLMetaElement>('meta[property^="og:" i]')) {
     const key = m.getAttribute("property")?.toLowerCase();
     const v = collapse(m.content ?? "");
-    if (key && v && !(key in og)) og[key] = v.slice(0, 1000);
+    if (key && v && !(key in og)) og[key] = v.slice(0, UPLOAD_LIMITS.metaValue);
+    if (Object.keys(og).length >= MAX_OG) break;
   }
   if (Object.keys(og).length) meta.og = og;
   return meta;
@@ -62,7 +65,7 @@ function pageMeta(doc: Document): ItemText["meta"] {
 function headings(doc: Document): string[] {
   const out: string[] = [];
   for (const h of doc.querySelectorAll("h1, h2, h3")) {
-    const t = collapse(h.textContent ?? "").slice(0, 300);
+    const t = collapse(h.textContent ?? "").slice(0, UPLOAD_LIMITS.heading);
     if (t && !out.includes(t)) out.push(t);
     if (out.length >= MAX_HEADINGS) break;
   }
@@ -81,7 +84,7 @@ function altsIn(doc: Document, rect: Rect | null): string[] {
     const alt = collapse(img.getAttribute("alt") ?? "");
     if (!alt || out.includes(alt)) continue;
     if (rect && !rectsIntersect(img.getBoundingClientRect(), rect)) continue;
-    out.push(alt.slice(0, 500));
+    out.push(alt.slice(0, UPLOAD_LIMITS.alt));
     if (out.length >= MAX_ALTS) break;
   }
   return out;

@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { z } from "zod";
 import { type AppEnv, requireUser } from "../auth/middleware";
 import type { Deps } from "../deps";
-import { ULID_RE, ulid } from "../ids";
+import { ULID_RE, captureTime, ulidAt } from "../ids";
 import { BadCursor, itemsRepo } from "../items/repo";
 import { itemService } from "../items/service";
 import { FILE_NAME_RE } from "../storage";
@@ -63,7 +63,11 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
       } catch {
         return c.json({ error: "invalid_meta" }, 400);
       }
-      if (parsed.categoryId && !categoryOk(userId, parsed.categoryId)) return c.json({ error: "invalid_category" }, 400);
+      if (parsed.categoryId && !categoryOk(userId, parsed.categoryId)) {
+        // A category deleted (or never ours) while the capture waited in the queue: keep the capture, drop the link.
+        console.warn(`upload: unknown category ${parsed.categoryId.slice(0, 64)} for user ${userId}; saving without category`);
+        parsed.categoryId = null;
+      }
 
       let original: Buffer, thumb: Buffer;
       let width: number, height: number;
@@ -90,15 +94,20 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
       }
       const colors = await extractColors(thumb).catch(() => ({ dominant: "#000000", names: [] as string[] }));
 
-      const id = ulid();
-      const nowIso = new Date().toISOString();
+      // Ordered by capture time (keyset: createdAt DESC, id DESC), so a capture that waited in the offline queue
+      // lands where it was taken. Normalised ISO string: the keyset compares created_at as text.
+      const now = Date.now();
+      const captured = captureTime(parsed.capturedAt, now);
+      const id = ulidAt(captured);
+      const createdAt = new Date(captured).toISOString();
+      const nowIso = new Date(now).toISOString();
       const meta: Item = {
         id,
         userId,
         type: parsed.type,
         kind: parsed.kind,
         source: { url: parsed.url, site: hostOf(parsed.url), pageTitle: parsed.pageTitle },
-        createdAt: nowIso,
+        createdAt,
         updatedAt: nowIso,
         deletedAt: null,
         media: [{ file: "original.webp", thumb: "thumb.webp", width, height, color: colors.dominant, role: "main" }],

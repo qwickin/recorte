@@ -14,7 +14,7 @@ import { SelectIcon } from "../components/icons";
 import { useEvents } from "../hooks/useEvents";
 import { useItemFeed } from "../hooks/useItemFeed";
 import { displayTags, displayTitle, matchesFilters } from "../lib/item";
-import { newerFirst } from "../api/feed";
+import { inLoadedRange } from "../api/feed";
 import { Link } from "../lib/router";
 import { isMac, typeLabel } from "../lib/text";
 
@@ -67,22 +67,28 @@ export function GalleryPage() {
 
   useEffect(() => setSelected(new Set()), [filters]);
 
+  // Ids trashed while this page is open. An `item.updated` for one of them (e.g. the AI step finishing after
+  // the delete, from an older server) must not bring it back; `item.created` (restore) clears the mark.
+  const trashed = useRef(new Set<string>());
+
   useEvents({
     onCreated: (it) => {
+      trashed.current.delete(it.id);
       scheduleTags();
       setLibraryTotal((n) => (n === null ? n : n + 1));
       if (matchesFilters(it, filtersRef.current) !== true) return;
+      if (!inLoadedRange(feed.items, feed.hasMore, it)) return; // its page will bring it
       setFresh((s) => new Set(s).add(it.id));
       feed.upsert(it);
     },
     onUpdated: (it) => {
+      if (trashed.current.has(it.id)) return;
       scheduleTags();
       const match = matchesFilters(it, filtersRef.current);
       if (!feed.items.some((x) => x.id === it.id)) {
         // Now matches the filter (e.g. a tag was just added): insert it, but only inside the loaded range
         // so later pages still append in keyset order.
-        const last = feed.items.at(-1);
-        if (match === true && (!feed.hasMore || (last && newerFirst(it, last) < 0))) feed.upsert(it);
+        if (match === true && inLoadedRange(feed.items, feed.hasMore, it)) feed.upsert(it);
         return;
       }
       if (match === false) feed.remove([it.id]);
@@ -90,6 +96,7 @@ export function GalleryPage() {
       setDetail((d) => (d?.id === it.id ? it : d));
     },
     onDeleted: (id) => {
+      trashed.current.add(id);
       scheduleTags();
       setLibraryTotal((n) => (n === null ? n : Math.max(0, n - 1)));
       feed.remove([id]);
