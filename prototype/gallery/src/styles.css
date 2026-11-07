@@ -1,0 +1,315 @@
+@layer theme, base, components, utilities;
+
+@import "tailwindcss";
+/* HeroUI v3: only the pieces this page uses (the full stylesheet is ~480 KB). */
+@import "@heroui/styles/base" layer(base);
+@import "@heroui/styles/themes/default";
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/kbd.css" layer(components);
+@import "@heroui/styles/components/skeleton.css" layer(components);
+@import "@heroui/styles/components/modal.css" layer(components);
+@import "@heroui/styles/components/close-button.css" layer(components);
+@import "@heroui/styles/components/surface.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/variants";
+
+@theme {
+  --font-sans: "Albert Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Pure black canvas, white type. Elevation comes from light (hairlines, glows), not from grey boxes. */
+.dark,
+[data-theme="dark"] {
+  --background: #000;
+  --foreground: #fff;
+  --surface: #0c0c0c;
+  --overlay: #0b0b0b;
+  --muted: rgb(255 255 255 / 0.46);
+  --default: rgb(255 255 255 / 0.07);
+  --default-foreground: #fff;
+  --accent: #fff;
+  --accent-foreground: #000;
+  --border: rgb(255 255 255 / 0.09);
+  --separator: rgb(255 255 255 / 0.07);
+  --focus: rgb(255 255 255 / 0.75);
+  --backdrop: rgb(0 0 0 / 0.62);
+  --overlay-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 1px 0 0 rgb(255 255 255 / 0.06) inset,
+    0 50px 120px -30px rgb(0 0 0 / 0.95), 0 0 120px -40px rgb(255 255 255 / 0.12);
+
+  --ink-2: rgb(255 255 255 / 0.66);
+  --ink-3: rgb(255 255 255 / 0.42);
+  --ink-4: rgb(255 255 255 / 0.24);
+  --hairline: rgb(255 255 255 / 0.08);
+}
+
+html:not(.embed) body {
+  background: #000;
+}
+
+body {
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.embed,
+html.embed body {
+  background: transparent;
+}
+
+::selection {
+  background: rgb(255 255 255 / 0.85);
+  color: #000;
+}
+
+/* ---------- Shell ---------- */
+
+.embed-root {
+  height: 900px;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #000;
+  border-radius: var(--radius);
+  padding: 0 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.15) transparent;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  /* Fades the grid out as it slides under the bar. */
+  background: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.92) 55%, rgb(0 0 0 / 0) 100%);
+}
+
+.hero-light {
+  background: radial-gradient(55% 62% at 50% 46%, rgb(255 255 255 / 0.055), transparent 72%);
+}
+
+/* ---------- Tag marquee ---------- */
+
+.marquee {
+  mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--dur, 60s) linear infinite;
+}
+
+.marquee-row[data-dir="rtl"] .marquee-track {
+  animation-direction: reverse;
+}
+
+.marquee-row:hover .marquee-track,
+.marquee-row:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-run {
+  display: flex;
+  align-items: baseline;
+  gap: 0 2.1rem;
+  padding-right: 2.1rem;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tag {
+  position: relative;
+  white-space: nowrap;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: rgb(255 255 255 / var(--o, 0.5));
+  transition: color 300ms ease, text-shadow 400ms ease;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.tag[data-level="1"] { font-size: 15px; font-weight: 300; --o: 0.4; letter-spacing: 0; }
+.tag[data-level="2"] { font-size: 20px; font-weight: 300; --o: 0.48; }
+.tag[data-level="3"] { font-size: 27px; font-weight: 200; --o: 0.56; }
+.tag[data-level="4"] { font-size: 37px; font-weight: 200; --o: 0.66; }
+.tag[data-level="5"] { font-size: 50px; font-weight: 200; --o: 0.78; }
+
+@media (max-width: 640px) {
+  .tag[data-level="3"] { font-size: 23px; }
+  .tag[data-level="4"] { font-size: 30px; }
+  .tag[data-level="5"] { font-size: 38px; }
+}
+
+.tag:hover,
+.tag:focus-visible {
+  color: #fff;
+  text-shadow: 0 0 24px rgb(255 255 255 / 0.45);
+}
+
+.tag[aria-pressed="true"] {
+  color: #fff;
+  text-shadow: 0 0 18px rgb(255 255 255 / 0.6), 0 0 48px rgb(255 255 255 / 0.25);
+}
+
+.tag[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -0.18em;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.9), transparent);
+}
+
+.tag-count {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-left: 0.3em;
+  vertical-align: super;
+  color: rgb(255 255 255 / 0.3);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee { mask-image: none; }
+  .marquee-track { animation: none; width: auto; }
+  .marquee-run { flex-wrap: wrap; row-gap: 0.4rem; }
+  .marquee-run[aria-hidden="true"] { display: none; }
+}
+
+/* ---------- Masonry tiles ---------- */
+
+.tile {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border-radius: 14px;
+  outline: none;
+}
+
+.tile-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--glow) 14%, #050505);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.06);
+  transition: box-shadow 500ms ease, transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tile:hover .tile-media,
+.tile:focus-visible .tile-media {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.16), 0 26px 70px -26px color-mix(in srgb, var(--glow) 85%, transparent),
+    0 0 50px -18px color-mix(in srgb, var(--glow) 60%, transparent);
+}
+
+.tile:focus-visible .tile-media {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.8), 0 26px 70px -26px color-mix(in srgb, var(--glow) 85%, transparent);
+}
+
+.tile-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0;
+  transform: scale(1.015);
+  transition: opacity 700ms ease, transform 900ms ease, filter 500ms ease;
+  filter: brightness(0.9);
+}
+
+.tile-media img[data-loaded="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+.tile:hover .tile-media img {
+  filter: brightness(1);
+}
+
+.tile-clip-fade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 38%;
+  background: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.85));
+  pointer-events: none;
+}
+
+.tile-caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 44px 14px 12px;
+  background: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.78) 55%, rgb(0 0 0 / 0.9));
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 350ms ease, transform 450ms ease;
+}
+
+.tile:hover .tile-caption,
+.tile:focus-visible .tile-caption {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: none) {
+  .tile-caption { opacity: 1; transform: none; padding-top: 28px; }
+  .kbd-hint { display: none; }
+}
+
+.grid-stale {
+  opacity: 0.25;
+  filter: saturate(0.4);
+  transition: opacity 300ms ease, filter 300ms ease;
+}
+
+.grid-fresh {
+  opacity: 1;
+  transition: opacity 500ms ease, filter 500ms ease;
+}
+
+/* ---------- Palette ---------- */
+
+.palette-row[aria-selected="true"] {
+  background: linear-gradient(to right, rgb(255 255 255 / 0.075), rgb(255 255 255 / 0.02));
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+}
+
+.palette-row mark {
+  background: none;
+  color: #fff;
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.35);
+  text-underline-offset: 3px;
+}
+
+.fade-in {
+  animation: fade-in 500ms ease both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-media,
+  .tile-media img,
+  .tile-caption {
+    transition: none;
+  }
+  .fade-in {
+    animation: none;
+  }
+}
