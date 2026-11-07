@@ -16,15 +16,18 @@ export function TrashPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const restore = async (ids: string[]) => {
-    setBusy(ids.length === 1 ? ids[0]! : "all");
+  /** One id: that tile. `"all"`: the whole bin, including pages not loaded yet. */
+  const restore = async (target: string | "all") => {
+    setBusy(target);
     setMsg(null);
     try {
-      const r = ids.length === 1 ? { ids: [(await api.restoreItem(ids[0]!)).id] } : await api.bulk({ ids, action: "restore" });
+      const r = target === "all" ? await api.restoreAllTrash() : { ids: [(await api.restoreItem(target)).id] };
       feed.remove(r.ids);
+      if (target === "all") feed.reload();
       setMsg(r.ids.length === 1 ? "Captura reposta na galeria." : `${r.ids.length} capturas repostas na galeria.`);
     } catch {
       setMsg("Não foi possível repor.");
+      if (target === "all") feed.reload(); // some chunks may have gone through
     } finally {
       setBusy(null);
     }
@@ -48,8 +51,8 @@ export function TrashPage() {
             <span className="text-[13px] text-[var(--ink-3)]" aria-live="polite">
               {msg}
             </span>
-            {feed.items.length > 1 && (
-              <Button variant="outline" size="sm" isDisabled={!!busy} onPress={() => restore(feed.items.slice(0, 200).map((i) => i.id))}>
+            {(feed.total ?? feed.items.length) > 1 && (
+              <Button variant="outline" size="sm" isDisabled={!!busy} onPress={() => restore("all")}>
                 Repor todas
               </Button>
             )}
@@ -68,7 +71,7 @@ export function TrashPage() {
               clipped={box.clipped}
               onOpen={() => {}}
               action={
-                <Button size="sm" variant="secondary" isDisabled={!!busy} onPress={() => restore([c.id])} className="bg-black/70 backdrop-blur">
+                <Button size="sm" variant="secondary" isDisabled={!!busy} onPress={() => restore(c.id)} className="bg-black/70 backdrop-blur">
                   Repor
                 </Button>
               }

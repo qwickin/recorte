@@ -3,12 +3,12 @@ import { extname, resolve, sep } from "node:path";
 import type { Context, Hono } from "hono";
 import type { AppEnv } from "./auth/middleware";
 
-/** Spec §8. Fonts come from Google Fonts; frame-src is for phase 2 (X embeds). */
+/** Spec §8. Fonts are bundled with the gallery (no third-party host); frame-src is for phase 2 (X embeds). */
 export const GALLERY_CSP = [
   "default-src 'self'",
   "script-src 'self'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
   "img-src 'self' data: blob:",
   "connect-src 'self'",
   "frame-src https://platform.twitter.com",

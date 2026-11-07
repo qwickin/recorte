@@ -11,6 +11,8 @@ mkdirSync(join(gallery, "assets"), { recursive: true });
 writeFileSync(join(gallery, "index.html"), "<!doctype html><title>Recorte</title><div id=root></div>");
 writeFileSync(join(gallery, "assets", "index-abc.js"), "console.log(1)");
 writeFileSync(join(gallery, "assets", "index-abc.css"), "body{}");
+mkdirSync(join(gallery, "fonts"), { recursive: true });
+writeFileSync(join(gallery, "fonts", "albert-sans-latin-300-normal.woff2"), "wOF2");
 writeFileSync(join(base, "secret.txt"), "nope"); // outside the gallery dir
 afterAll(() => rmSync(base, { recursive: true, force: true }));
 
@@ -29,8 +31,9 @@ describe("gallery static serving", () => {
       expect(csp).toContain("img-src 'self' data: blob:");
       expect(csp).toContain("connect-src 'self'");
       expect(csp).toContain("frame-src https://platform.twitter.com");
-      expect(csp).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
-      expect(csp).toContain("font-src https://fonts.gstatic.com");
+      expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+      expect(csp).toContain("font-src 'self'");
+      expect(csp).not.toMatch(/googleapis|gstatic/);
       expect(r.headers.get("cache-control")).toBe("no-cache");
     }
   });
@@ -44,6 +47,13 @@ describe("gallery static serving", () => {
     expect(await js.text()).toBe("console.log(1)");
     const css = await t.app.request("/assets/index-abc.css");
     expect(css.headers.get("content-type")).toContain("text/css");
+  });
+
+  it("serves the bundled fonts as font/woff2", async () => {
+    const t = await make();
+    const r = await t.app.request("/fonts/albert-sans-latin-300-normal.woff2");
+    expect(r.status).toBe(200);
+    expect(r.headers.get("content-type")).toBe("font/woff2");
   });
 
   it("does not answer missing assets with HTML", async () => {
