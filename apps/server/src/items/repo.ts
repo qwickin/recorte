@@ -60,6 +60,35 @@ export function decodeCursor(cursor: string): { createdAt: string; id: string } 
   return { createdAt: raw.slice(0, i), id: raw.slice(i + 1) };
 }
 
+function summariesFromRows(db: Db, rows: Row[]): ItemSummary[] {
+  const tagMap = new Map<string, string[]>();
+  if (rows.length) {
+    const trows = db
+      .prepare(`SELECT item_id, tag FROM item_tags WHERE item_id IN (${rows.map(() => "?").join(",")}) ORDER BY item_id, pos`)
+      .all(...rows.map((r) => r.id)) as { item_id: string; tag: string }[];
+    for (const t of trows) {
+      const a = tagMap.get(t.item_id) ?? [];
+      if (!a.includes(t.tag)) a.push(t.tag);
+      tagMap.set(t.item_id, a);
+    }
+  }
+  return rows.map((r) => ({
+    id: r.id,
+    type: r.type,
+    ...(r.kind ? { kind: r.kind } : {}),
+    site: r.site,
+    url: r.url,
+    title: r.title,
+    createdAt: r.created_at,
+    thumb: `/api/items/${r.id}/files/thumb.webp`,
+    width: r.width,
+    height: r.height,
+    color: r.color,
+    tags: tagMap.get(r.id) ?? [],
+    hasNote: !!r.has_note,
+  }));
+}
+
 export function itemsRepo(db: Db) {
   const tx = <T>(fn: () => T): T => {
     if (db.isTransaction) return fn();
@@ -139,34 +168,7 @@ export function itemsRepo(db: Db) {
       const hasMore = rows.length > q.limit;
       const pageRows = rows.slice(0, q.limit);
 
-      const tagMap = new Map<string, string[]>();
-      if (pageRows.length) {
-        const trows = db
-          .prepare(
-            `SELECT item_id, tag FROM item_tags WHERE item_id IN (${pageRows.map(() => "?").join(",")}) ORDER BY item_id, pos`,
-          )
-          .all(...pageRows.map((r) => r.id)) as { item_id: string; tag: string }[];
-        for (const t of trows) {
-          const a = tagMap.get(t.item_id) ?? [];
-          if (!a.includes(t.tag)) a.push(t.tag);
-          tagMap.set(t.item_id, a);
-        }
-      }
-      const items: ItemSummary[] = pageRows.map((r) => ({
-        id: r.id,
-        type: r.type,
-        ...(r.kind ? { kind: r.kind } : {}),
-        site: r.site,
-        url: r.url,
-        title: r.title,
-        createdAt: r.created_at,
-        thumb: `/api/items/${r.id}/files/thumb.webp`,
-        width: r.width,
-        height: r.height,
-        color: r.color,
-        tags: tagMap.get(r.id) ?? [],
-        hasNote: !!r.has_note,
-      }));
+      const items = summariesFromRows(db, pageRows);
       const last = pageRows[pageRows.length - 1];
       return { items, nextCursor: hasMore && last ? encodeCursor(last.created_at, last.id) : null, total };
     },
@@ -186,6 +188,20 @@ export function itemsRepo(db: Db) {
         count: r.count,
         origin: r.origins.includes(",") ? "both" : (r.origins as "user" | "ai"),
       }));
+    },
+
+    /** Live (not deleted) summaries of the user's items among `ids`, keyed by id. */
+    summariesByIds(userId: string, ids: string[]): Map<string, ItemSummary> {
+      if (!ids.length) return new Map();
+      const rows = db
+        .prepare(`SELECT * FROM items WHERE user_id = ? AND deleted_at IS NULL AND id IN (${ids.map(() => "?").join(",")})`)
+        .all(userId, ...ids) as unknown as Row[];
+      return new Map(summariesFromRows(db, rows).map((s) => [s.id, s]));
+    },
+
+    /** Ids of every mirror row of the user (live and trashed). */
+    allIds(userId: string): string[] {
+      return (db.prepare("SELECT id FROM items WHERE user_id = ?").all(userId) as { id: string }[]).map((r) => r.id);
     },
 
     idsByCategory(userId: string, categoryId: string): string[] {

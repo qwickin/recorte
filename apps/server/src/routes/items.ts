@@ -203,7 +203,7 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
 }
 
 /** Hono gives string[] per key; the schema wants a single value except tags ("a,b" or repeated). */
-function flatQuery(q: Record<string, string[]>): Record<string, string> {
+export function flatQuery(q: Record<string, string[]>): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(q)) out[k] = k === "tags" ? v.join(",") : v[0]!;
   return out;

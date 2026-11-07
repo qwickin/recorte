@@ -1,12 +1,14 @@
 import { Hono } from "hono";
 import { type AppEnv, originCheck } from "./auth/middleware";
 import { type Deps, type DepsInput, resolveDeps } from "./deps";
+import { adminRoutes } from "./routes/admin";
 import { authRoutes } from "./routes/auth";
 import { categoryRoutes } from "./routes/categories";
 import { eventRoutes } from "./routes/events";
 import { exportRoutes } from "./routes/export";
 import { extensionRoutes } from "./routes/extension";
 import { itemRoutes } from "./routes/items";
+import { searchRoutes } from "./routes/search";
 import { tagRoutes } from "./routes/tags";
 
 export type { Deps, DepsInput } from "./deps";
@@ -21,6 +23,8 @@ export const routeModules: ((app: Hono<AppEnv>, deps: Deps) => void)[] = [
   eventRoutes,
   exportRoutes,
   extensionRoutes,
+  searchRoutes,
+  adminRoutes,
 ];
 
 export function createApp(input: DepsInput): Hono<AppEnv> {

@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Item } from "@recorte/shared";
 import { ULID_RE, ulidTime } from "./ids";
@@ -64,6 +64,22 @@ export class Storage {
       if ((e as NodeJS.ErrnoException).code !== "ENOENT") console.warn(`readMeta ${id} failed:`, (e as Error).message);
       return null;
     }
+  }
+
+  /** Ids of every item directory of the user on disk (`items/<user>/<yyyy>/<mm>/<id>`). */
+  listItemIds(userId: string): string[] {
+    if (!SAFE_ID.test(userId)) return [];
+    const out: string[] = [];
+    const ls = (dir: string): string[] => {
+      try {
+        return readdirSync(dir);
+      } catch {
+        return [];
+      }
+    };
+    const root = join(this.dataDir, "items", userId);
+    for (const y of ls(root)) for (const mo of ls(join(root, y))) for (const id of ls(join(root, y, mo))) if (ULID_RE.test(id)) out.push(id);
+    return out.sort();
   }
 
   removeItem(userId: string, id: string): void {

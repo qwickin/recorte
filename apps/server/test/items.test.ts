@@ -8,6 +8,7 @@ import { createUser } from "../src/auth/users";
 import { EventBus } from "../src/events";
 import { purgeTrash } from "../src/items/purge";
 import { itemsRepo } from "../src/items/repo";
+import { stubSearch } from "./fakes";
 import { Storage } from "../src/storage";
 import { makeApp, login } from "./helpers";
 
@@ -163,6 +164,7 @@ describe("items", () => {
   it("delete then restore", async () => {
     const calls: string[] = [];
     const search = {
+      ...stubSearch,
       index: async (d: { id: string }) => void calls.push(`index:${d.id}`),
       remove: async (id: string) => void calls.push(`remove:${id}`),
       search: async () => [],
@@ -189,7 +191,7 @@ describe("items", () => {
   });
 
   it("delete/restore succeed when search is down and enqueue an index retry", async () => {
-    const down = { index: async () => { throw new Error("down"); }, remove: async () => { throw new Error("down"); }, search: async () => [] };
+    const down = { ...stubSearch, index: async () => { throw new Error("down"); }, remove: async () => { throw new Error("down"); }, search: async () => [] };
     const { t, cookie } = await setup({ deps: { search: down } });
     const a = (await (await upload(t, cookie)).json()) as ItemSummary;
     expect((await send(t, "DELETE", `/api/items/${a.id}`, cookie)).status).toBe(204);
@@ -226,7 +228,7 @@ describe("items", () => {
   });
 
   it("uploads succeed when search is unavailable", async () => {
-    const down = { index: async () => { throw new Error("meili down"); }, remove: async () => { throw new Error("down"); }, search: async () => { throw new Error("down"); } };
+    const down = { ...stubSearch, index: async () => { throw new Error("meili down"); }, remove: async () => { throw new Error("down"); }, search: async () => { throw new Error("down"); } };
     const { t, cookie } = await setup({ deps: { search: down } });
     const res = await upload(t, cookie);
     expect(res.status).toBe(201);

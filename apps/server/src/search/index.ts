@@ -31,14 +31,20 @@ export interface SearchResult {
   highlight: { title?: string; text?: string };
 }
 
-/** Implemented by Task 5 (Meilisearch). Listing never goes through it. */
+/** Meilisearch only does search; listing never goes through it. */
 export interface Search {
+  /** Creates/configures the index. Safe to call repeatedly. */
+  ensureIndex(): Promise<void>;
+  /** Drops every document of the user and indexes `docs` (admin "reindex"). */
+  replaceAll(userId: string, docs: SearchDoc[]): Promise<void>;
   index(doc: SearchDoc): Promise<void>;
   remove(id: string): Promise<void>;
   search(query: SearchQuery): Promise<SearchResult[]>;
 }
 
 export class NoopSearch implements Search {
+  async ensureIndex(): Promise<void> {}
+  async replaceAll(): Promise<void> {}
   async index(): Promise<void> {}
   async remove(): Promise<void> {}
   async search(): Promise<SearchResult[]> {
