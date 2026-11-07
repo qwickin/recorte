@@ -4,8 +4,10 @@
   "type": "module",
   "packageManager": "pnpm@12.16.1",
   "scripts": {
-    "test": "pnpm -r test",
+    "test": "pnpm -r test && pnpm run test:scripts",
+    "test:scripts": "node --test \"scripts/*.test.mjs\"",
     "build": "pnpm -r --if-present build",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm -r --if-present typecheck",
+    "versions": "node scripts/version.mjs"
   }
 }
