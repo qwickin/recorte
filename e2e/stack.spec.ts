@@ -11,7 +11,7 @@
 // The first run needs internet: Meilisearch downloads its embedding model on first start.
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
@@ -152,6 +152,8 @@ before(async () => {
   tmp = mkdtempSync(join(tmpdir(), "recorte-e2e-"));
   mkdirSync(join(tmp, "data"));
   mkdirSync(join(tmp, "meili"));
+  // The app runs as uid 1000; on Linux hosts the invoking user may differ (GitHub runners are 1001).
+  chmodSync(join(tmp, "data"), 0o777);
   const port = Number(process.env.E2E_PORT) || (await freePort());
   base = `http://127.0.0.1:${port}`;
   const override = join(tmp, "compose.e2e.yml");

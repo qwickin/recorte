@@ -28,10 +28,10 @@ cp .env.example .env
 # Edita .env: MEILI_MASTER_KEY (obrigatória, pelo menos 16 caracteres; p. ex. `openssl rand -base64 32`) e PUBLIC_URL
 mkdir -p data meili
 sudo chown 1000:1000 data      # só em Linux: a app corre como utilizador sem privilégios (uid 1000)
-docker compose up -d           # usa a imagem publicada no GHCR
-# ou, para construir a partir deste checkout:
-# docker compose up -d --build
+docker compose up -d --build   # constrói a imagem a partir deste checkout
 ```
+
+Depois de o CI publicar a imagem em `ghcr.io/qwickin/screenshotextension` (e de o pacote ficar público no GitHub), basta `docker compose up -d`, sem `--build`, para usar a imagem publicada.
 
 A galeria fica em `http://localhost:8080`. Para mudar a porta, define `RECORTE_PORT` no `.env`.
 
@@ -102,7 +102,8 @@ Repor a palavra-passe termina todas as sessões e desliga todas as extensões. C
 ## Atualizar
 
 ```sh
-docker compose pull && docker compose up -d
+git pull && docker compose up -d --build     # a partir do checkout
+docker compose pull && docker compose up -d  # com a imagem publicada
 ```
 
 ## Desenvolvimento

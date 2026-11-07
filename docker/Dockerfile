@@ -18,8 +18,13 @@ WORKDIR /src
 # ---------------------------------------------------------------------------
 # build: gallery + both extension ZIPs. Arch-independent output, so it runs on the build platform
 # (multi-arch CI builds it once, natively, instead of under QEMU).
-FROM --platform=$BUILDPLATFORM base AS build
+FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS build
+ARG PNPM_VERSION
 ARG EXTENSION_VERSION=0.0.0
+ENV PNPM_HOME=/pnpm CI=true
+ENV PATH=$PNPM_HOME:$PATH
+RUN npm install -g pnpm@${PNPM_VERSION}
+WORKDIR /src
 COPY . .
 RUN --mount=type=cache,id=recorte-pnpm,target=/pnpm-store \
     pnpm install --frozen-lockfile --store-dir /pnpm-store
