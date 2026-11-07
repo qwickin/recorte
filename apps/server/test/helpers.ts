@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach } from "vitest";
-import { createApp } from "../src/app";
+import { createApp, type Deps } from "../src/app";
 import { loadConfig } from "../src/config";
 import { openDb } from "../src/db";
 import { createUser } from "../src/auth/users";
@@ -15,13 +15,13 @@ afterEach(() => {
 export const EMAIL = "owner@example.com";
 export const PASSWORD = "correct horse battery";
 
-export async function makeApp(opts: { user?: boolean; env?: Record<string, string> } = {}) {
+export async function makeApp(opts: { user?: boolean; env?: Record<string, string>; deps?: Partial<Deps> } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "recorte-test-"));
   dirs.push(dir);
   const config = loadConfig({ DATA_DIR: dir, SETUP_TOKEN: "tok-123", ...opts.env });
   const db = openDb(dir);
   if (opts.user) await createUser(db, EMAIL, PASSWORD);
-  const app = createApp({ db, config });
+  const app = createApp({ db, config, ...opts.deps });
   const json = (path: string, body: unknown, headers: Record<string, string> = {}, method = "POST") =>
     app.request(path, { method, headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
   return { app, db, config, dir, json };

@@ -14,6 +14,7 @@ export interface Config {
   aiCloudModel: string | null;
   appVersion: string;
   extensionVersion: string;
+  downloadsDir: string;
 }
 
 const opt = (v: string | undefined): string | null => (v && v.trim() ? v.trim() : null);
@@ -34,5 +35,6 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     aiCloudModel: opt(env.AI_CLOUD_MODEL),
     appVersion: opt(env.APP_VERSION) ?? "0.0.0",
     extensionVersion: opt(env.EXTENSION_VERSION) ?? "0.0.0",
+    downloadsDir: resolve(opt(env.DOWNLOADS_DIR) ?? "/app/downloads"),
   };
 }

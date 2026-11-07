@@ -67,6 +67,7 @@ export const Item = z.object({
   }),
   text: ItemText,
   post: Post.optional(),
+  truncated: z.boolean().optional(),
 });
 export type Item = z.infer<typeof Item>;
 
@@ -171,5 +172,7 @@ export const ListQuery = z.object({
   color: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
+  /** "1" lists the trash (soft-deleted items) instead of live items. */
+  trash: z.enum(["1", "true"]).optional(),
 });
 export type ListQuery = z.infer<typeof ListQuery>;

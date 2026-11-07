@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "bin": { "recorte": "./bin/recorte.mjs" },
+  "bin": {
+    "recorte": "./bin/recorte.mjs"
+  },
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "start": "tsx src/main.ts",
@@ -13,12 +15,16 @@
   "dependencies": {
     "@hono/node-server": "^1.19.0",
     "@node-rs/argon2": "^2.0.2",
+    "@recorte/ai": "workspace:*",
     "@recorte/shared": "workspace:*",
+    "archiver": "^8.0.0",
     "hono": "^4.9.0",
+    "sharp": "0.35.5",
     "tsx": "^4.20.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@types/archiver": "^8.0.0",
     "@types/node": "^24.0.0",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"

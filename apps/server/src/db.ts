@@ -38,6 +38,58 @@ export const MIGRATIONS: readonly string[] = [
      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
      expires_at INTEGER NOT NULL
    );`,
+  // 2: items mirror, tags, colours, categories, jobs
+  `CREATE TABLE categories (
+     id TEXT PRIMARY KEY,
+     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     name TEXT NOT NULL,
+     color TEXT,
+     created_at TEXT NOT NULL,
+     UNIQUE (user_id, name)
+   );
+   CREATE TABLE items (
+     id TEXT PRIMARY KEY,
+     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+     type TEXT NOT NULL,
+     kind TEXT,
+     site TEXT NOT NULL,
+     url TEXT NOT NULL,
+     title TEXT NOT NULL,
+     created_at TEXT NOT NULL,
+     deleted_at TEXT,
+     category_id TEXT,
+     thumb TEXT NOT NULL,
+     width INTEGER NOT NULL,
+     height INTEGER NOT NULL,
+     color TEXT NOT NULL,
+     has_note INTEGER NOT NULL DEFAULT 0
+   );
+   CREATE INDEX items_user_created ON items(user_id, deleted_at, created_at DESC, id DESC);
+   CREATE INDEX items_category ON items(category_id);
+   CREATE TABLE item_tags (
+     item_id TEXT NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+     tag TEXT NOT NULL,
+     origin TEXT NOT NULL CHECK (origin IN ('user', 'ai')),
+     pos INTEGER NOT NULL,
+     PRIMARY KEY (item_id, tag, origin)
+   );
+   CREATE INDEX item_tags_tag ON item_tags(tag);
+   CREATE TABLE item_colors (
+     item_id TEXT NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+     color TEXT NOT NULL,
+     PRIMARY KEY (item_id, color)
+   );
+   CREATE TABLE jobs (
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     type TEXT NOT NULL,
+     payload TEXT NOT NULL,
+     status TEXT NOT NULL DEFAULT 'pending',
+     attempts INTEGER NOT NULL DEFAULT 0,
+     run_at INTEGER NOT NULL,
+     last_error TEXT,
+     created_at TEXT NOT NULL
+   );
+   CREATE INDEX jobs_pending ON jobs(status, run_at);`,
 ];
 
 export function migrate(db: Db, migrations: readonly string[] = MIGRATIONS): void {
