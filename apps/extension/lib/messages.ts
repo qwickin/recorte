@@ -43,6 +43,8 @@ export type BackgroundMessage =
   | { type: "recorte:draft-info"; draftId: string }
   /** Without `account`: drop captures of every other connection. With it: drop that connection's captures. */
   | { type: "recorte:discard-parked"; account?: string }
+  /** Drops the current connection's waiting captures (popup "Descartar"). */
+  | { type: "recorte:discard-pending" }
   | { type: "recorte:tags" }
   | { type: "recorte:categories" }
   | { type: "recorte:create-category"; name: string }

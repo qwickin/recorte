@@ -2,7 +2,7 @@ import "fake-indexeddb/auto";
 import type { UploadMeta } from "@recorte/shared";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { UploadResult } from "../lib/api";
-import { IdbQueueStore, MAX_AGE_MS, MAX_ATTEMPTS, accountKey, backoffMs, countByAccount, drainQueue, newQueueItem, openRecorteDb } from "../lib/queue";
+import { IdbQueueStore, accountKey, backoffMs, countByAccount, drainQueue, newQueueItem, openRecorteDb } from "../lib/queue";
 
 const ACC = accountKey("https://a.example", "user-1");
 const OTHER = accountKey("https://b.example", "user-2");
@@ -104,25 +104,58 @@ describe("drainQueue", () => {
     expect(await store.count()).toBe(0);
   });
 
-  it("drops a transiently failing item after MAX_ATTEMPTS attempts", async () => {
-    await store.put({ ...newQueueItem(image(), "image/webp", meta, ACC, 0), attempts: MAX_ATTEMPTS - 2 });
-    const fail = respond({ ok: false, status: 503, error: "" });
-    let r = await drainQueue(store, fail, { account: ACC, now: () => 1, force: true });
-    expect(r.dropped).toHaveLength(0);
-    expect((await store.all())[0]!.attempts).toBe(MAX_ATTEMPTS - 1);
-    r = await drainQueue(store, fail, { account: ACC, now: () => 2, force: true });
-    expect(r.dropped).toHaveLength(1);
-    expect(r.dropped[0]!.expired).toBe(true);
-    expect(await store.count()).toBe(0);
+  it("never drops a transiently failing item, however many attempts or however old (spec §2)", async () => {
+    const YEAR = 365 * 24 * 60 * 60_000;
+    await store.put({ ...newQueueItem(image(), "image/webp", meta, ACC, 0), attempts: 10_000 });
+    for (const status of [0, 500, 502, 503, 429, 404, 408]) {
+      const r = await drainQueue(store, respond({ ok: false, status, error: status ? "" : "Failed to fetch" }), {
+        account: ACC,
+        now: () => YEAR,
+        force: true,
+      });
+      expect(r.dropped).toHaveLength(0);
+      expect(r.remaining).toBe(1);
+    }
+    expect(await store.count()).toBe(1);
   });
 
-  it("drops a transiently failing item older than 7 days, but never on 401", async () => {
+  it("keeps a 400 whose code is not about the capture (proxy page, old server's invalid_category)", async () => {
     await store.put(newQueueItem(image(), "image/webp", meta, ACC, 0));
-    let r = await drainQueue(store, respond({ ok: false, status: 401, error: "" }), { account: ACC, now: () => MAX_AGE_MS + 1 });
+    for (const error of ["", "invalid_category", "invalid_body"]) {
+      const r = await drainQueue(store, respond({ ok: false, status: 400, error }), { account: ACC, now: () => 1e9, force: true });
+      expect(r.dropped).toHaveLength(0);
+    }
+    expect(await store.count()).toBe(1);
+  });
+
+  it("drops (and reports) only true permanent rejections: 400 invalid_meta/invalid_image, 413, 415, 422", async () => {
+    for (const [status, error] of [[400, "invalid_image"], [415, ""], [422, ""], [413, "image_too_large"]] as const) {
+      await store.put(newQueueItem(image(), "image/webp", meta, ACC, 0));
+      const r = await drainQueue(store, respond({ ok: false, status, error }), { account: ACC, now: () => 1 });
+      expect(r.dropped.map((d) => d.status)).toEqual([status]);
+      expect(await store.count()).toBe(0);
+    }
+  });
+
+  it("a forced drain of an item still in backoff does not count as an attempt", async () => {
+    await store.put({ ...newQueueItem(image(), "image/webp", meta, ACC, 0), attempts: 3, nextAttemptAt: 50_000 });
+    const fail = respond({ ok: false, status: 0, error: "offline" });
+    for (let i = 0; i < 5; i++) await drainQueue(store, fail, { account: ACC, now: () => 1000 + i, force: true });
+    expect(fail).toHaveBeenCalledTimes(5);
+    const kept = (await store.all())[0]!;
+    expect(kept.attempts).toBe(3);
+    expect(kept.nextAttemptAt).toBe(50_000);
+    expect(kept.lastError).toBe("offline");
+    // The scheduled retry still counts and backs off.
+    await drainQueue(store, fail, { account: ACC, now: () => 50_000 });
+    expect((await store.all())[0]!.attempts).toBe(4);
+    expect((await store.all())[0]!.nextAttemptAt).toBe(50_000 + backoffMs(4));
+  });
+
+  it("never drops on 401, however old", async () => {
+    await store.put(newQueueItem(image(), "image/webp", meta, ACC, 0));
+    const r = await drainQueue(store, respond({ ok: false, status: 401, error: "" }), { account: ACC, now: () => 1e12 });
     expect(r.authNeeded).toBe(true);
     expect(await store.count()).toBe(1);
-    r = await drainQueue(store, respond({ ok: false, status: 0, error: "offline" }), { account: ACC, now: () => MAX_AGE_MS + 1 });
-    expect(r.dropped[0]!.expired).toBe(true);
-    expect(await store.count()).toBe(0);
   });
 });

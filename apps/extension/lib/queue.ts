@@ -114,9 +114,8 @@ export async function countByAccount(store: QueueStore): Promise<Map<string, num
   return m;
 }
 
-/** Transient failures are retried at most this many times, and for at most this long; then dropped. */
-export const MAX_ATTEMPTS = 20;
-export const MAX_AGE_MS = 7 * 24 * 60 * 60_000;
+/** Transient failures (network, 5xx, 429, 404, unknown 400s…) are retried forever with backoff: a capture is
+ *  never dropped because the server was down (spec §2). Only the user discards them. */
 const BASE_DELAY_MS = 5_000;
 const MAX_DELAY_MS = 30 * 60_000;
 
@@ -125,15 +124,22 @@ export function backoffMs(attempts: number): number {
   return Math.min(MAX_DELAY_MS, BASE_DELAY_MS * 2 ** Math.max(0, attempts - 1));
 }
 
-/** Server rejected the item itself: retrying would never succeed. */
-export function isPermanentFailure(status: number): boolean {
-  return status === 400 || status === 413 || status === 415 || status === 422;
+/** 400 codes from `POST /api/items` that describe the capture itself (it can never succeed as is). */
+const PERMANENT_400 = new Set(["invalid_meta", "invalid_image"]);
+
+/**
+ * Server rejected the item itself: retrying would never succeed. A 400 without one of our codes (a proxy page,
+ * an older server's `invalid_category`, …) is not proof of that, so it is retried like any transient failure.
+ */
+export function isPermanentFailure(status: number, code = ""): boolean {
+  if (status === 413 || status === 415 || status === 422) return true;
+  return status === 400 && PERMANENT_400.has(code);
 }
 
 export interface DrainResult {
   saved: { item: QueueItem; body: unknown }[];
-  /** Rejected by the server (400/413/…) or given up after MAX_ATTEMPTS / MAX_AGE_MS (`expired`). */
-  dropped: { item: QueueItem; status: number; error: string; expired?: boolean }[];
+  /** Rejected by the server for good (400 invalid_meta/invalid_image, 413, 415, 422). Nothing else is dropped. */
+  dropped: { item: QueueItem; status: number; error: string }[];
   /** True when the server answered 401: the device token is gone; the queue is kept and paused. */
   authNeeded: boolean;
   /** Items of this account still waiting. */
@@ -149,9 +155,10 @@ export type Uploader = (item: QueueItem) => Promise<UploadResult>;
  * are never sent: they stay parked until that connection is active again or the user discards them.
  * - 2xx → removed.
  * - 401 → kept untouched; draining stops (every other item would fail the same way).
- * - 400/413/415/422 → removed and reported as dropped (not retried).
- * - anything else (network, 5xx, 429…) → kept with exponential backoff, until MAX_ATTEMPTS failures or
- *   MAX_AGE_MS since capture; then removed and reported as dropped (`expired`).
+ * - 400 invalid_meta/invalid_image, 413, 415, 422 → removed and reported as dropped (not retried).
+ * - anything else (network, 5xx, 429, 404…) → kept, with exponential backoff, until it is sent or the user
+ *   discards it. `force` (user action, new capture, login) sends regardless of backoff and does not count as an
+ *   attempt, so saving many captures while offline does not push the older ones' retries out.
  */
 export async function drainQueue(
   store: QueueStore,
@@ -170,15 +177,19 @@ export async function drainQueue(
     } else if (r.status === 401) {
       result.authNeeded = true;
       break;
-    } else if (isPermanentFailure(r.status)) {
+    } else if (isPermanentFailure(r.status, r.error)) {
       await store.delete(item.id);
       result.dropped.push({ item, status: r.status, error: r.error });
-    } else if (item.attempts + 1 >= MAX_ATTEMPTS || now() - item.createdAt >= MAX_AGE_MS) {
-      await store.delete(item.id);
-      result.dropped.push({ item, status: r.status, error: r.error || `HTTP ${r.status}`, expired: true });
     } else {
-      const attempts = item.attempts + 1;
-      await store.put({ ...item, attempts, nextAttemptAt: now() + backoffMs(attempts), lastError: r.error || `HTTP ${r.status}` });
+      const lastError = r.error || `HTTP ${r.status}`;
+      const due = item.nextAttemptAt <= now();
+      if (opts.force && !due) {
+        // Out-of-schedule try: keep the backoff state as it was.
+        await store.put({ ...item, lastError });
+      } else {
+        const attempts = item.attempts + 1;
+        await store.put({ ...item, attempts, nextAttemptAt: now() + backoffMs(attempts), lastError });
+      }
     }
   }
   const rest = (await store.all()).filter((i) => i.account === opts.account);

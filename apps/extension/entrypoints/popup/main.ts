@@ -35,6 +35,10 @@ function render(s: Status, tabOk: boolean): void {
     (s.pending === 0 ? "Fila vazia" : s.pending === 1 ? "1 captura por enviar" : `${s.pending} capturas por enviar`) +
     (s.parked ? ` · ${s.parked} de outra ligação` : "");
   $("retry").hidden = s.pending === 0 || s.authNeeded;
+  const discard = $<HTMLButtonElement>("discard");
+  discard.hidden = s.pending === 0;
+  discard.textContent = "Descartar";
+  delete discard.dataset.armed;
 }
 
 async function main(): Promise<void> {
@@ -64,6 +68,17 @@ async function main(): Promise<void> {
   $("retry").addEventListener("click", async () => {
     $("queue").textContent = "A enviar…";
     await send({ type: "recorte:retry-queue" });
+    render(await send<Status>({ type: "recorte:status" }), tabOk);
+  });
+  // Two clicks instead of confirm(): dialogs are unreliable inside a Firefox action popup.
+  $("discard").addEventListener("click", async () => {
+    const b = $<HTMLButtonElement>("discard");
+    if (!b.dataset.armed) {
+      b.dataset.armed = "1";
+      b.textContent = "Confirmar descarte";
+      return;
+    }
+    await send({ type: "recorte:discard-pending" });
     render(await send<Status>({ type: "recorte:status" }), tabOk);
   });
 }

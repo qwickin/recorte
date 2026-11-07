@@ -193,10 +193,9 @@ async function runDrain(force: boolean): Promise<DrainResult | null> {
       () => notify(`recorte-saved-${item.id}`, "Guardado", item.meta.title || item.meta.pageTitle || "Captura guardada no Recorte.", true),
     );
   }
-  for (const { item, status, expired } of r.dropped) {
-    const why = expired
-      ? "Desisti de enviar depois de muitas tentativas falhadas."
-      : status === 413
+  for (const { item, status } of r.dropped) {
+    const why =
+      status === 413
         ? "A imagem é demasiado grande para o servidor."
         : "O servidor recusou esta captura.";
     await notify(`recorte-dropped-${item.id}`, "Não foi possível guardar", `${why} (${item.meta.pageTitle || item.meta.url})`);
@@ -514,6 +513,13 @@ async function handleOther(msg: BackgroundMessage, sender: Browser.runtime.Messa
       for (const i of await store.all()) {
         if (msg.account ? i.account === msg.account : i.account !== current) await store.delete(i.id);
       }
+      await updateBadge();
+      return { ok: true };
+    }
+    case "recorte:discard-pending": {
+      // User's explicit choice in the popup: drop the current connection's waiting captures.
+      const current = accountOf(await getSettings());
+      if (current) for (const i of await store.all()) if (i.account === current) await store.delete(i.id);
       await updateBadge();
       return { ok: true };
     }
