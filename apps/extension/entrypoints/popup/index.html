@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recorte</title>
+  </head>
+  <body>
+    <main class="popup">
+      <header>
+        <span class="brand">Recorte</span>
+        <span class="server muted" id="server"></span>
+      </header>
+
+      <a class="notice update" id="update" hidden target="_blank" rel="noreferrer">
+        <span><b>Nova versão disponível</b> <span id="update-version" class="muted"></span></span>
+        <span class="arrow">→</span>
+      </a>
+      <button class="notice auth" id="auth" type="button" hidden>
+        <span><b>Volta a ligar a extensão</b><br /><span class="muted">O servidor recusou o acesso. A fila fica guardada.</span></span>
+        <span class="arrow">→</span>
+      </button>
+      <button class="notice setup" id="setup" type="button" hidden>
+        <span><b>Liga a extensão ao servidor</b><br /><span class="muted">Abre as opções e entra com a tua conta.</span></span>
+        <span class="arrow">→</span>
+      </button>
+
+      <p class="unsupported muted" id="unsupported" hidden>Esta página não pode ser capturada. O Recorte só captura páginas http:// ou https://.</p>
+
+      <div class="modes">
+        <button class="mode" type="button" data-kind="area">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" /></svg>
+          <span>Área</span><kbd data-cmd="capture-area"></kbd>
+        </button>
+        <button class="mode" type="button" data-kind="visible">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2" /></svg>
+          <span>Parte visível</span><kbd data-cmd="capture-visible"></kbd>
+        </button>
+        <button class="mode" type="button" data-kind="full">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2" /><path d="M9 7h6M9 11h6M9 15h4" /></svg>
+          <span>Página inteira</span><kbd data-cmd="capture-full"></kbd>
+        </button>
+      </div>
+
+      <button class="btn primary gallery" id="gallery" type="button">Abrir galeria</button>
+
+      <footer>
+        <span id="queue" class="muted">Fila vazia</span>
+        <button id="retry" class="link" type="button" hidden>Tentar agora</button>
+        <button id="options" class="link" type="button">Opções</button>
+      </footer>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

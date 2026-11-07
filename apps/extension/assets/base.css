@@ -1,0 +1,49 @@
+/* Albert Sans (OFL, from @fontsource/albert-sans), latin subset, shipped in public/fonts. */
+@font-face { font-family: "Albert Sans"; font-weight: 300; font-display: swap; src: url("/fonts/albert-sans-latin-300-normal.woff2") format("woff2"); }
+@font-face { font-family: "Albert Sans"; font-weight: 400; font-display: swap; src: url("/fonts/albert-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Albert Sans"; font-weight: 500; font-display: swap; src: url("/fonts/albert-sans-latin-500-normal.woff2") format("woff2"); }
+
+:root {
+  color-scheme: dark;
+  --ink: #fff;
+  --ink-2: rgb(255 255 255 / 0.66);
+  --ink-3: rgb(255 255 255 / 0.42);
+  --ink-4: rgb(255 255 255 / 0.24);
+  --hair: rgb(255 255 255 / 0.09);
+  --hair-2: rgb(255 255 255 / 0.16);
+  --fill: rgb(255 255 255 / 0.06);
+  --danger: #ff8a8a;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: #000; }
+body {
+  color: var(--ink);
+  font-family: "Albert Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+::selection { background: rgb(255 255 255 / 0.9); color: #000; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+.label { font-size: 11px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.input {
+  width: 100%; background: var(--fill); border: 1px solid var(--hair); border-radius: 10px; padding: 9px 11px; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:focus { border-color: rgb(255 255 255 / 0.4); box-shadow: 0 0 0 3px rgb(255 255 255 / 0.07), 0 0 24px -6px rgb(255 255 255 / 0.25); }
+.btn {
+  appearance: none; border: 0; cursor: pointer; border-radius: 999px; padding: 9px 16px; font-weight: 400;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+.btn.primary { background: #fff; color: #000; font-weight: 500; }
+.btn.primary:hover { box-shadow: 0 0 28px -4px rgb(255 255 255 / 0.55); }
+.btn.ghost { background: transparent; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--hair-2); }
+.btn.ghost:hover { color: #fff; background: var(--fill); }
+.btn:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+kbd { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink-3); border: 1px solid var(--hair-2); border-radius: 5px; padding: 3px 5px; }
+.muted { color: var(--ink-3); }
+.error { color: var(--danger); }
+[hidden] { display: none !important; }
