@@ -1,4 +1,5 @@
 import type { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
@@ -12,9 +13,9 @@ import type { Deps } from "../deps";
 const Email = z.string().trim().max(254).refine((s) => /^[^@\s]+@[^@\s]+$/.test(s));
 const Password = z.string().min(MIN_PASSWORD).max(256);
 const SetupBody = z.object({ token: z.string(), email: Email, password: Password });
-const LoginBody = z.object({ email: z.string(), password: z.string() });
-const DeviceBody = z.object({ email: z.string(), password: z.string(), name: z.string().trim().min(1).max(80) });
-const PasswordBody = z.object({ currentPassword: z.string(), newPassword: Password });
+const LoginBody = z.object({ email: z.string().max(256), password: z.string().max(256) });
+const DeviceBody = z.object({ email: z.string().max(256), password: z.string().max(256), name: z.string().trim().min(1).max(80) });
+const PasswordBody = z.object({ currentPassword: z.string().max(256), newPassword: Password });
 
 const safeEqual = (a: string, b: string): boolean => {
   const x = Buffer.from(sha256(a)), y = Buffer.from(sha256(b));
@@ -32,6 +33,7 @@ async function body<T extends z.ZodType>(c: { req: { json(): Promise<unknown> } 
 
 export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
   const auth = requireUser(db);
+  const limit = bodyLimit({ maxSize: 16 * 1024, onError: (c) => c.json({ error: "payload_too_large" }, 413) });
 
   const startSession = (c: Parameters<typeof setCookie>[0], userId: string) => {
     setCookie(c, SESSION_COOKIE, createSession(db, userId), {
@@ -47,7 +49,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
 
   app.get(API.setup, (c) => c.json({ needsSetup: countUsers(db) === 0 }));
 
-  app.post(API.setup, async (c) => {
+  app.post(API.setup, limit, async (c) => {
     if (countUsers(db) > 0) return c.json({ error: "already_set_up" }, 409);
     const b = await body(c, SetupBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
@@ -58,7 +60,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
     return c.json({ ok: true }, 201);
   });
 
-  app.post(API.login, async (c) => {
+  app.post(API.login, limit, async (c) => {
     const b = await body(c, LoginBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
     const user = findUserByEmail(db, b.email);
@@ -77,7 +79,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
   });
 
   // Extension login: credentials -> long-lived device token (only its sha256 is stored).
-  app.post(API.devices, async (c) => {
+  app.post(API.devices, limit, async (c) => {
     const b = await body(c, DeviceBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
     const user = findUserByEmail(db, b.email);
@@ -125,7 +127,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
   app.get(API.authTicketRedirect, (c) => {
     const t = c.req.query("t");
     const userId = t ? consumeTicket(db, t) : null;
-    if (!userId) return c.json({ error: "unauthorized" }, 401);
+    if (!userId) return c.redirect("/login", 302);
     startSession(c, userId);
     return c.redirect("/", 302);
   });
@@ -135,7 +137,7 @@ export function authRoutes(app: Hono<AppEnv>, { db, config }: Deps): void {
     return u ? c.json({ id: u.id, email: u.email }) : c.json({ error: "unauthorized" }, 401);
   });
 
-  app.post("/api/me/password", auth, async (c) => {
+  app.post("/api/me/password", limit, auth, async (c) => {
     const b = await body(c, PasswordBody);
     if (!b) return c.json({ error: "invalid_request" }, 400);
     const u = findUserById(db, c.var.userId);

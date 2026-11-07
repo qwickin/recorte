@@ -126,6 +126,20 @@ describe("login & session", () => {
 });
 
 describe("devices", () => {
+  it("POST /api/devices works from extension origins without Bearer", async () => {
+    const t = await makeApp({ user: true });
+    for (const origin of ["chrome-extension://abc", "moz-extension://abc"]) {
+      const r = await t.json("/api/devices", { email: EMAIL, password: PASSWORD, name: "x" }, { origin });
+      expect(r.status).toBe(201);
+    }
+  });
+  it("rejects over-long credentials and oversized bodies", async () => {
+    const t = await makeApp({ user: true });
+    expect((await t.json("/api/login", { email: EMAIL, password: "a".repeat(300) })).status).toBe(400);
+    expect((await t.json("/api/devices", { email: EMAIL, password: "a".repeat(300), name: "x" })).status).toBe(400);
+    const big = await t.json("/api/login", { email: EMAIL, password: "a", pad: "x".repeat(20_000) });
+    expect(big.status).toBe(413);
+  });
   it("issues a token, stores only its hash, lists with lastSeen/version", async () => {
     const t = await makeApp({ user: true });
     const token = await deviceToken(t, "Chrome PC");
@@ -175,7 +189,15 @@ describe("tickets", () => {
     expect(r1.headers.get("location")).toBe("/");
     const cookie = cookieOf(r1);
     expect((await t.app.request("/api/me", { headers: { cookie } })).status).toBe(200);
-    expect((await t.app.request(`/auth/ticket?t=${ticket}`)).status).toBe(401);
+    const used = await t.app.request(`/auth/ticket?t=${ticket}`);
+    expect(used.status).toBe(302);
+    expect(used.headers.get("location")).toBe("/login");
+  });
+  it("redirects invalid ticket to /login", async () => {
+    const t = await makeApp({ user: true });
+    const r = await t.app.request("/auth/ticket?t=zzz");
+    expect(r.status).toBe(302);
+    expect(r.headers.get("location")).toBe("/login");
   });
   it("expires after 60 s", async () => {
     vi.useFakeTimers({ toFake: ["Date"] });
@@ -184,15 +206,16 @@ describe("tickets", () => {
       const token = await deviceToken(t);
       const { ticket } = (await (await t.app.request("/api/auth/ticket", { method: "POST", headers: { authorization: `Bearer ${token}` } })).json()) as { ticket: string };
       vi.setSystemTime(Date.now() + 61_000);
-      expect((await t.app.request(`/auth/ticket?t=${ticket}`)).status).toBe(401);
+      const r = await t.app.request(`/auth/ticket?t=${ticket}`);
+      expect(r.status).toBe(302);
+      expect(r.headers.get("location")).toBe("/login");
     } finally {
       vi.useRealTimers();
     }
   });
-  it("unknown ticket is 401", async () => {
+  it("missing ticket redirects to /login", async () => {
     const t = await makeApp({ user: true });
-    expect((await t.app.request("/auth/ticket?t=zzz")).status).toBe(401);
-    expect((await t.app.request("/auth/ticket")).status).toBe(401);
+    expect((await t.app.request("/auth/ticket")).status).toBe(302);
   });
 });
 

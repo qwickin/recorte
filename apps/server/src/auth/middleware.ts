@@ -24,6 +24,8 @@ export function originCheck(publicUrl: string | null) {
   const publicHost = publicUrl ? new URL(publicUrl).host : null;
   return createMiddleware(async (c, next) => {
     if (SAFE.has(c.req.method) || c.req.header("authorization")?.startsWith("Bearer ")) return next();
+    // Extension login: authenticates by body credentials, no cookie, Origin is chrome-/moz-extension://.
+    if (c.req.method === "POST" && c.req.path === "/api/devices") return next();
     const origin = c.req.header("origin");
     if (origin !== undefined) {
       let host: string | null = null;

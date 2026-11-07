@@ -18,15 +18,18 @@ export async function runCli(argv: string[], log: (m: string) => void = console.
     return 2;
   }
   const db = openDb(loadConfig().dataDir);
-  const user = findUserByEmail(db, email);
-  if (!user) {
-    log(`No account for ${email}`);
-    return 1;
+  try {
+    const user = findUserByEmail(db, email);
+    if (!user) {
+      log(`No account for ${email}`);
+      return 1;
+    }
+    const password = given ?? randomBytes(12).toString("base64url");
+    await setPassword(db, user.id, password);
+    log(given ? `Password updated for ${user.email}. All sessions were closed.` : `New password for ${user.email}: ${password}\nAll sessions were closed.`);
+  } finally {
+    db.close();
   }
-  const password = given ?? randomBytes(12).toString("base64url");
-  await setPassword(db, user.id, password);
-  log(given ? `Password updated for ${user.email}. All sessions were closed.` : `New password for ${user.email}: ${password}\nAll sessions were closed.`);
-  db.close();
   return 0;
 }
 
