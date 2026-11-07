@@ -243,10 +243,12 @@ describe("cli reset-password", () => {
   it("resets the password, closes sessions", async () => {
     const t = await makeApp({ user: true });
     const cookie = await login(t);
+    const dev = await deviceToken(t);
     process.env.DATA_DIR = t.dir;
     const out: string[] = [];
     expect(await runCli(["reset-password", EMAIL, "--password", "fresh-password-1"], (m) => out.push(m))).toBe(0);
     expect((await t.app.request("/api/me", { headers: { cookie } })).status).toBe(401);
+    expect((await t.app.request("/api/me", { headers: { authorization: `Bearer ${dev}` } })).status).toBe(401);
     expect((await t.json("/api/login", { email: EMAIL, password: "fresh-password-1" })).status).toBe(200);
     expect(await runCli(["reset-password", "nobody@x.io"], (m) => out.push(m))).toBe(1);
     expect(await runCli(["reset-password", EMAIL], (m) => out.push(m))).toBe(0);

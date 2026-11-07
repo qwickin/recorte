@@ -25,8 +25,8 @@ export async function runCli(argv: string[], log: (m: string) => void = console.
       return 1;
     }
     const password = given ?? randomBytes(12).toString("base64url");
-    await setPassword(db, user.id, password);
-    log(given ? `Password updated for ${user.email}. All sessions were closed.` : `New password for ${user.email}: ${password}\nAll sessions were closed.`);
+    await setPassword(db, user.id, password, undefined, true);
+    log(given ? `Password updated for ${user.email}. All sessions and devices were revoked; extensions must reconnect.` : `New password for ${user.email}: ${password}\nAll sessions and devices were revoked; extensions must reconnect.`);
   } finally {
     db.close();
   }

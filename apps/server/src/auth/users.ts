@@ -33,7 +33,7 @@ export async function createUser(db: Db, email: string, password: string): Promi
 }
 
 /** Sets a new password and drops sessions (all, or all except `keepSessionToken`). Devices stay valid. */
-export async function setPassword(db: Db, userId: string, password: string, keepSessionToken?: string) {
+export async function setPassword(db: Db, userId: string, password: string, keepSessionToken?: string, revokeAccess = false) {
   const h = await hashPassword(password);
   db.exec("BEGIN");
   try {
@@ -42,6 +42,10 @@ export async function setPassword(db: Db, userId: string, password: string, keep
       db.prepare("DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?").run(userId, sha256(keepSessionToken));
     } else {
       db.prepare("DELETE FROM sessions WHERE user_id = ?").run(userId);
+    }
+    if (revokeAccess) {
+      db.prepare("DELETE FROM devices WHERE user_id = ?").run(userId);
+      db.prepare("DELETE FROM tickets WHERE user_id = ?").run(userId);
     }
     db.exec("COMMIT");
   } catch (e) {
