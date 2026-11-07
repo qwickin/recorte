@@ -186,7 +186,8 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
 - **Gatilhos:**
   - os botões do popup;
   - os atalhos (`commands`), configuráveis, com sugestões Alt+Shift+S (área), Alt+Shift+V (visível) e
-    Alt+Shift+F (página inteira);
+    Alt+Shift+F (página inteira); no macOS ⌃⇧S, ⌃⇧V e ⌃⇧F (`suggested_key.mac`: ⌘⇧3/4/5 são do sistema e o Chrome
+    já usa vários ⌘⇧). O popup e as opções mostram o atalho real (`commands.getAll()`, com ⌃ ⌥ ⇧ ⌘ no Mac);
   - o menu de contexto.
 
 **Extração de texto (no content script)**

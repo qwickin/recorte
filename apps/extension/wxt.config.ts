@@ -1,4 +1,5 @@
 import { defineConfig } from "wxt";
+import { COMMAND_LABELS, SUGGESTED_KEYS } from "./lib/shortcuts";
 
 /**
  * One generic build for every server: the server URL is configured at runtime in the options page.
@@ -25,11 +26,10 @@ export default defineConfig({
     ],
     host_permissions: ["<all_urls>"],
     action: { default_title: "Recorte" },
-    commands: {
-      "capture-area": { suggested_key: { default: "Alt+Shift+S" }, description: "Capturar área" },
-      "capture-visible": { suggested_key: { default: "Alt+Shift+V" }, description: "Capturar parte visível" },
-      "capture-full": { suggested_key: { default: "Alt+Shift+F" }, description: "Capturar página inteira" },
-    },
+    // Per-platform suggestions (lib/shortcuts.ts): ⌃⇧ on macOS, Alt+Shift elsewhere. The user can remap them.
+    commands: Object.fromEntries(
+      Object.entries(SUGGESTED_KEYS).map(([name, keys]) => [name, { suggested_key: { ...keys }, description: COMMAND_LABELS[name] }]),
+    ),
     web_accessible_resources: [{ resources: ["fonts/*.woff2", "dialog.html"], matches: ["<all_urls>"] }],
     ...(browser === "firefox"
       ? {

@@ -4,16 +4,11 @@ import { browser } from "wxt/browser";
 import { ApiError, fetchMe, normalizeServerUrl, registerDevice, revokeDevice } from "@/lib/api";
 import type { BackgroundMessage, Status } from "@/lib/messages";
 import { type Settings, accountOf, connectionOf, extensionVersion, getSettings, setSettings } from "@/lib/settings";
+import { COMMAND_LABELS, formatShortcut, isMacPlatform } from "@/lib/shortcuts";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const send = <T = unknown>(m: BackgroundMessage) => browser.runtime.sendMessage(m) as Promise<T>;
 const isFirefox = import.meta.env.FIREFOX;
-
-const COMMAND_LABELS: Record<string, string> = {
-  "capture-area": "Capturar área",
-  "capture-visible": "Capturar parte visível",
-  "capture-full": "Capturar página inteira",
-};
 
 function defaultDeviceName(): string {
   const ua = navigator.userAgent;
@@ -58,7 +53,7 @@ async function renderShortcuts(): Promise<void> {
         .map((c) => {
           const li = document.createElement("li");
           const k = document.createElement("kbd");
-          k.textContent = c.shortcut || "—";
+          k.textContent = formatShortcut(c.shortcut, isMacPlatform()) || "sem atalho";
           li.append(COMMAND_LABELS[c.name!]!, k);
           return li;
         }),

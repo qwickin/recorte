@@ -2,6 +2,7 @@ import "@/assets/base.css";
 import "./style.css";
 import { browser } from "wxt/browser";
 import { isHttpUrl } from "@/lib/api";
+import { formatShortcut, isMacPlatform } from "@/lib/shortcuts";
 import type { BackgroundMessage, Status } from "@/lib/messages";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -11,7 +12,7 @@ async function shortcuts(): Promise<void> {
   try {
     for (const c of await browser.commands.getAll()) {
       const el = document.querySelector<HTMLElement>(`kbd[data-cmd="${c.name}"]`);
-      if (el && c.shortcut) el.textContent = c.shortcut;
+      if (el) el.textContent = formatShortcut(c.shortcut, isMacPlatform());
     }
   } catch {
     // not supported
