@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7
-# Recorte image: API + worker + SQLite, gallery build, extension ZIPs, SigLIP2 vision model (spec §4, §9).
+# Recorte image: API + worker + SQLite, embedded Meilisearch, gallery build, extension ZIPs, SigLIP2 vision model (spec §4, §9).
+#   docker run -d -p 8080:8080 -v recorte:/data ghcr.io/qwickin/screenshotextension
 # Build from the repo root:  docker build -f docker/Dockerfile --build-arg APP_VERSION=… --build-arg EXTENSION_VERSION=… .
 # Versions come from scripts/version.mjs (the .git folder is not in the build context).
 
@@ -39,6 +40,14 @@ RUN cd apps/extension && EXTENSION_VERSION=${EXTENSION_VERSION} pnpm exec wxt zi
 FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS model
 COPY docker/fetch-model.mjs /fetch-model.mjs
 RUN node /fetch-model.mjs /out/models
+
+# ---------------------------------------------------------------------------
+# meili: the official Meilisearch binary for the target arch (sha256-checked). Downloaded on the build
+# platform; it only runs in the runtime stage.
+FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS meili
+ARG TARGETARCH
+COPY docker/fetch-meili.mjs /fetch-meili.mjs
+RUN node /fetch-meili.mjs "${TARGETARCH:-amd64}" /out/meilisearch
 
 # ---------------------------------------------------------------------------
 # deps: production dependencies of the server (and its workspace packages) for the target arch.
@@ -84,15 +93,19 @@ ENV NODE_ENV=production \
     DATA_DIR=/data \
     GALLERY_DIR=/app/gallery \
     DOWNLOADS_DIR=/app/downloads \
-    RECORTE_MODEL_DIR=/app/models
+    RECORTE_MODEL_DIR=/app/models \
+    MEILI_BIN=/usr/local/bin/meilisearch
 WORKDIR /app
 COPY --from=deps /src /app
 COPY --from=build /src/apps/gallery/dist /app/gallery
 COPY --from=build /out/downloads /app/downloads
 COPY --from=model /out/models /app/models
+COPY --from=meili /out/meilisearch /usr/local/bin/meilisearch
 COPY docker/entrypoint.sh /usr/local/bin/recorte-entrypoint
-# `recorte reset-password <email>` on PATH (docker compose exec app recorte …).
-RUN printf '#!/bin/sh\nexec node /app/apps/server/bin/recorte.mjs "$@"\n' > /usr/local/bin/recorte \
+# `recorte reset-password` on PATH (docker exec recorte recorte reset-password).
+# `meilisearch --version` fails the build if the binary cannot run on this base image.
+RUN meilisearch --version \
+ && printf '#!/bin/sh\nexec node /app/apps/server/bin/recorte.mjs "$@"\n' > /usr/local/bin/recorte \
  && chmod +x /usr/local/bin/recorte \
  && mkdir -p /data && chown node:node /data
 USER node

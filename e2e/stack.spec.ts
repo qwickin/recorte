@@ -1,17 +1,18 @@
-// End-to-end test against the real docker compose stack (docker/compose.yml: app + Meilisearch).
+// End-to-end test of the single-container install (docker/Dockerfile: app + embedded Meilisearch).
 //
 //   pnpm --filter @recorte/e2e e2e
 //
-// - Builds the image from this checkout and starts it under a separate compose project (`recorte-e2e`),
-//   with its data/meili volumes in a temp dir and the app on a free 127.0.0.1 port (nothing in the repo is touched).
-// - Owner via ADMIN_EMAIL/ADMIN_PASSWORD, two captures uploaded through the API with a device token,
-//   AI tags awaited, then the gallery is driven in Chromium: login, tiles, ⌘K/Ctrl+K "doce português", ZIP download.
-// - Always ends with `docker compose down -v` (set E2E_KEEP=1 to leave the stack running).
+// - Builds the image from this checkout and runs it like the README does (`docker run -p … -v <volume>:/data`,
+//   no environment at all), on a free 127.0.0.1 port with a throw-away named volume.
+// - Completes /setup through the API with the access password only (inside the 15-minute window), saves the
+//   public URL, gets a device token, uploads two captures, waits for the AI tags, then drives the gallery in
+//   Chromium: login (password only), tiles, ⌘K/Ctrl+K "doce português", ZIP download. Ends with reset-password.
+// - Always removes the container and the volume (set E2E_KEEP=1 to leave them).
 // - Chromium: $CHROMIUM_PATH, else the newest Chromium in the Playwright cache, else playwright-core's default.
 // The first run needs internet: Meilisearch downloads its embedding model on first start.
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
@@ -21,18 +22,18 @@ import { type Browser, chromium } from "playwright-core";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SHOTS = join(ROOT, "prototype/gallery/public/shots");
-const PROJECT = "recorte-e2e";
-const EMAIL = "dono@recorte.test";
+const RUN = `recorte-e2e-${Date.now().toString(36)}`;
+const IMAGE = "recorte:e2e";
 const PASSWORD = "e2e-palavra-passe-longa";
-const MEILI_KEY = `e2e-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}-master-key`;
 const START = Date.now();
 const timings: Record<string, number> = {};
 const mark = (k: string, since: number) => (timings[k] = Math.round((Date.now() - since) / 100) / 10);
 
 let tmp = "";
 let base = "";
-let composeArgs: string[] = [];
+let started = false;
 let token = "";
+let cookie = "";
 let browser: Browser | null = null;
 const ids: Record<"map" | "nata", string> = { map: "", nata: "" };
 
@@ -62,18 +63,21 @@ async function until<T>(what: string, timeoutMs: number, fn: () => Promise<T | n
   throw new Error(`timed out waiting for ${what}${last ? ` (last error: ${(last as Error).message})` : ""}`);
 }
 
-function compose(args: string[], opts: { input?: string; quiet?: boolean } = {}): string {
-  const r = spawnSync("docker", ["compose", ...composeArgs, ...args], {
+function docker(args: string[], opts: { quiet?: boolean; allowFail?: boolean } = {}): string {
+  const r = spawnSync("docker", args, {
     cwd: ROOT,
     encoding: "utf8",
-    input: opts.input,
-    env: { ...process.env, MEILI_MASTER_KEY: MEILI_KEY, ...versions() },
-    stdio: ["pipe", "pipe", opts.quiet ? "pipe" : "inherit"],
+    stdio: ["ignore", "pipe", opts.quiet ? "pipe" : "inherit"],
     maxBuffer: 64 * 1024 * 1024,
   });
-  if (r.status !== 0) throw new Error(`docker compose ${args.join(" ")} failed (${r.status}): ${r.stderr ?? ""}`);
+  if (r.status !== 0 && !opts.allowFail) throw new Error(`docker ${args.join(" ")} failed (${r.status}): ${r.stderr ?? ""}`);
   return r.stdout;
 }
+const exec = (...cmd: string[]) => docker(["exec", RUN, ...cmd], { quiet: true });
+const logs = () => {
+  const r = spawnSync("docker", ["logs", RUN], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  return `${r.stdout}${r.stderr}`;
+};
 
 let cachedVersions: { APP_VERSION: string; EXTENSION_VERSION: string } | null = null;
 function versions() {
@@ -150,74 +154,83 @@ const CAPTURES = {
 
 before(async () => {
   tmp = mkdtempSync(join(tmpdir(), "recorte-e2e-"));
-  mkdirSync(join(tmp, "data"));
-  mkdirSync(join(tmp, "meili"));
-  // The app runs as uid 1000; on Linux hosts the invoking user may differ (GitHub runners are 1001).
-  chmodSync(join(tmp, "data"), 0o777);
   const port = Number(process.env.E2E_PORT) || (await freePort());
   base = `http://127.0.0.1:${port}`;
-  const override = join(tmp, "compose.e2e.yml");
-  writeFileSync(
-    override,
-    [
-      "services:",
-      "  app:",
-      "    image: recorte:e2e",
-      `    ports: !override ["127.0.0.1:${port}:8080"]`,
-      "    environment:",
-      `      PUBLIC_URL: ${base}`,
-      `      ADMIN_EMAIL: ${EMAIL}`,
-      `      ADMIN_PASSWORD: ${PASSWORD}`,
-      `    volumes: !override ["${join(tmp, "data")}:/data"]`,
-      "  search:",
-      `    volumes: !override ["${join(tmp, "meili")}:/meili_data"]`,
-      "",
-    ].join("\n"),
-  );
-  composeArgs = ["-p", PROJECT, "-f", join(ROOT, "docker/compose.yml"), "-f", override];
 });
 
 after(async () => {
   await browser?.close().catch(() => {});
-  if (!composeArgs.length) return;
+  if (!started) return;
   if (process.env.E2E_KEEP) {
-    console.log(`E2E_KEEP set: stack left running at ${base} (docker compose ${composeArgs.join(" ")} down -v)`);
+    console.log(`E2E_KEEP set: container ${RUN} left running at ${base} (docker rm -f ${RUN} && docker volume rm ${RUN})`);
     return;
   }
   try {
-    compose(["down", "-v", "--remove-orphans"], { quiet: true });
+    docker(["rm", "-f", RUN], { quiet: true, allowFail: true });
+    docker(["volume", "rm", RUN], { quiet: true, allowFail: true });
   } finally {
     rmSync(tmp, { recursive: true, force: true });
     console.log(`timings (s): ${JSON.stringify({ ...timings, total: Math.round((Date.now() - START) / 1000) })}`);
   }
 });
 
-test("compose up --build: app healthy, Meilisearch reachable only internally", { timeout: 30 * 60_000 }, async () => {
-  const merged = compose(["config"], { quiet: true });
-  assert.match(merged, /meili_data/);
-  assert.ok(!/published: "7700"/.test(merged), "Meilisearch must not publish a port");
-
+test("docker run with no configuration: healthy, /setup open, Meilisearch only on 127.0.0.1", { timeout: 30 * 60_000 }, async () => {
   let t = Date.now();
-  compose(["build", "app"]);
+  const v = versions();
+  docker(["build", "-f", "docker/Dockerfile", "--build-arg", `APP_VERSION=${v.APP_VERSION}`, "--build-arg", `EXTENSION_VERSION=${v.EXTENSION_VERSION}`, "-t", IMAGE, "."]);
   mark("build", t);
   t = Date.now();
-  compose(["up", "-d"]);
+  started = true;
+  docker(["run", "-d", "--name", RUN, "-p", `${base.replace("http://", "")}:8080`, "-v", `${RUN}:/data`, IMAGE], { quiet: true });
   const health = await until("GET /api/health", 180_000, async () => {
     const r = await fetch(`${base}/api/health`);
     return r.ok ? ((await r.json()) as { ok: boolean; version: string }) : null;
   });
   mark("startToHealthy", t);
   assert.equal(health.ok, true);
-  assert.equal(health.version, versions().APP_VERSION);
-  // Healthcheck defined in the image turns healthy.
-  await until("container healthy", 120_000, async () => compose(["ps", "--format", "{{.Service}} {{.Health}}"], { quiet: true }).includes("app healthy"), 2000);
+  assert.equal(health.version, v.APP_VERSION);
+  assert.deepEqual(await (await fetch(`${base}/api/setup`)).json(), { needsSetup: true, open: true });
+  assert.match(logs(), /Abre http:\/\/\S+:8080\/setup nos próximos 15 minutos para configurar/);
+
+  // Only 8080 is published; Meilisearch answers inside the container on 127.0.0.1:7700 and listens nowhere else.
+  assert.deepEqual(docker(["port", RUN], { quiet: true }).trim().split("\n").map((l) => l.split(" ")[0]), ["8080/tcp"]);
+  await until("embedded Meilisearch healthy", 120_000, async () => exec("node", "-e", "fetch('http://127.0.0.1:7700/health').then(r=>r.json()).then(j=>console.log(j.status))").includes("available"), 2000);
+  const listen = exec("sh", "-c", "cat /proc/net/tcp /proc/net/tcp6")
+    .split("\n")
+    .map((l) => l.trim().split(/\s+/))
+    .filter((f) => f[3] === "0A" && f[1]?.endsWith(":1E14"))
+    .map((f) => f[1]);
+  assert.deepEqual(listen, ["0100007F:1E14"], `7700 must listen on 127.0.0.1 only (got ${listen.join(", ")})`);
+  assert.equal(exec("stat", "-c", "%a %U", "/data/secrets/meili.key").trim(), "600 node");
+  assert.equal(exec("stat", "-c", "%a", "/data/secrets").trim(), "700");
+
+  await until("container healthy", 120_000, async () => docker(["inspect", "-f", "{{.State.Health.Status}}", RUN], { quiet: true }).trim() === "healthy", 2000);
 });
 
-test("device token for the owner created by ADMIN_* env", async () => {
+test("setup with the access password only, then the window is spent", async () => {
+  const r = await fetch(`${base}/api/setup`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: base },
+    body: JSON.stringify({ password: PASSWORD }),
+  });
+  assert.equal(r.status, 201, await r.clone().text());
+  cookie = (r.headers.get("set-cookie") ?? "").split(";")[0]!;
+  assert.match(cookie, /^recorte_session=/);
+  assert.deepEqual(await (await fetch(`${base}/api/setup`)).json(), { needsSetup: false, open: false });
+  const again = await fetch(`${base}/api/setup`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ password: "outra-coisa-qualquer" }) });
+  assert.equal(again.status, 409);
+
+  // Wizard step 2: the public address is saved in the database.
+  const s = await fetch(`${base}/api/settings`, { method: "PUT", headers: { "content-type": "application/json", origin: base, cookie }, body: JSON.stringify({ publicUrl: base }) });
+  assert.equal(s.status, 200, await s.clone().text());
+  assert.deepEqual(((await s.json()) as { publicUrl: unknown }).publicUrl, { value: base, source: "db" });
+});
+
+test("device token with the access password (extension login)", async () => {
   const r = await fetch(`${base}/api/devices`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ email: EMAIL, password: PASSWORD, name: "E2E" }),
+    headers: { "content-type": "application/json", origin: "chrome-extension://e2e" },
+    body: JSON.stringify({ password: PASSWORD, name: "E2E" }),
   });
   assert.equal(r.status, 201, await r.clone().text());
   token = ((await r.json()) as { token: string }).token;
@@ -276,7 +289,7 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search, ZIP download", { 
 
   await page.goto(base + "/");
   await page.waitForURL(/\/login/);
-  await page.getByLabel("Email").fill(EMAIL);
+  assert.equal(await page.getByLabel("Email").count(), 0, "no email field any more");
   await page.getByLabel("Palavra-passe").fill(PASSWORD);
   await page.getByRole("button", { name: "Entrar" }).click();
 
@@ -305,18 +318,28 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search, ZIP download", { 
 });
 
 test("resources: image size and container memory", async () => {
-  const size = Number(execFileSync("docker", ["image", "inspect", "recorte:e2e", "--format", "{{.Size}}"], { encoding: "utf8" }).trim());
-  const stats = execFileSync("docker", ["stats", "--no-stream", "--format", "{{.Name}} {{.MemUsage}} {{.CPUPerc}}", `${PROJECT}-app-1`, `${PROJECT}-search-1`], { encoding: "utf8" }).trim();
-  console.log(`image recorte:e2e ${(size / 1e6).toFixed(0)} MB\n${stats}`);
+  const size = Number(execFileSync("docker", ["image", "inspect", IMAGE, "--format", "{{.Size}}"], { encoding: "utf8" }).trim());
+  const stats = execFileSync("docker", ["stats", "--no-stream", "--format", "{{.Name}} {{.MemUsage}} {{.CPUPerc}}", RUN], { encoding: "utf8" }).trim();
+  console.log(`image ${IMAGE} ${(size / 1e6).toFixed(0)} MB\n${stats}`);
   assert.ok(size > 0);
 });
 
-test("recorte reset-password inside the container", async () => {
+test("logs never contain the password or the Meilisearch key", () => {
+  const key = exec("cat", "/data/secrets/meili.key").trim();
+  assert.ok(key.length >= 32);
+  const out = logs();
+  assert.ok(!out.includes(PASSWORD), "password in logs");
+  assert.ok(!out.includes(key), "meili key in logs");
+  assert.ok(!exec("sh", "-c", "cat /proc/[0-9]*/cmdline | tr '\\0' ' '").includes(key), "meili key in a process command line");
+});
+
+test("recorte reset-password inside the container (no email argument)", async () => {
   const NEW = "outra-palavra-passe-longa";
-  const out = compose(["exec", "-T", "app", "recorte", "reset-password", EMAIL, "--password", NEW], { quiet: true });
+  const out = exec("recorte", "reset-password", "--password", NEW);
   assert.match(out, /Password updated/);
-  // Devices are revoked; the new password works.
+  // Devices are revoked; the new password works, the old one does not.
   assert.equal((await api("/api/items")).status, 401);
-  const r = await fetch(`${base}/api/login`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ email: EMAIL, password: NEW }) });
-  assert.equal(r.status, 200);
+  const login = (password: string) => fetch(`${base}/api/login`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ password }) });
+  assert.equal((await login(PASSWORD)).status, 401);
+  assert.equal((await login(NEW)).status, 200);
 });

@@ -1,4 +1,4 @@
-# HTTPS with a domain (Let's Encrypt via Caddy). Override file:
+# HTTPS with a domain (Let's Encrypt via Caddy). Advanced override file:
 #   DOMAIN=recorte.example.com in .env, DNS A/AAAA record pointing here, ports 80 and 443 open.
 #   docker compose -f compose.yml -f compose.caddy.yml up -d
 services:

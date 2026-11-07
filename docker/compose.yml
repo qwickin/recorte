@@ -1,9 +1,11 @@
-# Recorte — docker compose stack (spec §4).
-#   cp .env.example .env    # set MEILI_MASTER_KEY (and PUBLIC_URL)
-#   mkdir -p data meili     # Linux: sudo chown 1000:1000 data
-#   ../scripts/up.sh               # builds from this checkout with the Git versions (plain `docker compose up -d --build`
-#                                  # would stamp 0.0.0); `docker compose up -d` uses the published GHCR image
-# HTTPS with a domain: docker compose -f compose.yml -f compose.caddy.yml up -d
+# Recorte — docker compose (spec §4). One container: API, worker, gallery, extension ZIPs and an embedded
+# Meilisearch (127.0.0.1 inside the container only). No .env needed:
+#   docker compose up -d            # published image; then open http://<IP>:8080/setup within 15 minutes
+#   ../scripts/up.sh                # builds from this checkout with the Git versions (plain `docker compose up -d --build`
+#                                   # would stamp 0.0.0)
+# Everything lives in ./data (Linux: sudo chown 1000:1000 data). Optional settings: .env.example.
+# HTTPS with a domain:           docker compose -f compose.yml -f compose.caddy.yml up -d
+# External Meilisearch instead:  docker compose -f compose.yml -f compose.meili-external.yml up -d
 name: recorte
 
 services:
@@ -18,36 +20,12 @@ services:
     restart: unless-stopped
     ports:
       - "${RECORTE_PORT:-8080}:8080"
+    # All optional: each one, when set, overrides what the gallery saved in Definições → Servidor.
     environment:
       PUBLIC_URL: ${PUBLIC_URL:-}
-      MEILI_URL: http://search:7700
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY in .env (at least 16 characters)}
-      SETUP_TOKEN: ${SETUP_TOKEN:-}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       AI_CLOUD_URL: ${AI_CLOUD_URL:-}
       AI_CLOUD_KEY: ${AI_CLOUD_KEY:-}
       AI_CLOUD_MODEL: ${AI_CLOUD_MODEL:-}
     volumes:
       - ./data:/data
-    depends_on:
-      search:
-        condition: service_healthy
-
-  search:
-    image: getmeili/meilisearch:v1.56.1
-    restart: unless-stopped
-    # No published port: only the app reaches it, on the compose network.
-    environment:
-      MEILI_ENV: production
-      MEILI_NO_ANALYTICS: "true"
-      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY in .env (at least 16 characters)}
-    volumes:
-      - ./meili:/meili_data
-    healthcheck:
-      # curl ships in the Meilisearch image (Alpine).
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:7700/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 20s

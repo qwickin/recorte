@@ -30,7 +30,7 @@ dados precisa para não mudar depois.
 - Classificar com IA leve dentro do container: só CPU, sem GPU, sem Ollama e sem contas externas.
 - Pesquisa híbrida (texto completo e semântica) que funcione entre português e inglês.
 - Galeria com o aspeto e o comportamento do protótipo aprovado (`prototype/gallery`).
-- Instalação com `docker compose up`. As extensões descarregam-se como ZIP a partir do próprio servidor.
+- Instalação com um `docker run` (ou `docker compose up`), sem configuração. As extensões descarregam-se como ZIP a partir do próprio servidor.
 
 **Não-objetivos (fase 1)**
 - Apps móveis, partilha entre utilizadores e links públicos.
@@ -72,15 +72,17 @@ docker/          Dockerfile, compose.yml, exemplo com Caddy
 scripts/         version.mjs (versão a partir do Git), build-labels, etc.
 ```
 
-**Runtime: `docker compose` com 2 serviços**
-- `app` (imagem do projeto):
-  - a API, o worker de processamento em processo e o SQLite;
-  - a galeria (build estático) e os ZIPs das extensões;
-  - o modelo de visão, embutido na imagem.
-  - Volume: `/data`. É o único serviço com porta publicada.
-- `search`: `getmeili/meilisearch:v1.56.1`, com versão fixa (foi a medida).
-  - Só na rede interna do compose, sem porta publicada. A master key vem de uma variável de ambiente.
-  - Volume: `/meili_data`.
+**Runtime: um só container** (`docker run -p 8080:8080 -v recorte:/data …`, sem configuração; ver §16, 4)
+- a API, o worker de processamento em processo e o SQLite;
+- a galeria (build estático) e os ZIPs das extensões;
+- o modelo de visão, embutido na imagem;
+- o **Meilisearch v1.56.1 embutido** (binário oficial, sha256 verificado no build), arrancado pela app como
+  processo filho em `127.0.0.1:7700`, com dados em `/data/meili` e master key gerada no primeiro arranque em
+  `/data/secrets/meili.key` (0600, passada por variável de ambiente ao filho, nunca nos logs). Reinicia com
+  backoff se sair; pára com SIGTERM/SIGINT.
+- Volume: `/data`. Só a porta 8080 é publicada.
+- Alternativa avançada: com `MEILI_URL` (e `MEILI_MASTER_KEY`) a app usa um Meilisearch externo e não arranca o seu
+  (`docker/compose.meili-external.yml`, o antigo serviço `search`).
 
 **Fluxo de uma captura**
 
@@ -161,10 +163,11 @@ type Media = { file: string; thumb: string; width: number; height: number; color
 **Tecnologia:** WXT. Um só build genérico: o URL do servidor configura-se em runtime, nas opções.
 
 **Ligação ao servidor**
-1. Nas opções, o utilizador mete o URL do servidor, o email e a password.
+1. Nas opções, o utilizador mete o URL público do servidor e a palavra-passe de acesso (o nome do dispositivo é
+   opcional; por defeito, o do browser e sistema).
 2. A extensão chama `POST /api/devices` e recebe um **token de dispositivo**: aleatório, guardado no servidor só
    em hash, e revogável.
-3. A password nunca é guardada.
+3. A palavra-passe nunca é guardada.
 
 Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
 
@@ -217,14 +220,24 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
 ## 7. Servidor (fase 1)
 
 **Contas e acesso**
-- **Primeiro arranque:** sem utilizadores, `/setup` pede um `SETUP_TOKEN`. Esse token é gerado e escrito nos logs
-  do container, ou vem por variável de ambiente.
-  - Alternativa: `ADMIN_EMAIL` e `ADMIN_PASSWORD` por variável de ambiente.
-  - Passwords guardadas com argon2id.
+- **Acesso só por palavra-passe** (§16, 4): um dono, sem email. `POST /api/login {password}`,
+  `POST /api/devices {password, name}`.
+- **Primeiro arranque:** sem dono, o assistente `/setup` (3 passos: palavra-passe; endereço público e IA cloud
+  opcional; descarregar a extensão) só aceita a palavra-passe **nos 15 minutos a seguir ao arranque do processo**.
+  Depois responde `403 setup_closed` e manda reiniciar o container. O arranque escreve nos logs "Abre
+  http://<host>:<porta>/setup nos próximos 15 minutos para configurar". Não há token de setup. A criação do dono é
+  atómica (um só dono mesmo com pedidos concorrentes).
+  - Alternativa: `ADMIN_PASSWORD` por variável de ambiente cria o dono no arranque.
+  - Palavras-passe guardadas com argon2id. Bases de dados antigas mantêm o dono; a coluna `users.email` fica sem uso.
 - **Gestão de contas na fase 1:** só a conta do dono (§16). Além disso:
-  - cada utilizador muda a sua password em Definições;
-  - uma password esquecida repõe-se com `docker compose exec app recorte reset-password <email>`, porque não há
-    envio de email.
+  - o dono muda a palavra-passe em Definições;
+  - uma palavra-passe esquecida repõe-se com `recorte reset-password [--password …]` dentro do container (termina
+    sessões e revoga dispositivos), porque não há email.
+- **Definições do servidor na base de dados** (tabela `settings`): `publicUrl`, `aiCloudUrl`, `aiCloudKey`,
+  `aiCloudModel`. As variáveis `PUBLIC_URL` e `AI_CLOUD_*` mandam sobre a BD quando definidas. `GET /api/settings`
+  devolve cada valor com `source` (`env`|`db`) e a chave mascarada; `PUT /api/settings` (só sessão de browser, com
+  verificação de `Origin`) muda as que não vêm do ambiente. O `Origin` aceita o `Host` do pedido ou o `publicUrl`
+  efetivo, lido a cada pedido; o pipeline lê a IA cloud a cada tarefa.
 - **Isolamento:** cada login vê só os seus itens. Há `userId` em tudo e o servidor aplica-o em todas as consultas,
   incluindo um filtro obrigatório em cada pesquisa ao Meilisearch.
 - **Sessões da galeria:** cookie `httpOnly`, `SameSite=Lax`, e `Secure` quando o pedido vem por HTTPS. Pedidos que
@@ -237,7 +250,8 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
 
 | Área | Rotas |
 |---|---|
-| Setup e sessão | `POST /api/setup`, `POST /api/login`, `POST /api/logout`, `GET /auth/ticket` |
+| Setup e sessão | `GET/POST /api/setup`, `POST /api/login`, `POST /api/logout`, `GET /auth/ticket`, `GET /api/me`, `POST /api/me/password` |
+| Definições do servidor | `GET /api/settings`, `PUT /api/settings` |
 | Dispositivos | `POST /api/devices` (login → token), `GET /api/devices`, `DELETE /api/devices/:id`, `POST /api/auth/ticket` |
 | Itens | `POST /api/items`, `GET /api/items?cursor&limit&tags&category&site&type&color&from&to`, `GET/PATCH/DELETE /api/items/:id`, `POST /api/items/:id/restore`, `POST /api/items/bulk` |
 | Ficheiros | `GET /api/items/:id/files/:name` |
@@ -270,7 +284,8 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
    meta description e do domínio. Usa stopwords pt e en, unigramas e bigramas, e devolve as 12 melhores em
    `ai.keys`.
 4. **IA cloud (opcional, desligada por defeito):**
-   - Ativa-se com `AI_CLOUD_URL` (API compatível com OpenAI), `AI_CLOUD_KEY` e `AI_CLOUD_MODEL`.
+   - Ativa-se em Definições → Servidor (ou no `/setup`), ou com `AI_CLOUD_URL` (API compatível com OpenAI),
+     `AI_CLOUD_KEY` e `AI_CLOUD_MODEL`, que mandam sobre a BD.
    - Gera `ai.title` e `ai.description` (pt-PT) e acrescenta chaves a `ai.keys`, a partir da imagem reduzida e do
      texto.
    - Não cria etiquetas: as chaves só servem a pesquisa.
@@ -347,7 +362,9 @@ para `packages/shared`.
 - **Dockerfile:**
   - descarrega o `vision_model_int8.onnx` de uma revisão fixa do Hugging Face no build, por isso a imagem traz o
     modelo;
-  - copia os ZIPs das extensões gerados pelo build (`wxt zip`).
+  - copia os ZIPs das extensões gerados pelo build (`wxt zip`);
+  - descarrega o binário oficial do Meilisearch v1.56.1 para a arquitetura alvo (`linux-amd64`/`linux-aarch64`),
+    verificado pelo sha256 publicado no release, e corre `meilisearch --version` no build.
 - **Medições:**
   - Docker `node:24-slim`, `--cpus=2 --memory=1g`, arm64 em núcleos M4: 79 ms por imagem, 389 MB de RAM.
   - Também carrega em amd64 (emulado).
@@ -374,19 +391,21 @@ Esta é a leitura de "Version Control pelo Git, de forma automática". É uma es
 
 1. Cada login vê só os seus itens. Não há partilha na fase 1.
 2. Cada item tem uma categoria (como as coleções do Linkwarden) e quantas etiquetas o utilizador quiser.
-3. Os 2 serviços acima. O SQLite trata da listagem e o Meilisearch só da pesquisa.
+3. Um só container com o Meilisearch embutido (§4); o antigo serviço `search` fica como opção avançada. O SQLite
+   trata da listagem e o Meilisearch só da pesquisa.
 4. `semanticRatio` inicial de 0,6, ajustável.
 5. A leitura das versões em §10: tags `vX.Y` mais o número de commits, e CI no GitHub com imagem no GHCR.
 6. Na fase 1, a seleção de área fica limitada ao ecrã visível. A página inteira tem máximo de 12 000 px.
 7. WebP codificado no cliente. O servidor guarda o original em WebP com largura máxima de 3200 px.
-8. A ligação da extensão é por email e password nas opções, trocados por um token de dispositivo. Não há código de
-   emparelhamento.
+8. A ligação da extensão é por URL e palavra-passe de acesso nas opções, trocados por um token de dispositivo. Não
+   há email nem código de emparelhamento.
 9. Os ZIPs só se descarregam com sessão iniciada.
 10. O nome "Recorte" e os textos da interface em pt-PT.
 11. As etiquetas da IA podem ser removidas por item (`hiddenAiTags`) e a remoção sobrevive ao reprocessamento. A IA
     cloud não cria etiquetas.
 12. Há duas versões automáticas, a da app e a da extensão (§10).
-13. A password repõe-se por um comando no container, sem email.
+13. A palavra-passe repõe-se por um comando no container (`recorte reset-password`), sem email.
+14. O assistente `/setup` fecha 15 minutos depois do arranque; reabri-lo é reiniciar o container.
 
 ## 12. Limitações conhecidas
 
@@ -455,3 +474,7 @@ Esta é a leitura de "Version Control pelo Git, de forma automática". É uma es
    o ecrã de utilizadores fica para depois. As rotas `/api/admin/*` pertencem ao dono.
 2. Atualizações: só o aviso de nova versão da extensão (§10). O servidor não faz pedidos ao GitHub.
 3. Execução: tudo de uma vez ("one-shot"), sem pausas para revisão intermédia.
+4. Instalação sem configuração (decisão posterior): `docker run -d -p 8080:8080 -v recorte:/data
+   ghcr.io/qwickin/screenshotextension`, abrir `http://IP:8080` e seguir o assistente. Sem `.env` e sem email em
+   lado nenhum: acesso só por palavra-passe (um dono), Meilisearch embutido, endereço público e IA cloud guardados na
+   BD e editáveis na galeria, `/setup` aberto só 15 minutos depois do arranque.

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Build the image from this checkout with the Git-derived versions and start the stack.
-#   scripts/up.sh            # docker/compose.yml (app + Meilisearch)
+#   scripts/up.sh            # docker/compose.yml (one container, embedded Meilisearch)
 #   scripts/up.sh --caddy    # + docker/compose.caddy.yml (HTTPS with $DOMAIN)
 # Extra arguments go to `docker compose up` (e.g. scripts/up.sh --force-recreate).
 # Needs git history (the versions count commits) and Node 24; reads docker/.env like plain compose.

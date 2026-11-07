@@ -8,57 +8,61 @@ O Recorte guarda capturas de ecrã da web no teu próprio servidor.
 - **Servidor.** Guarda tudo em disco e sugere etiquetas com IA local (SigLIP2, sem GPU e sem enviar nada para fora): tipo de página, aspeto visual e cores.
 - **Galeria.** Scroll infinito e filtros. A pesquisa ⌘K / Ctrl+K entende o significado em português e em inglês: "doce português" encontra um pastel de nata numa página em inglês.
 
-Tudo corre em `docker compose`, com dois serviços:
-
-- `app`: API, processamento, galeria e ZIPs das extensões;
-- `search`: Meilisearch, só na rede interna.
+Tudo corre num só container: API, processamento, galeria, ZIPs das extensões e o Meilisearch (a pesquisa), que só escuta dentro do container.
 
 ## Requisitos
 
-- Docker com Compose v2 (**2.24 ou mais recente** para o override do Caddy, que usa `!reset`), em amd64 ou arm64.
+- Docker, em amd64 ou arm64.
+- **2 GB de RAM no mínimo, 4 GB recomendados.** Em uso, o container ocupa cerca de 1,5 a 2 GB (app ~0,6 GB, Meilisearch ~1 GB).
+- **Internet no primeiro arranque.** O Meilisearch descarrega aí o modelo de embeddings (`paraphrase-multilingual-MiniLM-L12-v2`, ~450 MB, guardado no volume). O modelo de visão já vem dentro da imagem.
 - Para construir a partir do código: Git (com o histórico) e Node 24, porque as versões saem do Git.
-- **2 GB de RAM no mínimo, 4 GB recomendados.** Em uso, a app ocupa cerca de 0,6 GB e o Meilisearch cerca de 1,2 GB.
-- **Internet no primeiro arranque.** O Meilisearch descarrega aí o modelo de embeddings (`paraphrase-multilingual-MiniLM-L12-v2`). O modelo de visão já vem dentro da imagem.
 
 ## Instalação
 
 ```sh
-git clone https://github.com/qwickin/screenshotextension.git recorte
-cd recorte/docker
-cp .env.example .env
-# Edita .env: MEILI_MASTER_KEY (obrigatória, pelo menos 16 caracteres; p. ex. `openssl rand -base64 32`) e PUBLIC_URL
-mkdir -p data meili
-sudo chown 1000:1000 data      # só em Linux: a app corre como utilizador sem privilégios (uid 1000)
-../scripts/up.sh               # constrói a imagem a partir deste checkout e arranca a stack
+docker run -d --name recorte --restart unless-stopped -p 8080:8080 -v recorte:/data ghcr.io/qwickin/screenshotextension
 ```
 
-O `scripts/up.sh` (ou `pnpm stack:up` na raiz) calcula as versões com `scripts/version.mjs` e passa-as ao build. Corre depois `docker compose -f docker/compose.yml up -d --build`. Um `docker compose up -d --build` direto também funciona, mas carimba a versão `0.0.0`, e então o aviso de nova versão da extensão nunca aparece.
+Não é preciso `.env` nem configuração. Depois:
 
-Depois de o CI publicar a imagem em `ghcr.io/qwickin/screenshotextension` (e de o pacote ficar público no GitHub), basta `docker compose up -d` para usar a imagem publicada.
+1. Abre `http://<IP-do-servidor>:8080` no browser. Aparece o assistente de configuração (`/setup`), em três passos:
+   1. **Palavra-passe de acesso.** É a única credencial: serve para a galeria e para a extensão. Não há email nem contas.
+   2. **Servidor.** Confirma o endereço público (vem preenchido com o endereço que usaste) e, se quiseres, liga uma IA na cloud compatível com a OpenAI (URL, chave, modelo). Com a IA na cloud, uma versão reduzida de cada captura e o seu texto vão para esse serviço de terceiros.
+   3. **Extensão.** Descarrega o ZIP para Chrome ou Firefox e segue os passos. Na extensão indicas o URL público e a palavra-passe.
+2. **O assistente só fica aberto 15 minutos depois de o container arrancar**, e só enquanto não houver palavra-passe. Os registos dizem-no (`docker logs recorte`: "Abre http://…/setup nos próximos 15 minutos para configurar"). Se o tempo passar, reinicia o container (`docker restart recorte`) e volta a abrir `/setup`.
 
-A galeria fica em `http://localhost:8080`. Para mudar a porta, define `RECORTE_PORT` no `.env`.
+Tudo fica no volume `recorte` (`/data` no container). O endereço público e a IA na cloud mudam-se depois em **Definições → Servidor**.
 
-### Primeiro arranque: a conta do dono
+Para mudar a porta: `-p 9000:8080`. Para usar uma pasta do host em vez do volume: `-v /srv/recorte:/data` (em Linux, `sudo chown 1000:1000 /srv/recorte` antes, porque a app corre como uid 1000).
 
-O Recorte tem uma conta, a do dono. Há duas formas de a criar.
+### Com docker compose
 
-- **Pelo browser.** Abre `/setup` e introduz o código de configuração que aparece nos registos:
+```sh
+git clone https://github.com/qwickin/screenshotextension.git recorte
+cd recorte/docker
+mkdir -p data && sudo chown 1000:1000 data   # o chown só em Linux
+docker compose up -d                         # imagem publicada
+../scripts/up.sh                             # ou: constrói a partir deste checkout, com as versões do Git
+```
 
-  ```sh
-  docker compose logs app | grep Setup
-  # Setup: open http://localhost:8080/setup — token: …
-  ```
+O `compose.yml` tem um só serviço (`app`) e guarda tudo em `docker/data`. O `.env` é opcional: o `.env.example` lista o que se pode definir (tudo comentado). O `scripts/up.sh` (ou `pnpm stack:up` na raiz) calcula as versões com `scripts/version.mjs` e passa-as ao build; um `docker compose up -d --build` direto carimba a versão `0.0.0`, e então o aviso de nova versão da extensão nunca aparece.
 
-  Também podes fixar o código com `SETUP_TOKEN` no `.env`.
-- **Pelo `.env`.** Define `ADMIN_EMAIL` e `ADMIN_PASSWORD` antes do primeiro arranque e a conta é criada automaticamente. A seguir, **apaga o `ADMIN_PASSWORD` do `.env`**: depois de a conta existir já não é usado, e assim a palavra-passe não fica em texto simples no disco.
+### Variáveis de ambiente (opcionais)
 
-### HTTPS com um domínio (Caddy)
+| Variável | O quê |
+|---|---|
+| `PUBLIC_URL` | Endereço público. Se estiver definida, manda sobre o valor guardado na galeria (e o campo fica bloqueado). |
+| `AI_CLOUD_URL`, `AI_CLOUD_KEY`, `AI_CLOUD_MODEL` | IA na cloud. Idem: mandam sobre as Definições. |
+| `ADMIN_PASSWORD` | Cria a palavra-passe no primeiro arranque, sem o assistente. Apaga-a depois: já não é usada e assim não fica em texto simples. |
+| `MEILI_URL`, `MEILI_MASTER_KEY` | Meilisearch externo (ver abaixo). Sem `MEILI_URL`, a app arranca o Meilisearch embutido. |
 
-Fora de `localhost` é preciso HTTPS, porque os cookies de sessão são `Secure`. O ficheiro `compose.caddy.yml` junta à stack um Caddy que pede e renova o certificado Let's Encrypt.
+### Avançado: HTTPS com um domínio (Caddy)
+
+Em `http://<IP>` a sessão funciona (o cookie só é `Secure` em HTTPS). Para usar um domínio com HTTPS, o ficheiro `compose.caddy.yml` junta um Caddy que pede e renova o certificado Let's Encrypt.
 
 1. Aponta o DNS do domínio (registos A/AAAA) para o servidor e abre as portas 80 e 443.
-2. No `.env`, define `DOMAIN=recorte.exemplo.pt`. O `PUBLIC_URL` passa a `https://$DOMAIN` automaticamente.
-3. Arranca a stack:
+2. No `docker/.env`, define `DOMAIN=recorte.exemplo.pt`. O `PUBLIC_URL` passa a `https://$DOMAIN` automaticamente.
+3. Arranca (Compose **2.24 ou mais recente**, por causa do `!reset`):
 
    ```sh
    ../scripts/up.sh --caddy                            # a partir do checkout
@@ -68,7 +72,17 @@ Fora de `localhost` é preciso HTTPS, porque os cookies de sessão são `Secure`
 
 Com este override, a porta 8080 deixa de estar publicada e só o Caddy (80/443) fica exposto.
 
-Se usares outro reverse proxy, ele tem de passar `X-Forwarded-Proto` e `Host`/`X-Forwarded-Host`, e não pode fazer buffering de `/api/events` (SSE). Define também o `PUBLIC_URL` com o endereço público.
+Se usares outro reverse proxy, ele tem de passar `X-Forwarded-Proto` e `Host`/`X-Forwarded-Host`, e não pode fazer buffering de `/api/events` (SSE). Indica o endereço público em **Definições → Servidor** (ou `PUBLIC_URL`).
+
+### Avançado: Meilisearch noutro serviço
+
+O Meilisearch embutido escuta só em `127.0.0.1:7700` dentro do container, com os dados em `/data/meili` e a chave-mestra gerada no primeiro arranque em `/data/secrets/meili.key` (modo 0600). Para o correr à parte, define `MEILI_MASTER_KEY` no `docker/.env` e usa o override:
+
+```sh
+docker compose -f compose.yml -f compose.meili-external.yml up -d
+```
+
+Com `MEILI_URL` definido, a app não arranca o Meilisearch embutido.
 
 ## Instalar a extensão
 
@@ -78,7 +92,7 @@ As extensões descarregam-se da própria galeria: página **Extensão**, com ses
 1. Descarrega o ZIP do Chrome e descompacta-o numa pasta que vais manter.
 2. Abre `chrome://extensions` e ativa o **Modo de programador**.
 3. Clica em **Carregar expandida** e escolhe a pasta.
-4. Nas opções da extensão, indica o endereço do servidor, o email e a palavra-passe. A palavra-passe não fica guardada: é trocada por um token do dispositivo.
+4. Nas opções da extensão, indica o URL público do servidor (p. ex. `http://192.168.1.20:8080`) e a palavra-passe de acesso. O nome do dispositivo é opcional. A palavra-passe não fica guardada: é trocada por um token do dispositivo.
 
 **Firefox**
 - Uma extensão sem assinatura só carrega como **extra temporário**: abre `about:debugging#/runtime/this-firefox`, clica em **Carregar extra temporário…** e escolhe o ZIP. O extra desaparece quando o Firefox reinicia.
@@ -90,26 +104,30 @@ Nenhum browser atualiza estas extensões sozinho. Quando o servidor traz uma ver
 
 ## Repor a palavra-passe
 
-Não há envio de email. No servidor:
+Não há email. No servidor:
 
 ```sh
-docker compose exec app recorte reset-password <email>                         # gera e mostra uma nova
-docker compose exec app recorte reset-password <email> --password '<nova>'     # define-a tu
+docker exec recorte recorte reset-password                        # gera e mostra uma nova
+docker exec recorte recorte reset-password --password '<nova>'    # define-a tu
+# com compose: docker compose exec app recorte reset-password …
 ```
 
 Repor a palavra-passe termina todas as sessões e desliga todas as extensões. Cada extensão tem de voltar a ligar-se.
 
 ## Cópias de segurança
 
-- **Tudo o que importa está em `docker/data`** (`/data` no container): as imagens, um `meta.json` por captura e o SQLite (`recorte.db`). Copia essa pasta, de preferência com a app parada (`docker compose stop app`). A galeria também exporta tudo num ZIP: **Definições → Exportar**.
-- **`docker/meili` não precisa de cópia.** O índice de pesquisa reconstrói-se a partir dos `meta.json`: **Definições → Reconstruir índice**. É também assim que se atualiza o Meilisearch: para o serviço, apaga `docker/meili`, arranca e reconstrói o índice.
+- **Tudo está em `/data`** (o volume `recorte`, ou `docker/data` com compose): as imagens, um `meta.json` por captura, o SQLite (`recorte.db`, com as definições), `secrets/` e o índice do Meilisearch (`meili/`). Copia-o com a app parada (`docker stop recorte`), p. ex. `docker run --rm -v recorte:/data -v "$PWD":/backup alpine tar czf /backup/recorte.tgz -C /data .`. A galeria também exporta as capturas num ZIP: **Definições → Exportar**.
+- **`/data/meili` não precisa de cópia.** O índice de pesquisa reconstrói-se a partir dos `meta.json`: **Definições → Reconstruir índice**. Para o reconstruir de raiz, para o container, apaga `/data/meili`, arranca e reconstrói o índice.
 
 ## Atualizar
 
 ```sh
-git pull && ../scripts/up.sh                 # a partir do checkout
-docker compose pull && docker compose up -d  # com a imagem publicada
+docker pull ghcr.io/qwickin/screenshotextension && docker rm -f recorte && docker run -d --name recorte --restart unless-stopped -p 8080:8080 -v recorte:/data ghcr.io/qwickin/screenshotextension
+git pull && ../scripts/up.sh                 # compose, a partir do checkout
+docker compose pull && docker compose up -d  # compose, com a imagem publicada
 ```
+
+**Vindo da versão com dois serviços (`app` + `search`) e email:** a conta mantém-se e passa a entrar só com a palavra-passe (o email deixa de ser pedido; `ADMIN_EMAIL` e `SETUP_TOKEN` já não existem). O Meilisearch passa a correr dentro do container, com um índice novo em `docker/data/meili`: depois de atualizar, carrega uma vez em **Definições → Reconstruir índice**. A pasta antiga `docker/meili` pode ser apagada. As extensões têm de voltar a ligar-se só se a palavra-passe mudar.
 
 ## Desenvolvimento
 
@@ -121,13 +139,13 @@ pnpm typecheck
 pnpm test                                   # testes unitários de todos os pacotes + scripts/
 pnpm build                                  # galeria (apps/gallery/dist) + extensão (apps/extension/.output)
 pnpm --filter @recorte/extension zip        # recorte-chrome.zip e recorte-firefox.zip
-pnpm --filter @recorte/server dev           # servidor em :8080 (sem MEILI_URL a pesquisa fica desligada)
+pnpm --filter @recorte/server dev           # servidor em :8080 (sem MEILI_URL nem MEILI_BIN a pesquisa fica desligada)
 pnpm --filter @recorte/gallery dev          # galeria com proxy para o servidor
 pnpm --filter @recorte/extension dev        # extensão em modo de desenvolvimento (WXT)
-pnpm --filter @recorte/e2e e2e              # E2E: stack compose real + Chromium
+pnpm --filter @recorte/e2e e2e              # E2E: imagem real (docker run) + Chromium
 ```
 
-O E2E constrói a imagem e arranca a stack num projeto compose à parte (`recorte-e2e`), numa porta livre e com os dados numa pasta temporária. No fim corre `docker compose down -v`. Usa o Chromium da cache do Playwright, ou o caminho em `CHROMIUM_PATH`.
+O E2E constrói a imagem e corre-a como no `docker run` acima, sem configuração, numa porta livre e com um volume próprio; faz o `/setup` só com a palavra-passe e no fim apaga o container e o volume. Usa o Chromium da cache do Playwright, ou o caminho em `CHROMIUM_PATH`.
 
 Estrutura:
 
@@ -138,7 +156,7 @@ Estrutura:
 | `apps/extension` | WXT (Chrome MV3, Firefox MV2) |
 | `packages/shared` | contrato da API (Zod) |
 | `packages/ai` | classificador SigLIP2, vocabulário, rótulos |
-| `docker/` | Dockerfile, compose, Caddy |
+| `docker/` | Dockerfile (com o Meilisearch embutido), compose, Caddy |
 | `scripts/` | `version.mjs` |
 | `e2e/` | teste ponta a ponta |
 
