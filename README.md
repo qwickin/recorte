@@ -15,7 +15,8 @@ Tudo corre em `docker compose`, com dois serviços:
 
 ## Requisitos
 
-- Docker com Compose v2, em amd64 ou arm64.
+- Docker com Compose v2 (**2.24 ou mais recente** para o override do Caddy, que usa `!reset`), em amd64 ou arm64.
+- Para construir a partir do código: Git (com o histórico) e Node 24, porque as versões saem do Git.
 - **2 GB de RAM no mínimo, 4 GB recomendados.** Em uso, a app ocupa cerca de 0,6 GB e o Meilisearch cerca de 1,2 GB.
 - **Internet no primeiro arranque.** O Meilisearch descarrega aí o modelo de embeddings (`paraphrase-multilingual-MiniLM-L12-v2`). O modelo de visão já vem dentro da imagem.
 
@@ -28,10 +29,12 @@ cp .env.example .env
 # Edita .env: MEILI_MASTER_KEY (obrigatória, pelo menos 16 caracteres; p. ex. `openssl rand -base64 32`) e PUBLIC_URL
 mkdir -p data meili
 sudo chown 1000:1000 data      # só em Linux: a app corre como utilizador sem privilégios (uid 1000)
-docker compose up -d --build   # constrói a imagem a partir deste checkout
+../scripts/up.sh               # constrói a imagem a partir deste checkout e arranca a stack
 ```
 
-Depois de o CI publicar a imagem em `ghcr.io/qwickin/screenshotextension` (e de o pacote ficar público no GitHub), basta `docker compose up -d`, sem `--build`, para usar a imagem publicada.
+O `scripts/up.sh` (ou `pnpm stack:up` na raiz) calcula as versões com `scripts/version.mjs` e passa-as ao build. Corre depois `docker compose -f docker/compose.yml up -d --build`. Um `docker compose up -d --build` direto também funciona, mas carimba a versão `0.0.0`, e então o aviso de nova versão da extensão nunca aparece.
+
+Depois de o CI publicar a imagem em `ghcr.io/qwickin/screenshotextension` (e de o pacote ficar público no GitHub), basta `docker compose up -d` para usar a imagem publicada.
 
 A galeria fica em `http://localhost:8080`. Para mudar a porta, define `RECORTE_PORT` no `.env`.
 
@@ -47,7 +50,7 @@ O Recorte tem uma conta, a do dono. Há duas formas de a criar.
   ```
 
   Também podes fixar o código com `SETUP_TOKEN` no `.env`.
-- **Pelo `.env`.** Define `ADMIN_EMAIL` e `ADMIN_PASSWORD` antes do primeiro arranque e a conta é criada automaticamente.
+- **Pelo `.env`.** Define `ADMIN_EMAIL` e `ADMIN_PASSWORD` antes do primeiro arranque e a conta é criada automaticamente. A seguir, **apaga o `ADMIN_PASSWORD` do `.env`**: depois de a conta existir já não é usado, e assim a palavra-passe não fica em texto simples no disco.
 
 ### HTTPS com um domínio (Caddy)
 
@@ -58,6 +61,8 @@ Fora de `localhost` é preciso HTTPS, porque os cookies de sessão são `Secure`
 3. Arranca a stack:
 
    ```sh
+   ../scripts/up.sh --caddy                            # a partir do checkout
+   # ou, com a imagem publicada:
    docker compose -f compose.yml -f compose.caddy.yml up -d
    ```
 
@@ -102,7 +107,7 @@ Repor a palavra-passe termina todas as sessões e desliga todas as extensões. C
 ## Atualizar
 
 ```sh
-git pull && docker compose up -d --build     # a partir do checkout
+git pull && ../scripts/up.sh                 # a partir do checkout
 docker compose pull && docker compose up -d  # com a imagem publicada
 ```
 
@@ -151,7 +156,7 @@ node scripts/version.mjs        # {"app":"0.1.12","extension":"0.1.3"}
 git tag v0.2 && git push --tags # começa a série 0.2.x
 ```
 
-Em cada push para `main`, o CI (`.github/workflows/ci.yml`) valida tudo e gera os ZIPs. Depois publica a imagem multi-arquitetura (amd64 e arm64) em `ghcr.io/qwickin/screenshotextension`, com a etiqueta da versão e `latest`.
+O CI (`.github/workflows/ci.yml`) valida tudo e gera os ZIPs em cada push e em cada pull request. A imagem só é publicada pelo CI, em pushes para `main` e em pushes de tags `v*`: criar uma tag localmente não publica nada. A imagem é multi-arquitetura (amd64 e arm64), vai para `ghcr.io/qwickin/screenshotextension` e leva a etiqueta da versão e `latest`. As actions do workflow estão fixadas por SHA, e o Dependabot (`.github/dependabot.yml`) propõe as atualizações todas as semanas.
 
 Para construir localmente com as versões certas:
 

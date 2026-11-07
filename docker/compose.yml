@@ -1,7 +1,8 @@
 # Recorte — docker compose stack (spec §4).
 #   cp .env.example .env    # set MEILI_MASTER_KEY (and PUBLIC_URL)
 #   mkdir -p data meili     # Linux: sudo chown 1000:1000 data
-#   docker compose up -d --build   # builds from this checkout (plain `up -d` uses the published GHCR image)
+#   ../scripts/up.sh               # builds from this checkout with the Git versions (plain `docker compose up -d --build`
+#                                  # would stamp 0.0.0); `docker compose up -d` uses the published GHCR image
 # HTTPS with a domain: docker compose -f compose.yml -f compose.caddy.yml up -d
 name: recorte
 
@@ -30,7 +31,8 @@ services:
     volumes:
       - ./data:/data
     depends_on:
-      - search
+      search:
+        condition: service_healthy
 
   search:
     image: getmeili/meilisearch:v1.56.1
@@ -42,3 +44,10 @@ services:
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY in .env (at least 16 characters)}
     volumes:
       - ./meili:/meili_data
+    healthcheck:
+      # curl ships in the Meilisearch image (Alpine).
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s

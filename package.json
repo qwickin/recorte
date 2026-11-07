@@ -8,6 +8,7 @@
     "test:scripts": "node --test \"scripts/*.test.mjs\"",
     "build": "pnpm -r --if-present build",
     "typecheck": "pnpm -r --if-present typecheck",
-    "versions": "node scripts/version.mjs"
+    "versions": "node scripts/version.mjs",
+    "stack:up": "sh scripts/up.sh"
   }
 }

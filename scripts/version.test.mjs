@@ -61,3 +61,18 @@ test("CLI prints JSON or a single field", () => {
   assert.deepEqual(JSON.parse(out), { app: "2.0.1", extension: "2.0.1" });
   assert.equal(execFileSync(process.execPath, [script, "--extension", dir], { encoding: "utf8" }).trim(), "2.0.1");
 });
+
+test("tag tie on the same commit: highest MAJOR.MINOR wins", () => {
+  commit("apps/server/tie.ts");
+  git("tag", "v3.1");
+  git("tag", "v3.10");
+  git("tag", "v2.99");
+  assert.deepEqual(computeVersions(dir), { app: "3.10.0", extension: "3.10.0" });
+});
+
+test("a segment above 65535 fails loudly", () => {
+  git("tag", "v70000.0");
+  assert.throws(() => computeVersions(dir), /65535/);
+  git("tag", "-d", "v70000.0");
+  assert.deepEqual(computeVersions(dir), { app: "3.10.0", extension: "3.10.0" });
+});

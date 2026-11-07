@@ -20,20 +20,35 @@ export function findTag(cwd) {
   let best = null;
   for (const tag of reachable) {
     const distance = Number(git(cwd, ["rev-list", "--count", `${tag}..HEAD`]));
-    if (!best || distance < best.distance) best = { tag, distance };
+    // Ties (several tags on the same commit, or equally near) go to the highest MAJOR.MINOR.
+    if (!best || distance < best.distance || (distance === best.distance && compareTags(tag, best.tag) > 0)) best = { tag, distance };
   }
   return best.tag;
 }
+
+const tagParts = (t) => TAG_RE.exec(t).slice(1, 3).map(Number);
+const compareTags = (a, b) => {
+  const [x, y] = [tagParts(a), tagParts(b)];
+  return x[0] - y[0] || x[1] - y[1];
+};
+
+export const MAX_SEGMENT = 65535; // Chrome: each version integer must be <= 65535
 
 export function computeVersions(cwd = process.cwd()) {
   const tag = findTag(cwd);
   const range = tag ? `${tag}..HEAD` : "HEAD";
   const count = (paths = []) => Number(git(cwd, ["rev-list", "--count", range, ...(paths.length ? ["--", ...paths] : [])]));
-  const [major, minor] = tag ? TAG_RE.exec(tag).slice(1, 3).map(Number) : [0, 0];
-  return {
+  const [major, minor] = tag ? tagParts(tag) : [0, 0];
+  const v = {
     app: `${major}.${minor}.${count()}`,
     extension: `${major}.${minor}.${count(EXTENSION_PATHS)}`,
   };
+  for (const [k, ver] of Object.entries(v)) {
+    if (ver.split(".").some((n) => Number(n) > MAX_SEGMENT)) {
+      throw new Error(`${k} version ${ver} has a segment > ${MAX_SEGMENT} (Chrome rejects it); tag a new vX.Y to reset the count`);
+    }
+  }
+  return v;
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
