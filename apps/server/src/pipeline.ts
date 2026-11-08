@@ -2,7 +2,7 @@ import { type Classifier, type KeywordInput, MODEL_ID, extractColors, extractKey
 import { type Item, UPLOAD_LIMITS } from "@recorte/shared";
 import { makeImages } from "./items/images";
 import { type FetchedLink, fetchImage, fetchLink } from "./links/fetch-link";
-import type { SafeFetchOptions } from "./links/safe-fetch";
+import { type SafeFetchOptions, fetchErrorCode } from "./links/safe-fetch";
 import type { CloudAi } from "./cloud";
 import type { Deps } from "./deps";
 import { summaryFromMeta } from "./items/repo";
@@ -91,47 +91,84 @@ export function createPipeline(p: PipelineDeps) {
   const { deps } = p;
   const svc = itemService(deps);
 
-  /** A saved link: fetch the page (SSRF-guarded), merge, and download its OG image as the tile's media. */
-  async function enrichLink(m: Item): Promise<Item> {
+  /**
+   * A saved link: fetch the page (SSRF-guarded), merge, and download its OG image as the tile's media. Persisted
+   * at once, so a later failure (the classifier) retries only the AI step. Returns null when the item was purged
+   * or trashed meanwhile: nothing is written and the files fetched here are removed.
+   */
+  async function enrichLink(m: Item): Promise<Item | null> {
     let fetched: FetchedLink | null = null;
     let error: string | null = null;
     try {
       fetched = await fetchLink(m.source.url, p.linkFetch);
     } catch (e) {
-      error = (e as Error)?.message ?? String(e);
-      console.warn(`link fetch failed for ${m.id} (keeping the extension's data): ${error}`);
+      error = fetchErrorCode(e);
+      // Details (addresses, host names) only in the server log.
+      console.warn(`link fetch failed for ${m.id} (keeping the extension's data): ${(e as Error)?.message ?? e}`);
     }
     let media = m.media;
+    const written: string[] = [];
     const image = fetched?.image ?? m.text.meta.og?.["og:image"];
     if (!media.length && image) {
       try {
         const img = await makeImages(await fetchImage(new URL(image, m.source.url).href, p.linkFetch));
+        // Re-check before writing: never recreate the directory of an item purged while we were downloading.
+        if (!deps.storage.readMeta(m.userId, m.id)) return null;
         deps.storage.writeFile(m.userId, m.id, "original.webp", img.original);
+        written.push("original.webp");
         deps.storage.writeFile(m.userId, m.id, "thumb.webp", img.thumb);
+        written.push("thumb.webp");
         const color = (await extractColors(img.thumb).catch(() => null))?.dominant ?? "#000000";
         media = [{ file: "original.webp", thumb: "thumb.webp", width: img.width, height: img.height, color, role: "main" }];
       } catch (e) {
         console.warn(`og:image download failed for ${m.id}: ${(e as Error)?.message ?? e}`);
       }
     }
-    // Re-read: a PATCH may have changed `user` while we were fetching.
-    const fresh = deps.storage.readMeta(m.userId, m.id) ?? m;
+    // Re-read: a PATCH may have changed `user` while we were fetching; a purge or a delete stops here.
+    const fresh = deps.storage.readMeta(m.userId, m.id);
+    if (!fresh || fresh.deletedAt) {
+      for (const name of written) deps.storage.removeFile(m.userId, m.id, name);
+      return null;
+    }
     const next = mergeLink({ ...fresh, media }, fetched, error, new Date().toISOString());
     svc.persist(next);
+    if (!next.deletedAt) deps.events.emit(next.userId, { type: "item.updated", data: summaryFromMeta(next) });
     return next;
   }
 
-  async function process(userId: string, id: string): Promise<void> {
+  /** The classifier, or null when its model cannot be loaded (logged once): the AI step is then skipped, not retried. */
+  let classifierMissingLogged = false;
+  async function classifierOrNull(): Promise<Classifier | null> {
+    try {
+      return await p.classifier();
+    } catch (e) {
+      if (!classifierMissingLogged) {
+        classifierMissingLogged = true;
+        console.warn(`visual classifier unavailable, skipping visual tags until a restart + reprocess: ${(e as Error)?.message ?? e}`);
+      }
+      return null;
+    }
+  }
+
+  /** `refetch`: fetch a saved link again (Reprocessar); otherwise a link is fetched once and retries only redo the AI. */
+  async function process(userId: string, id: string, opts: { refetch?: boolean } = {}): Promise<void> {
     let m0 = deps.storage.readMeta(userId, id);
     if (!m0) return; // item gone (purged): nothing to do
-    if (m0.type === "link") m0 = await enrichLink(m0);
+    if (m0.type === "link" && (opts.refetch || !m0.link?.fetchedAt)) {
+      if (m0.deletedAt) return;
+      const enriched = await enrichLink(m0);
+      if (!enriched) return;
+      m0 = enriched;
+    }
     const original = deps.storage.readFile(userId, id, "original.webp");
     // A link may have no image at all (no OG image): text card, no visual classification.
     if (!original && m0.type !== "link") throw new Error(`original.webp missing for ${id}`);
     const thumb = deps.storage.readFile(userId, id, "thumb.webp") ?? original;
 
     const colors = thumb ? await extractColors(thumb) : { dominant: "#000000", names: [] as string[] };
-    const cls = original ? await (await p.classifier()).classify(original) : { tipo: [] as string[], visual: [] as string[] };
+    const classifier = original ? await classifierOrNull() : null;
+    const cls = classifier && original ? await classifier.classify(original) : { tipo: [] as string[], visual: [] as string[] };
+    const aiSkipped = !!original && !classifier;
     const keys = extractKeywords(keywordInput(m0));
 
     let cloud: { title?: string; description?: string; keys: string[] } | null = null;
@@ -162,6 +199,7 @@ export function createPipeline(p: PipelineDeps) {
       model: cloud ? `${MODEL_ID}+cloud` : MODEL_ID,
       processedAt: now,
     };
+    if (aiSkipped) ai.skipped = "classifier_unavailable";
     // A failed cloud step keeps what a previous run produced.
     const title = cloud ? cloud.title : fresh.ai.title;
     const description = cloud ? cloud.description : fresh.ai.description;

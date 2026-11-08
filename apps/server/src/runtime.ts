@@ -69,8 +69,8 @@ export function startRuntime(deps: Deps & { queue: SqliteQueue }, opts: { classi
     queue: deps.queue,
     handlers: {
       process: async (p) => {
-        const { userId, id } = p as { userId: string; id: string };
-        await pipeline.process(userId, id);
+        const { userId, id, refetch } = p as { userId: string; id: string; refetch?: boolean };
+        await pipeline.process(userId, id, { refetch });
       },
       index: async (p) => {
         const { userId, id } = p as { userId: string; id: string };

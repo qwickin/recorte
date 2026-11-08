@@ -2,7 +2,7 @@ import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { gzipSync } from "node:zlib";
 import { afterEach, describe, expect, it } from "vitest";
-import { BlockedUrlError, FetchFailedError, isBlockedAddress, safeFetch, type LookupFn } from "../src/links/safe-fetch";
+import { BlockedUrlError, FetchFailedError, fetchErrorCode, isBlockedAddress, safeFetch, type LookupFn } from "../src/links/safe-fetch";
 
 const servers: Server[] = [];
 afterEach(async () => {
@@ -117,5 +117,19 @@ describe("safeFetch", () => {
     const t0 = Date.now();
     await expect(safeFetch(`http://slow.test:${port}/`, opts)).rejects.toThrow(/timeout/);
     expect(Date.now() - t0).toBeLessThan(2000);
+  });
+});
+
+describe("fetchErrorCode (what link.fetchError may say)", () => {
+  it("maps errors to generic codes, never addresses or host names", async () => {
+    const blocked = await safeFetch("http://intranet.test/", { lookup: fakeDns({ "intranet.test": "10.1.2.3" }) }).catch((e) => e);
+    expect(String(blocked.message)).toContain("10.1.2.3"); // the log may have it…
+    expect(fetchErrorCode(blocked)).toBe("blocked"); // …the item never does
+    expect(fetchErrorCode(new FetchFailedError("timeout"))).toBe("timeout");
+    expect(fetchErrorCode(new FetchFailedError("too large"))).toBe("too_large");
+    expect(fetchErrorCode(new FetchFailedError("HTTP 404", 404))).toBe("http_404");
+    expect(fetchErrorCode(new FetchFailedError("not a web page (application/pdf)"))).toBe("unsupported");
+    expect(fetchErrorCode(new Error("getaddrinfo ENOTFOUND secret.internal.corp"))).toBe("unreachable");
+    expect(fetchErrorCode(new FetchFailedError("too many redirects"))).toBe("unreachable");
   });
 });

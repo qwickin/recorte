@@ -101,6 +101,8 @@ export const Item = z.object({
     description: z.string().optional(),
     model: z.string(),
     processedAt: z.string().nullable(),
+    /** Set when a step could not run (e.g. "classifier_unavailable": no visual tags); a reprocess retries it. */
+    skipped: z.string().optional(),
   }),
   text: ItemText,
   link: LinkInfo.optional(),

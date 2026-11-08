@@ -84,7 +84,7 @@ export function adminRoutes(app: Hono<AppEnv>, deps: Deps): void {
   app.post("/api/admin/reprocess", auth, (c) => {
     const userId = c.var.userId;
     const ids = repo.liveIds(userId);
-    for (const id of ids) deps.queue.enqueue("process", { id, userId });
+    for (const id of ids) deps.queue.enqueue("process", { id, userId, refetch: true });
     return c.json({ queued: ids.length });
   });
 

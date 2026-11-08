@@ -287,7 +287,7 @@ test("a saved link (type link) through the API: no image, the server fetches it 
     const x = (await (await api(`/api/items/${ri.id}`)).json()) as { link?: { fetchedAt?: string; fetchError?: string } };
     return x.link?.fetchedAt ? x : null;
   });
-  assert.match(mi.link?.fetchError ?? "", /not allowed/);
+  assert.equal(mi.link?.fetchError, "blocked"); // a generic code, never the address
   for (const id of [s.id, ri.id]) assert.equal((await api(`/api/items/${id}`, { method: "DELETE" })).status, 204);
 });
 

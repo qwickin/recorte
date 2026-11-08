@@ -29,6 +29,23 @@ export class FetchFailedError extends Error {
   }
 }
 
+/**
+ * What a saved link may record about a failed fetch (`link.fetchError`, visible in the gallery and meta.json):
+ * a generic code, never resolved addresses or host names. The details only go to the server log.
+ */
+export type FetchErrorCode = "blocked" | "unreachable" | "timeout" | "too_large" | "unsupported" | `http_${number}`;
+
+export function fetchErrorCode(e: unknown): FetchErrorCode {
+  if (e instanceof BlockedUrlError) return "blocked";
+  if (e instanceof FetchFailedError) {
+    if (e.status) return `http_${e.status}`;
+    if (e.message === "timeout") return "timeout";
+    if (e.message === "too large") return "too_large";
+    if (e.message.startsWith("not a web page") || e.message.startsWith("not an image")) return "unsupported";
+  }
+  return "unreachable";
+}
+
 const V4_BLOCKED: [string, number][] = [
   ["0.0.0.0", 8], // "this" network
   ["10.0.0.0", 8],

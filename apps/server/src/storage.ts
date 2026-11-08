@@ -134,6 +134,16 @@ export class Storage {
     return { moved, skipped };
   }
 
+  /** Removes one item file; the item directory goes too when nothing else is left in it. */
+  removeFile(userId: string, id: string, name: string): void {
+    if (!FILE_NAME_RE.test(name) || !ULID_RE.test(id)) return;
+    const dir = this.itemDir(userId, id);
+    rmSync(join(dir, name), { force: true });
+    try {
+      if (!readdirSync(dir).length) rmdirSync(dir);
+    } catch {}
+  }
+
   removeItem(userId: string, id: string): void {
     rmSync(this.itemDir(userId, id), { recursive: true, force: true });
   }

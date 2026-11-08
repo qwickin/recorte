@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { ItemSummary, SearchHit, UploadMeta } from "@recorte/shared";
 import { createCloudAi, cloudEndpoint, parseAnswer } from "../src/cloud";
 import { createWorker, backoffMs } from "../src/jobs";
@@ -475,7 +475,9 @@ describe("saved links (type link)", () => {
   async function linkServer(html: string) {
     const { createServer } = await import("node:http");
     const jpg = await sharp({ create: { width: 1200, height: 630, channels: 3, background: "#cc3322" } }).jpeg().toBuffer();
+    const hits: string[] = [];
     const s = createServer((req, res) => {
+      hits.push(req.url ?? "");
       if (req.url === "/page") res.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(html);
       else if (req.url === "/img/bacalhau.jpg") res.writeHead(200, { "content-type": "image/jpeg" }).end(jpg);
       else res.writeHead(404).end();
@@ -488,7 +490,7 @@ describe("saved links (type link)", () => {
         h === "receitas.test" ? cb(null, [{ address: "127.0.0.1", family: 4 }]) : cb(new Error("ENOTFOUND"), []),
       isBlocked: (ip: string) => ip !== "127.0.0.1" && isBlockedAddress(ip),
     };
-    return { url: `http://receitas.test:${port}/page`, linkFetch, close: () => new Promise((r) => s.close(r)) };
+    return { url: `http://receitas.test:${port}/page`, linkFetch, hits, close: () => new Promise((r) => s.close(r)) };
   }
   const uploadLink = async (t: Awaited<ReturnType<typeof makeApp>>, cookie: string, over: Partial<UploadMeta>) => {
     const fd = new FormData();
@@ -545,13 +547,100 @@ describe("saved links (type link)", () => {
     const cls = fakeClassifier();
     await createPipeline({ deps: d, classifier: async () => cls }).process(userId, s0.id);
     const m = d.storage.readMeta(userId, s0.id)!;
-    expect(m.link?.fetchError).toMatch(/not allowed/);
+    expect(m.link?.fetchError).toBe("blocked");
+    expect(readFileSync(join(d.storage.itemDir(userId, s0.id), "meta.json"), "utf8")).not.toContain("127.0.0.1:9 ->"); // no resolved details
     expect(m.link).toMatchObject({ title: "Painel", description: "Só com sessão" });
     expect(m.media).toEqual([]);
     expect(cls.calls).toBe(0); // nothing to look at
     expect(m.ai.processedAt).not.toBeNull();
     expect(m.ai.keys).toContain("relatórios");
     expect(m.text.page?.text).toBe("relatórios trimestrais vendas");
+  });
+
+  it("fetches once: a retry (classifier error) only redoes the AI step; Reprocessar (refetch) fetches again", async () => {
+    const srv = await linkServer(readFileSync(new URL("./fixtures/links/article.html", import.meta.url), "utf8"));
+    try {
+      const { t, cookie, deps } = await setup();
+      const s0 = (await (await uploadLink(t, cookie, { url: srv.url })).json()) as ItemSummary;
+      const userId = userIdOf(t);
+      let fail = true;
+      const cls = { async classify() { if (fail) throw new Error("onnx exploded"); return { tipo: ["receita"], visual: [], scores: {} }; } };
+      const pipe = createPipeline({ deps: deps(), classifier: async () => cls, linkFetch: srv.linkFetch });
+      await expect(pipe.process(userId, s0.id)).rejects.toThrow(/onnx/);
+      const afterFirst = deps().storage.readMeta(userId, s0.id)!;
+      expect(afterFirst.link?.fetchedAt).toBeTruthy(); // persisted before the AI step
+      expect(afterFirst.media).toHaveLength(1);
+      expect(srv.hits.filter((h) => h === "/page")).toHaveLength(1);
+      fail = false;
+      await pipe.process(userId, s0.id);
+      expect(srv.hits.filter((h) => h === "/page")).toHaveLength(1); // the retry did not fetch again
+      expect(deps().storage.readMeta(userId, s0.id)!.ai.tipo).toEqual(["receita"]);
+      await pipe.process(userId, s0.id, { refetch: true });
+      expect(srv.hits.filter((h) => h === "/page")).toHaveLength(2);
+    } finally {
+      await srv.close();
+    }
+  });
+
+  it("a missing classifier model does not fail the job: ai.skipped, logged once", async () => {
+    const { t, upload, deps } = await setup();
+    const a = await upload();
+    const b = await upload();
+    const userId = userIdOf(t);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const pipe = createPipeline({ deps: deps(), classifier: async () => { throw new Error("Unable to get model file path or buffer."); } });
+      await pipe.process(userId, a.id);
+      await pipe.process(userId, b.id);
+      for (const id of [a.id, b.id]) {
+        const m = deps().storage.readMeta(userId, id)!;
+        expect(m.ai.skipped).toBe("classifier_unavailable");
+        expect(m.ai.processedAt).not.toBeNull();
+        expect(m.ai.tipo).toEqual([]);
+        expect(m.ai.keys.length).toBeGreaterThan(0); // keywords still run
+      }
+      expect(warn.mock.calls.filter((c) => String(c[0]).includes("classifier unavailable"))).toHaveLength(1);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it.each(["trashed", "purged"] as const)("an item %s during the fetch is not written back; downloaded files are removed", async (what) => {
+    const srv = await linkServer(readFileSync(new URL("./fixtures/links/article.html", import.meta.url), "utf8"));
+    try {
+      const { t, cookie, deps } = await setup();
+      const s0 = (await (await uploadLink(t, cookie, { url: srv.url })).json()) as ItemSummary;
+      const userId = userIdOf(t);
+      const d = deps();
+      let lookups = 0;
+      // The image download (2nd lookup) happens after the item went away.
+      const linkFetch = {
+        ...srv.linkFetch,
+        lookup: (h: string, cb: (e: Error | null, a: { address: string; family: number }[]) => void) => {
+          if (++lookups === 2) {
+            if (what === "trashed") void t.app.request(`/api/items/${s0.id}`, { method: "DELETE", headers: { cookie } });
+            else d.storage.removeItem(userId, s0.id);
+          }
+          setTimeout(() => srv.linkFetch.lookup(h, cb), 20);
+        },
+      };
+      const cls = fakeClassifier();
+      await createPipeline({ deps: d, classifier: async () => cls, linkFetch }).process(userId, s0.id);
+      expect(lookups).toBeGreaterThanOrEqual(2);
+      expect(cls.calls).toBe(0);
+      const dir = d.storage.itemDir(userId, s0.id);
+      expect(existsSync(join(dir, "original.webp"))).toBe(false);
+      expect(existsSync(join(dir, "thumb.webp"))).toBe(false);
+      if (what === "purged") expect(existsSync(dir)).toBe(false);
+      else {
+        const m = d.storage.readMeta(userId, s0.id)!;
+        expect(m.deletedAt).not.toBeNull();
+        expect(m.link?.fetchedAt).toBeUndefined();
+        expect(m.media).toEqual([]);
+      }
+    } finally {
+      await srv.close();
+    }
   });
 
   it("a screenshot still needs its image", async () => {
