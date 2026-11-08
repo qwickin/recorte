@@ -229,9 +229,10 @@ export function GalleryPage() {
       <main className="mx-auto max-w-[1680px] pb-28">
         <section className="hero-light -mx-4 px-4 pt-6 pb-6 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10" aria-label="Etiquetas">
           <TagMarquee tags={tags} selected={filters.tags} onToggle={toggleTag} libraryTotal={libraryTotal} />
-          {tags !== null && tags.length > 0 && (
-            <p className="fade-in mx-auto mt-6 max-w-[62ch] text-center text-[14px] leading-relaxed text-[var(--ink-3)]">
-              {libraryTotal === null ? "…" : plural(libraryTotal, "captura", "capturas")} e {plural(tags.length, "etiqueta", "etiquetas")}. Clica numa etiqueta para filtrar
+          {/* Reserved while the tags load (no jump when they arrive); the empty hero brings its own copy. */}
+          {(tags === null || tags.length > 0) && (
+            <p aria-hidden={tags === null || undefined} className={`${tags === null ? "invisible" : "fade-in"} mx-auto mt-6 max-w-[62ch] text-center text-[14px] leading-relaxed text-[var(--ink-3)]`}>
+              {libraryTotal === null ? "…" : plural(libraryTotal, "captura", "capturas")} e {plural(tags?.length ?? 0, "etiqueta", "etiquetas")}. Clica numa etiqueta para filtrar
               <span className="kbd-hint">
                 , ou carrega em <span className="text-[var(--ink-2)]">{isMac ? "⌘K" : "Ctrl K"}</span> para pesquisar pelo que te lembras da imagem
               </span>

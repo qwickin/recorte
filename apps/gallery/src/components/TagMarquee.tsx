@@ -80,8 +80,8 @@ function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
           </div>
         ))}
       </div>
-      <div className="fade-in mt-6 flex max-w-[52ch] flex-col items-center gap-2 text-center">
-        {waiting ? (
+      <div className="fade-in mt-6 flex min-h-[52px] max-w-[52ch] flex-col items-center gap-2 text-center">
+        {libraryTotal === undefined || libraryTotal === null ? null : waiting ? (
           <>
             <p className="text-[16px] font-light text-white/85">As etiquetas estão a caminho.</p>
             <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">Aparecem aqui assim que a IA acabar de ver as tuas capturas.</p>
