@@ -4,6 +4,7 @@ import type { Deps } from "../deps";
 import { countUsers, findUserById } from "../auth/users";
 import { itemsRepo } from "../items/repo";
 import { toSearchDoc } from "../items/service";
+import { migrateItemTags } from "../tag-migration";
 
 export interface RebuildResult {
   /** Items restored into SQLite from their meta.json. */
@@ -56,6 +57,12 @@ export async function rebuildIndex(deps: Deps, userId: string): Promise<RebuildR
         continue;
       }
       m = { ...m, userId };
+      deps.storage.writeMeta(m);
+    }
+    // Files from before tag IDs (an old backup restored after the startup migration ran): convert them too.
+    const migrated = migrateItemTags(m);
+    if (migrated) {
+      m = migrated;
       deps.storage.writeMeta(m);
     }
     repo.upsertFromMeta(m);

@@ -150,6 +150,23 @@ describe("tag ID migration", () => {
     expect(deps.storage.readMeta(userId, b.id)!.ai.topics).toEqual(["recipe"]);
   });
 
+  it("the admin reindex converts files from before tag IDs (an old backup restored after the migration)", async () => {
+    const { t, cookie, upload, deps, userId, legacy, tagRows } = await setup();
+    const a = await upload();
+    migrateTagIds(deps);
+    // Restored afterwards: an old meta.json with pt-PT names.
+    legacy(a.id, (m) => {
+      m.ai.topics = ["receita", "modo escuro"];
+      m.user.hiddenAiTags = ["modo escuro"];
+    });
+    const r = await t.app.request("/api/admin/reindex", { method: "POST", headers: { cookie, origin: "http://localhost" } });
+    expect(r.status).toBe(200);
+    const m = deps.storage.readMeta(userId, a.id)!;
+    expect(m.ai.topics).toEqual(["recipe", "dark mode"]);
+    expect(m.user.hiddenAiTags).toEqual(["dark mode"]);
+    expect(tagRows(a.id)).toEqual(["recipe"]);
+  });
+
   it("startup order: an AI tag the person removed stays removed after the topics-v2 retag", async () => {
     const { t, cookie, upload, queue, deps, userId, legacy } = await setup();
     const a = await upload();
