@@ -1,4 +1,4 @@
-import { API, type CaptureKind, type Category, type ExtensionInfo, type ItemText, type TagCount, UPLOAD_LIMITS, UploadMeta, normalizeTags } from "@recorte/shared";
+import { API, type CaptureKind, type Category, type ExtensionInfo, type ItemText, type ItemType, type TagCount, UPLOAD_LIMITS, UploadMeta, normalizeTags } from "@recorte/shared";
 
 /** Hard cap on extracted text sent with an item (spec §6). */
 export const MAX_TEXT_CHARS = 20_000;
@@ -92,6 +92,8 @@ export function capItemText(text: ItemText, max = MAX_TEXT_CHARS): ItemText {
 }
 
 export interface MetaInput {
+  /** Default "screenshot"; "link" for "Guardar link" (kind link/page, no image). */
+  type?: ItemType;
   kind: CaptureKind;
   url: string;
   pageTitle: string;
@@ -110,7 +112,7 @@ export function buildUploadMeta(input: MetaInput): UploadMeta {
   const title = input.title?.trim();
   const note = input.note?.trim();
   const meta: UploadMeta = {
-    type: "screenshot",
+    type: input.type ?? "screenshot",
     kind: input.kind,
     url: input.url,
     pageTitle: input.pageTitle.trim().slice(0, UPLOAD_LIMITS.pageTitle),
@@ -190,7 +192,8 @@ export async function uploadItem(
 ): Promise<UploadResult> {
   const form = new FormData();
   const ext = mime === "image/webp" ? "webp" : mime === "image/png" ? "png" : "jpg";
-  form.append("image", new Blob([image], { type: mime }), `capture.${ext}`);
+  // A saved link has no image (empty buffer): the server fetches its OG image.
+  if (image.byteLength) form.append("image", new Blob([image], { type: mime }), `capture.${ext}`);
   form.append("meta", JSON.stringify(meta));
   try {
     const res = await fetch(`${conn.server}${API.items}`, {

@@ -195,6 +195,15 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
     já usa vários ⌘⇧). O popup e as opções mostram o atalho real (`commands.getAll()`, com ⌃ ⌥ ⇧ ⌘ no Mac);
   - o menu de contexto.
 
+**"Guardar link"** (substitui o plano do botão específico do X.com)
+- Menu de contexto sobre um link: "Guardar link no Recorte"; sobre a página: "Guardar esta página (link)".
+- Abre o mesmo diálogo (título, nota, etiquetas, categoria). A pré-visualização é um cartão: a `og:image` da página
+  (só na página atual) ou o título, o domínio e o URL.
+- Cria um item `type: "link"` (`kind` `link` ou `page`) sem imagem. Na página atual a extensão manda também a sua
+  extração do DOM (título, meta, `og:*`, texto Readability), que funciona mesmo atrás de um login.
+- O servidor vai buscar o URL na tarefa de processamento (ver §7) e o item aparece logo na galeria, como cartão de
+  texto até haver imagem.
+
 **Extração de texto (no content script)**
 - Nós de texto que intersetam o retângulo capturado mais uma margem de 48 px (`text.selection`).
 - `document.title`, meta description, `og:*`, h1–h3 da página (até 40) e o `alt` das imagens dentro da área.
@@ -305,6 +314,16 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
      texto.
    - Não cria etiquetas: as chaves só servem a pesquisa.
    - Aviso nas definições: envia as imagens a terceiros.
+0. **Links (`type: "link"`), antes do resto:** o servidor vai buscar o URL com uma guarda contra SSRF: só http/https,
+   10 s no total, 5 MB no máximo, até 5 redirecionamentos, e cada endereço resolvido tem de ser público (nada de
+   loopback, redes privadas, link-local, CGNAT, multicast ou IPv4 dentro de IPv6), verificado no `lookup` do socket,
+   portanto também depois de redirecionamentos e de DNS. Tira `og:*`, `twitter:*`, o URL canónico, o favicon (só o
+   URL) e o texto principal (Readability com linkedom) e descarrega a `og:image` (com a mesma guarda) para
+   `media[0]`. Os dados do DOM enviados pela extensão ganham; o fetch preenche o resto; se o fetch falhar ficam esses
+   dados (`link.fetchError`). Sem imagem não há classificação visual. Para x.com/twitter.com usa um UA de crawler
+   (`Twitterbot`, `facebookexternalhit`) e, sem OG, o oEmbed; num post com vídeo (`og:video`/`twitter:player`) guarda
+   `link.embedUrl` = `https://platform.twitter.com/embed/Tweet.html?id=<id>&theme=dark&dnt=true`, que a galeria mostra
+   num iframe quando se clica.
 5. **Gravação:** reescreve o bloco `ai` do `meta.json`, atualiza o SQLite, indexa no Meilisearch e emite
    `item.updated`.
 

@@ -4,7 +4,7 @@
 
 O Recorte guarda capturas de ecrã da web no teu próprio servidor.
 
-- **Extensão** para Chrome e Firefox. Captura uma área, o ecrã visível, a página inteira ou uma imagem. Guarda também o texto da página, para a pesquisa encontrar a captura.
+- **Extensão** para Chrome e Firefox. Captura uma área, o ecrã visível, a página inteira ou uma imagem. Guarda também o texto da página, para a pesquisa encontrar a captura. Com o botão direito guarda também links ("Guardar link no Recorte", "Guardar esta página (link)"): o servidor vai buscar o título, a descrição e a imagem do link (e, num post do X com vídeo, o vídeo embebido).
 - **Servidor.** Guarda tudo em disco e sugere etiquetas com IA local (SigLIP2, sem GPU e sem enviar nada para fora): tipo de página, aspeto visual e cores.
 - **Galeria.** Scroll infinito e filtros. A pesquisa ⌘K / Ctrl+K entende o significado em português e em inglês: "doce português" encontra um pastel de nata numa página em inglês.
 

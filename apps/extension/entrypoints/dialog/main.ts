@@ -27,6 +27,7 @@ async function main(): Promise<void> {
   }
   const input = await renderSaveDialog(document.getElementById("root")!, {
     preview: info.preview,
+    ...(info.link ? { link: info.link } : {}),
     title: info.title,
     site: info.site,
     truncated: info.truncated,

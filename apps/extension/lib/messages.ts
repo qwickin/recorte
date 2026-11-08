@@ -61,6 +61,8 @@ export type ContentMessage =
   | { type: "recorte:scroll-to"; y: number; hideFixed: boolean }
   | { type: "recorte:restore"; x: number; y: number }
   | { type: "recorte:locate-image"; srcUrl: string }
+  /** Text/title of the <a> the context menu was opened on ("Guardar link"). */
+  | { type: "recorte:link-text"; url: string }
   | { type: "recorte:extract"; kind: CaptureKind; rect?: Rect; image?: { alt: string; caption: string } }
   | { type: "recorte:dialog"; draftId: string }
   | { type: "recorte:close-dialog" }
@@ -69,10 +71,20 @@ export type ContentMessage =
 
 /** What the dialog page needs to show a draft. */
 export interface DraftInfo {
+  /** Data URL of the capture; "" for a link (see `link`). */
   preview: string;
   title: string;
   site: string;
   truncated: boolean;
+  /** A saved link: shown as a card (its og:image when the page gave one). */
+  link?: LinkPreview;
+}
+
+export interface LinkPreview {
+  url: string;
+  description?: string;
+  /** og:image from the page's DOM ("Guardar esta página"); the server downloads its own copy. */
+  image?: string;
 }
 
 export interface LocatedImage {

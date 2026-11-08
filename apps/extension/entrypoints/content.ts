@@ -136,6 +136,17 @@ export default defineContentScript({
           const out: LocatedImage = { rect, alt: img.alt ?? "", caption, scroll: before };
           return out;
         }
+        case "recorte:link-text": {
+          let a: HTMLAnchorElement | null = null;
+          for (const el of document.querySelectorAll<HTMLAnchorElement>("a[href]")) {
+            if (el.href === msg.url) {
+              a = el;
+              break;
+            }
+          }
+          const text = (a?.innerText || a?.textContent || "").replace(/\s+/g, " ").trim().slice(0, 300);
+          return { text, title: a?.title?.trim() ?? "" };
+        }
         case "recorte:extract": {
           const text = extractText(document, { kind: msg.kind, rect: msg.rect, image: msg.image });
           const out: ExtractResult = { text, pageTitle: document.title || location.hostname };

@@ -1,5 +1,5 @@
 import { type Category, type TagCount, normalizeTag, normalizeTags } from "@recorte/shared";
-import type { DialogInput } from "./messages";
+import type { DialogInput, LinkPreview } from "./messages";
 import { h, mount } from "./ui";
 
 /**
@@ -10,6 +10,8 @@ import { h, mount } from "./ui";
 
 export interface DialogOptions {
   preview: string;
+  /** A saved link: a card (its og:image when known) instead of the capture. */
+  link?: LinkPreview;
   title: string;
   site: string;
   truncated: boolean;
@@ -33,6 +35,14 @@ export const DIALOG_CSS = `
   display: flex; align-items: center; justify-content: center; padding: 20px; }
 .preview img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
   border-radius: 8px; box-shadow: 0 0 0 1px var(--hair), 0 20px 60px -20px rgb(255 255 255 / .12); }
+.linkcard { width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.linkcard img { flex: 0 1 auto; min-height: 0; max-height: calc(100% - 120px); width: 100%; object-fit: cover; }
+.linkcard .site { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.linkcard .t { font-size: 20px; font-weight: 300; line-height: 1.25; color: #fff; overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+.linkcard .d { font-size: 13px; line-height: 1.5; color: var(--ink-2); overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.linkcard .u { font-size: 12px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .preview .tall { position: absolute; left: 50%; bottom: 10px; translate: -50% 0; font-size: 11px; color: var(--ink-3);
   background: rgb(0 0 0 / .7); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
 form { display: flex; flex-direction: column; min-height: 0; }
@@ -88,6 +98,19 @@ footer { flex: none; display: flex; justify-content: flex-end; gap: 8px; padding
 .note { margin: 0; font-size: 12px; color: var(--ink-3); }
 .error { margin: 0; font-size: 12px; color: #ff8a8a; }
 `;
+
+function linkCard(l: LinkPreview, site: string, title: string): HTMLElement {
+  const card = h("div", { class: "linkcard" });
+  if (l.image) {
+    const im = h("img", { alt: "", src: l.image, referrerpolicy: "no-referrer" });
+    im.addEventListener("error", () => im.remove());
+    card.append(im);
+  }
+  card.append(h("span", { class: "site" }, site), h("p", { class: "t" }, title));
+  if (l.description) card.append(h("p", { class: "d" }, l.description));
+  card.append(h("span", { class: "u" }, l.url));
+  return card;
+}
 
 /** Accent- and case-insensitive key for matching. */
 const fold = (s: string) => normalizeTag(s).normalize("NFD").replace(/\p{M}/gu, "");
@@ -291,7 +314,7 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
       ),
       h("footer", {}, cancel, save),
     );
-    const preview = h("div", { class: "preview" }, img);
+    const preview = h("div", { class: "preview" }, o.link ? linkCard(o.link, o.site, o.title) : img);
     // A very tall capture is shrunk to fit: say it is whole.
     img.addEventListener("load", () => {
       if (img.naturalHeight > img.naturalWidth * 3) preview.append(h("span", { class: "tall" }, "Página inteira (reduzida para caber)"));

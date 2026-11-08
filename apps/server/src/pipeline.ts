@@ -65,7 +65,10 @@ export function mergeLink(m: Item, f: FetchedLink | null, error: string | null, 
       ...(page.keywords?.length || !f.keywords.length ? {} : { keywords: f.keywords }),
     };
   }
-  const pageTitle = m.source.pageTitle.trim() && m.source.pageTitle !== m.source.url ? m.source.pageTitle : (link.title ?? m.source.pageTitle);
+  // "Guardar link": the client only knew the anchor text ("ler mais"…), the page's own title is better. "Guardar
+  // esta página": the client had the real document title.
+  const clientTitle = m.source.pageTitle.trim() && m.source.pageTitle !== m.source.url ? m.source.pageTitle : "";
+  const pageTitle = (m.kind === "link" ? f?.title || clientTitle : clientTitle || link.title) || link.title || m.source.pageTitle;
   return { ...m, link, text, source: { ...m.source, pageTitle } };
 }
 

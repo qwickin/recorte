@@ -12,6 +12,7 @@ export interface QueueItem {
   id: string;
   /** Connection the capture belongs to (`accountKey(server, userId)`). Only sent while that connection is active. */
   account: string;
+  /** Empty for a saved link (the server fetches its image). */
   image: ArrayBuffer;
   mime: string;
   meta: UploadMeta;
@@ -31,8 +32,10 @@ export interface Draft {
   mime: string;
   /** Meta without the user's dialog input (title/note/tags/category are filled on save). */
   meta: UploadMeta;
-  /** Small JPEG data URL shown in the dialog. */
+  /** Small JPEG data URL shown in the dialog ("" for a link). */
   preview: string;
+  /** A saved link (`image` is then empty). */
+  link?: import("./messages").LinkPreview;
   tabId: number | null;
   createdAt: number;
 }

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ApiError, absoluteUrl, buildUploadMeta, capItemText, fetchMe, normalizeServerUrl, registerDevice } from "../lib/api";
+import { ApiError, absoluteUrl, buildUploadMeta, capItemText, fetchMe, normalizeServerUrl, registerDevice, uploadItem } from "../lib/api";
 
 const text = { selection: "olá", meta: {}, headings: [], alts: [] };
 
@@ -102,5 +102,23 @@ describe("device registration (password only)", () => {
   it("/api/me gives the account id", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ id: "u1" }), { status: 200 })));
     expect(await fetchMe({ server: "http://x", token: "t" }, "1.0.0")).toEqual({ id: "u1" });
+  });
+});
+
+describe("saved links", () => {
+  it("buildUploadMeta makes a link item (kind link/page)", () => {
+    const m = buildUploadMeta({ type: "link", kind: "link", url: "https://x.com/a/status/1", pageTitle: "Post", text });
+    expect(m.type).toBe("link");
+    expect(m.kind).toBe("link");
+    expect(buildUploadMeta({ kind: "visible", url: "https://e.com/", pageTitle: "x", text }).type).toBe("screenshot");
+  });
+  it("uploadItem sends no image part for an empty buffer (a link)", async () => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => new Response(JSON.stringify({ id: "1" }), { status: 201 }));
+    vi.stubGlobal("fetch", fetch);
+    const meta = buildUploadMeta({ type: "link", kind: "page", url: "https://e.com/", pageTitle: "x", text });
+    expect((await uploadItem({ server: "http://s", token: "t" }, "1.0.0", new ArrayBuffer(0), "", meta)).ok).toBe(true);
+    const body = fetch.mock.calls[0]![1]!.body as FormData;
+    expect(body.get("image")).toBeNull();
+    expect(JSON.parse(String(body.get("meta"))).type).toBe("link");
   });
 });

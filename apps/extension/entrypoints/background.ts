@@ -32,6 +32,7 @@ import type {
   DraftInfo,
   ExtractResult,
   LocatedImage,
+  LinkPreview,
   PageMetrics,
   Status,
 } from "@/lib/messages";
@@ -40,6 +41,8 @@ import { type Settings, accountOf, connectionOf, extensionVersion, getSettings, 
 
 const CONTENT_SCRIPT = "/content-scripts/content.js";
 const MENU_IMAGE = "recorte-save-image";
+const MENU_LINK = "recorte-save-link";
+const MENU_PAGE = "recorte-save-page-link";
 const ALARM_RETRY = "recorte-retry";
 const ALARM_TICK = "recorte-tick";
 const UPDATE_TTL_MS = 60 * 60_000;
@@ -362,7 +365,75 @@ async function finishCapture(tab: Tab, kind: CaptureKind, c: Captured): Promise<
 
 async function draftInfo(draftId: string): Promise<DraftInfo | null> {
   const d = await store.getDraft(draftId);
-  return d ? { preview: d.preview, title: d.meta.pageTitle, site: siteOf(d.meta.url), truncated: !!d.meta.truncated } : null;
+  if (!d) return null;
+  const info: DraftInfo = { preview: d.preview, title: d.meta.pageTitle, site: siteOf(d.meta.url), truncated: !!d.meta.truncated };
+  if (d.link) info.link = d.link;
+  return info;
+}
+
+// ----------------------------------------------------------------------------------------------- saved links
+
+const EMPTY_TEXT = { selection: "", meta: {}, headings: [], alts: [] };
+
+/**
+ * "Guardar link no Recorte" (context menu on a link) and "Guardar esta página (link)" (on the page). Same
+ * pre-save dialog; the item is `type: "link"` without an image: the server fetches the URL and its OG image.
+ * For the page itself the extension also sends its own DOM extraction (works behind logins).
+ */
+async function startLink(tab: Tab | undefined, kind: "link" | "page", linkUrl?: string, linkText?: string): Promise<void> {
+  const url = kind === "page" ? tab?.url : linkUrl;
+  if (!isHttpUrl(url)) {
+    await notify("recorte-unsupported", "Não é possível guardar este link", "O Recorte só guarda links http:// ou https://.");
+    return;
+  }
+  const s = await getSettings();
+  if (!connectionOf(s)) {
+    await notify("recorte-setup", "Liga a extensão ao servidor", "Abre as opções do Recorte e entra com a tua conta.");
+    await browser.runtime.openOptionsPage();
+    return;
+  }
+  const tabId = tab?.id;
+  const canTalk = tabId !== undefined && isHttpUrl(tab?.url);
+  try {
+    let pageTitle = "";
+    let text: ExtractResult["text"] = EMPTY_TEXT;
+    const preview: LinkPreview = { url };
+    if (canTalk) await ensureContent(tabId);
+    if (kind === "page" && canTalk) {
+      const ex = await toTab<ExtractResult>(tabId, { type: "recorte:extract", kind: "page" });
+      pageTitle = ex.text.meta.og?.["og:title"] || ex.pageTitle || tab?.title || "";
+      text = ex.text;
+      const og = ex.text.meta.og ?? {};
+      try {
+        const image = og["og:image"] ? new URL(og["og:image"], url).href : "";
+        if (isHttpUrl(image)) preview.image = image;
+      } catch {
+        // not a URL: no preview image
+      }
+      const description = og["og:description"] || ex.text.meta.description;
+      if (description) preview.description = description;
+    } else if (canTalk) {
+      const a = await toTab<{ text: string; title: string }>(tabId, { type: "recorte:link-text", url }).catch(() => null);
+      pageTitle = a?.title || a?.text || linkText || "";
+    } else pageTitle = linkText || "";
+    if (!pageTitle) pageTitle = url;
+    const meta = buildUploadMeta({ type: "link", kind, url, pageTitle, text });
+    const s2 = await connectedSettings();
+    const account = accountOf(s2);
+    if (!account) throw new Error("não foi possível identificar a conta no servidor");
+    const empty = new ArrayBuffer(0);
+    if (s2.saveWithoutAsking || !canTalk) {
+      await store.put({ ...newQueueItem(empty, "", meta, account), tabId: tabId ?? null });
+      await updateBadge();
+      await drain(true);
+      return;
+    }
+    const draftId = crypto.randomUUID();
+    await store.putDraft({ id: draftId, account, image: empty, mime: "", meta, preview: "", link: preview, tabId, createdAt: Date.now() });
+    await toTab(tabId, { type: "recorte:dialog", draftId });
+  } catch (e) {
+    if (tab) await captureFailed(tab, e);
+  }
 }
 
 async function closeDialog(tabId: number | undefined): Promise<void> {
@@ -556,9 +627,11 @@ async function handleOther(msg: BackgroundMessage, sender: Browser.runtime.Messa
 }
 
 function setupMenus(): void {
-  browser.contextMenus.removeAll().then(() =>
-    browser.contextMenus.create({ id: MENU_IMAGE, title: "Guardar esta imagem", contexts: ["image"] }),
-  );
+  browser.contextMenus.removeAll().then(() => {
+    browser.contextMenus.create({ id: MENU_IMAGE, title: "Guardar esta imagem", contexts: ["image"] });
+    browser.contextMenus.create({ id: MENU_LINK, title: "Guardar link no Recorte", contexts: ["link"] });
+    browser.contextMenus.create({ id: MENU_PAGE, title: "Guardar esta página (link)", contexts: ["page"] });
+  });
 }
 
 export default defineBackground(() => {
@@ -587,6 +660,8 @@ export default defineBackground(() => {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === MENU_IMAGE) void startCapture(tab, "image", info.srcUrl);
+    else if (info.menuItemId === MENU_LINK) void startLink(tab, "link", info.linkUrl, (info as { linkText?: string }).linkText ?? info.selectionText);
+    else if (info.menuItemId === MENU_PAGE) void startLink(tab, "page");
   });
 
   const onNotification = (id: string) => {
@@ -609,6 +684,8 @@ export default defineBackground(() => {
   (globalThis as unknown as { recorte: unknown }).recorte = {
     capture: async (kind: CaptureKind) => startCapture(await activeTab(), kind),
     captureImage: async (srcUrl: string) => startCapture(await activeTab(), "image", srcUrl),
+    saveLink: async (url: string, text?: string) => startLink(await activeTab(), "link", url, text),
+    savePage: async () => startLink(await activeTab(), "page"),
     drain: () => drain(true),
     status: getStatus,
   };

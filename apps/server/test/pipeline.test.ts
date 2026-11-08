@@ -501,7 +501,7 @@ describe("saved links (type link)", () => {
     const srv = await linkServer(html);
     try {
       const { t, cookie, upload: _u, deps } = await setup();
-      const res = await uploadLink(t, cookie, { url: srv.url, tags: ["jantar"] });
+      const res = await uploadLink(t, cookie, { url: srv.url, tags: ["jantar"], pageTitle: "ler mais" }); // the anchor text
       expect(res.status).toBe(201);
       const s0 = (await res.json()) as ItemSummary;
       expect(s0.type).toBe("link");
