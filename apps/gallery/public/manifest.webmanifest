@@ -1,8 +1,8 @@
 {
   "name": "Recorte",
   "short_name": "Recorte",
-  "description": "As tuas capturas da web, pesquisáveis pelo que te lembras delas.",
-  "lang": "pt-PT",
+  "description": "Your web captures, searchable by what you remember about them.",
+  "lang": "en",
   "id": "/",
   "start_url": "/",
   "scope": "/",

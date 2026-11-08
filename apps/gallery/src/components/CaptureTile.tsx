@@ -1,6 +1,6 @@
 import type { ItemSummary } from "@recorte/shared";
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { timeAgo } from "../lib/text";
+import { useFormat, useT } from "../i18n";
 import { CheckIcon, LinkIcon } from "./icons";
 
 type Props = {
@@ -16,6 +16,8 @@ type Props = {
 };
 
 export function CaptureTile({ item: c, height, clipped, onOpen, selecting, selected, fresh, action }: Props) {
+  const t = useT();
+  const fmt = useFormat();
   const [loaded, setLoaded] = useState(false);
   return (
     <div className={`relative ${fresh ? "fade-in" : ""}`}>
@@ -49,7 +51,7 @@ export function CaptureTile({ item: c, height, clipped, onOpen, selecting, selec
           )}
           {c.type === "link" && (
             <span className="tile-badge" aria-hidden="true">
-              <LinkIcon width={12} height={12} /> link
+              <LinkIcon width={12} height={12} /> {t("common.link")}
             </span>
           )}
           {clipped && <div className="tile-clip-fade" />}
@@ -57,7 +59,7 @@ export function CaptureTile({ item: c, height, clipped, onOpen, selecting, selec
             <p className="line-clamp-2 text-[13.5px] leading-snug font-normal text-white">{c.title}</p>
             <p className="mt-1 flex gap-2.5 text-[12px] text-[var(--ink-3)]">
               <span className="truncate">{c.site}</span>
-              <span className="shrink-0">{timeAgo(c.createdAt)}</span>
+              <span className="shrink-0">{fmt.relative(c.createdAt)}</span>
             </p>
           </div>
           {selecting && (

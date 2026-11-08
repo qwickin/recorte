@@ -959,6 +959,38 @@ body {
   background: rgb(230 50 50 / 0.85);
 }
 
+/* Language selector on the sign-in and setup pages: quiet, next to the brand. */
+.language-compact {
+  appearance: none;
+  max-width: 11rem;
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.03)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='1.4'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E")
+    no-repeat right 10px center / 9px 6px;
+  padding: 4px 26px 4px 12px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  text-overflow: ellipsis;
+  color-scheme: dark;
+  outline: none;
+  cursor: pointer;
+}
+.language-compact:hover {
+  border-color: rgb(255 255 255 / 0.2);
+  color: #fff;
+}
+.language-compact:focus-visible {
+  border-color: rgb(255 255 255 / 0.45);
+}
+@media (pointer: coarse) {
+  .language-compact {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+
 /* Touch screens: every control is at least 44 px in both directions (C8). */
 @media (pointer: coarse) {
   .detail-icon {
@@ -988,7 +1020,7 @@ body {
     padding: 0 14px 0 8px;
     min-width: 44px;
   }
-  .detail-aside input[aria-label="Adicionar etiqueta"] {
+  .detail-aside .tag-add {
     height: 44px;
     font-size: 16px;
   }

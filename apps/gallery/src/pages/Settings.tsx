@@ -5,19 +5,25 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ApiError, api } from "../api";
 import { Devices } from "../components/Devices";
 import { inputClass, Page, Section } from "../components/Page";
+import { LanguageSelect } from "../components/LanguageSelect";
 import { ServerSettingsForm } from "../components/ServerSettingsForm";
+import { type Msg, msgText, useT } from "../i18n";
 import { navigate } from "../lib/router";
 
-const Status = ({ text, error }: { text: string | null; error?: boolean }) => (
-  <p className={`min-h-5 text-[13px] ${error ? "text-[#ff8a8a]" : "text-[var(--ink-3)]"}`} aria-live="polite">
-    {text}
-  </p>
-);
+function Status({ msg }: { msg: Msg | null }) {
+  const t = useT();
+  return (
+    <p className={`min-h-5 text-[13px] ${msg?.error ? "text-[#ff8a8a]" : "text-[var(--ink-3)]"}`} aria-live="polite">
+      {msgText(t, msg)}
+    </p>
+  );
+}
 
 function PasswordForm() {
+  const t = useT();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
-  const [msg, setMsg] = useState<{ text: string; error?: boolean } | null>(null);
+  const [msg, setMsg] = useState<Msg | null>(null);
   const [busy, setBusy] = useState(false);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -27,12 +33,12 @@ function PasswordForm() {
       await api.changePassword({ currentPassword: current, newPassword: next });
       setCurrent("");
       setNext("");
-      setMsg({ text: "Palavra-passe mudada. As outras sessões e extensões têm de voltar a entrar." });
+      setMsg({ key: "settings.passwordChanged" });
     } catch (err) {
       const code = err instanceof ApiError ? err.code : "";
       setMsg({
         error: true,
-        text: code === "invalid_credentials" ? "A palavra-passe atual não está certa." : code === "invalid_request" ? "A nova palavra-passe precisa de pelo menos 8 caracteres." : "Não foi possível mudar a palavra-passe.",
+        key: code === "invalid_credentials" ? "settings.passwordWrong" : code === "invalid_request" ? "settings.passwordShort" : "settings.passwordFailed",
       });
     } finally {
       setBusy(false);
@@ -41,32 +47,33 @@ function PasswordForm() {
   return (
     <form onSubmit={submit} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
       <label className="flex flex-col gap-1.5 text-[13px] text-[var(--ink-3)]">
-        Atual
+        {t("settings.passwordCurrent")}
         <input type="password" autoComplete="current-password" required value={current} onChange={(e) => setCurrent(e.target.value)} className={inputClass} />
       </label>
       <label className="flex flex-col gap-1.5 text-[13px] text-[var(--ink-3)]">
-        Nova
+        {t("settings.passwordNew")}
         <input type="password" autoComplete="new-password" required minLength={8} value={next} onChange={(e) => setNext(e.target.value)} className={inputClass} />
       </label>
       <Button type="submit" variant="secondary" isDisabled={busy} className="h-[46px]">
-        Mudar
+        {t("settings.passwordChange")}
       </Button>
       <div className="sm:col-span-3">
-        <Status text={msg?.text ?? null} error={msg?.error} />
+        <Status msg={msg} />
       </div>
     </form>
   );
 }
 
 function Categories() {
+  const t = useT();
   const [list, setList] = useState<Category[] | null>(null);
   const [name, setName] = useState("");
   const [editing, setEditing] = useState<{ id: string; name: string } | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<Msg | null>(null);
   const load = () => api.listCategories().then(setList, () => setList([]));
   useEffect(() => void load(), []);
 
-  const fail = (e: unknown) => setMsg(e instanceof ApiError && e.code === "name_taken" ? "Já existe uma categoria com esse nome." : "Não foi possível guardar.");
+  const fail = (e: unknown) => setMsg({ error: true, key: e instanceof ApiError && e.code === "name_taken" ? "common.categoryTaken" : "common.saveFailed" });
 
   const create = async (e: FormEvent) => {
     e.preventDefault();
@@ -92,12 +99,12 @@ function Categories() {
     }
   };
   const remove = async (c: Category) => {
-    if (!window.confirm(`Apagar a categoria “${c.name}”? As capturas ficam sem categoria.`)) return;
+    if (!window.confirm(t("settings.deleteCategory", { name: c.name }))) return;
     try {
       await api.deleteCategory(c.id);
       await load();
     } catch {
-      setMsg("Não foi possível apagar.");
+      setMsg({ error: true, key: "common.deleteFailed" });
     }
   };
 
@@ -110,7 +117,7 @@ function Categories() {
               {editing?.id === c.id ? (
                 <input
                   autoFocus
-                  aria-label="Nome da categoria"
+                  aria-label={t("settings.categoryName")}
                   value={editing.name}
                   maxLength={60}
                   onChange={(e) => setEditing({ id: c.id, name: e.target.value })}
@@ -119,47 +126,48 @@ function Categories() {
                   className={`${inputClass} py-1.5`}
                 />
               ) : (
-                <button type="button" className="min-w-0 flex-1 truncate text-left text-[14.5px] text-white" onClick={() => setEditing({ id: c.id, name: c.name })} title="Mudar o nome">
+                <button type="button" className="min-w-0 flex-1 truncate text-left text-[14.5px] text-white" onClick={() => setEditing({ id: c.id, name: c.name })} title={t("settings.rename")}>
                   {c.name}
                 </button>
               )}
               <Button size="sm" variant="ghost" className="text-[var(--ink-3)]" onPress={() => remove(c)}>
-                Apagar
+                {t("common.delete")}
               </Button>
             </li>
           ))}
         </ul>
       )}
-      {list?.length === 0 && <p className="text-[13.5px] text-[var(--ink-3)]">Ainda não tens categorias.</p>}
+      {list?.length === 0 && <p className="text-[13.5px] text-[var(--ink-3)]">{t("settings.noCategories")}</p>}
       <form onSubmit={create} className="flex gap-2">
-        <input placeholder="Nova categoria" aria-label="Nova categoria" maxLength={60} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+        <input placeholder={t("settings.newCategory")} aria-label={t("settings.newCategory")} maxLength={60} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
         <Button type="submit" variant="secondary" className="h-[46px]">
-          Criar
+          {t("common.create")}
         </Button>
       </form>
-      <Status text={msg} error />
+      <Status msg={msg} />
     </div>
   );
 }
 
 function DeviceList() {
+  const t = useT();
   const [devices, setDevices] = useState<Device[] | null>(null);
   const [info, setInfo] = useState<ExtensionInfo | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Msg | null>(null);
   useEffect(() => {
     api.listDevices().then(setDevices, () => setDevices([]));
     api.extensionInfo().then(setInfo, () => {});
   }, []);
   const revoke = async (d: Device) => {
-    if (!window.confirm(`Revogar “${d.name}”? Essa extensão terá de voltar a entrar.`)) return;
+    if (!window.confirm(t("settings.revokeConfirm", { name: d.name }))) return;
     setBusy(d.id);
     setError(null);
     try {
       await api.revokeDevice(d.id);
       setDevices((ds) => ds?.filter((x) => x.id !== d.id) ?? null);
     } catch {
-      setError(`Não foi possível revogar “${d.name}”. Tenta de novo.`);
+      setError({ error: true, key: "settings.revokeFailed", vars: { name: d.name } });
     } finally {
       setBusy(null);
     }
@@ -167,21 +175,25 @@ function DeviceList() {
   return (
     <div className="flex flex-col gap-2">
       <Devices devices={devices} latest={info?.version} onRevoke={revoke} busyId={busy} />
-      <Status text={error} error />
+      <Status msg={error} />
     </div>
   );
 }
 
+/** Reindex result: the main line plus an optional note about unreadable files. */
+type Result = Msg & { extra?: Msg };
+
 function Maintenance() {
-  const [msg, setMsg] = useState<{ text: string; error?: boolean } | null>(null);
+  const t = useT();
+  const [msg, setMsg] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
-  const run = async (fn: () => Promise<string>) => {
+  const run = async (fn: () => Promise<Result>) => {
     setBusy(true);
     setMsg(null);
     try {
-      setMsg({ text: await fn() });
+      setMsg(await fn());
     } catch {
-      setMsg({ text: "Não foi possível concluir.", error: true });
+      setMsg({ key: "settings.actionFailed", error: true });
     } finally {
       setBusy(false);
     }
@@ -195,11 +207,11 @@ function Maintenance() {
           onPress={() =>
             run(async () => {
               const r = await api.reprocess();
-              return `${r.queued} ${r.queued === 1 ? "captura vai" : "capturas vão"} ser reprocessadas. As tuas etiquetas, títulos e notas não mudam.`;
+              return { key: "settings.reprocessDone", vars: { count: r.queued } };
             })
           }
         >
-          Reprocessar com a IA
+          {t("settings.reprocess")}
         </Button>
         <Button
           variant="outline"
@@ -207,71 +219,74 @@ function Maintenance() {
           onPress={() =>
             run(async () => {
               const r = await api.reindex();
-              const extra = r.unreadable
-                ? ` ${r.unreadable} ${r.unreadable === 1 ? "captura tem" : "capturas têm"} o meta.json ilegível (ver os registos do servidor).`
-                : "";
-              return (
-                (r.indexed
-                  ? `Índice reconstruído com ${r.items} ${r.items === 1 ? "captura" : "capturas"}.`
-                  : `Lista reconstruída (${r.items}), mas a pesquisa não respondeu. Tenta de novo mais tarde.`) + extra
-              );
+              return {
+                key: r.indexed ? "settings.reindexDone" : "settings.reindexPartial",
+                vars: { count: r.items },
+                ...(r.unreadable ? { extra: { key: "settings.reindexUnreadable", vars: { count: r.unreadable } } } : {}),
+              };
             })
           }
         >
-          Reconstruir índice
+          {t("settings.reindex")}
         </Button>
       </div>
-      <Status text={msg?.text ?? null} error={msg?.error} />
+      <p className={`min-h-5 text-[13px] ${msg?.error ? "text-[#ff8a8a]" : "text-[var(--ink-3)]"}`} aria-live="polite">
+        {msgText(t, msg)}
+        {msg?.extra && ` ${msgText(t, msg.extra)}`}
+      </p>
     </div>
   );
 }
 
 export function SettingsPage() {
+  const t = useT();
   const logout = async () => {
     await api.logout().catch(() => {});
     navigate("/login", { replace: true });
   };
   return (
-    <Page title="Definições">
-      <Section title="Servidor" description="Endereço público e IA na cloud. Os campos definidos por variáveis de ambiente no servidor não se mudam aqui.">
+    <Page title={t("settings.title")}>
+      <Section title={t("language.label")} description={t("language.description")}>
+        <div>
+          <LanguageSelect className={`${inputClass} max-w-[320px] [color-scheme:dark]`} />
+        </div>
+      </Section>
+
+      <Section title={t("settings.server")} description={t("settings.serverDescription")}>
         <ServerSettingsForm />
       </Section>
 
-      <Section title="Palavra-passe" description="A palavra-passe da tua conta, para a galeria e para as extensões.">
+      <Section title={t("settings.password")} description={t("settings.passwordDescription")}>
         <PasswordForm />
       </Section>
 
-      <Section title="Categorias" description="Agrupam capturas para lá das etiquetas. Clica num nome para o mudar.">
+      <Section title={t("settings.categories")} description={t("settings.categoriesDescription")}>
         <Categories />
       </Section>
 
-      <Section title="Dispositivos" description="Revogar uma extensão obriga-a a entrar outra vez.">
+      <Section title={t("settings.devices")} description={t("settings.devicesDescription")}>
         <DeviceList />
       </Section>
 
-      <Section title="Exportar" description="Um ZIP com todas as imagens e o meta.json de cada captura.">
+      <Section title={t("settings.export")} description={t("settings.exportDescription")}>
         <div>
           <a href={API.export} download className={buttonVariants({ variant: "outline" })}>
-            Exportar ZIP
+            {t("settings.exportZip")}
           </a>
         </div>
       </Section>
 
-      <Section
-        title="IA e pesquisa"
-        description="Reprocessar volta a sugerir etiquetas a todas as capturas. Reconstruir o índice relê os ficheiros e refaz a pesquisa."
-      >
+      <Section title={t("settings.ai")} description={t("settings.aiDescription")}>
         <Maintenance />
         <p className="rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-[13px] leading-relaxed text-[var(--ink-2)]">
-          A IA corre neste servidor e as imagens não saem dele. Se ligares a IA na cloud (em <em>Servidor</em>, acima), uma versão reduzida de cada
-          captura e o seu texto são enviados a esse serviço de terceiros para gerar título e descrição.
+          {t.node("settings.privacy", { server: <em>{t("settings.server")}</em> })}
         </p>
       </Section>
 
-      <Section title="Sessão">
+      <Section title={t("settings.session")}>
         <div>
           <Button variant="ghost" onPress={logout} className="text-[var(--ink-2)]">
-            Sair
+            {t("settings.signOut")}
           </Button>
         </div>
       </Section>

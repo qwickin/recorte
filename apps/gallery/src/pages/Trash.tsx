@@ -7,14 +7,16 @@ import { Masonry } from "../components/Masonry";
 import { Sentinel } from "../components/Sentinel";
 import { TopBar } from "../components/TopBar";
 import { useItemFeed } from "../hooks/useItemFeed";
+import { type Msg, msgText, useT } from "../i18n";
 
 const ratio = (c: ItemSummary) => (c.width > 0 ? c.height / c.width : 0.62);
 const keyOf = (c: ItemSummary) => c.id;
 
 export function TrashPage() {
+  const t = useT();
   const feed = useItemFeed(EMPTY_FILTERS, { trash: true });
   const [busy, setBusy] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<Msg | null>(null);
 
   /** One id: that tile. `"all"`: the whole bin, including pages not loaded yet. */
   const restore = async (target: string | "all") => {
@@ -24,9 +26,9 @@ export function TrashPage() {
       const r = target === "all" ? await api.restoreAllTrash() : { ids: [(await api.restoreItem(target)).id] };
       feed.remove(r.ids);
       if (target === "all") feed.reload();
-      setMsg(r.ids.length === 1 ? "Captura reposta na galeria." : `${r.ids.length} capturas repostas na galeria.`);
+      setMsg({ key: "trash.restored", vars: { count: r.ids.length } });
     } catch {
-      setMsg("Não foi possível repor.");
+      setMsg({ key: "trash.restoreFailed", error: true });
       if (target === "all") feed.reload(); // some chunks may have gone through
     } finally {
       setBusy(null);
@@ -41,19 +43,19 @@ export function TrashPage() {
       <main className="mx-auto max-w-[1680px]">
         <header className="hero-light -mx-4 flex flex-wrap items-end justify-between gap-4 px-4 pt-8 pb-8 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
           <div>
-            <h1 className="text-[34px] leading-tight font-extralight tracking-[-0.02em] text-white">Lixo</h1>
+            <h1 className="text-[34px] leading-tight font-extralight tracking-[-0.02em] text-white">{t("trash.title")}</h1>
             <p className="mt-2 max-w-[60ch] text-[14.5px] text-[var(--ink-3)]">
-              As capturas apagadas ficam aqui 30 dias e depois desaparecem de vez.
-              {feed.total ? ` ${feed.total} ${feed.total === 1 ? "captura" : "capturas"} no lixo.` : ""}
+              {t("trash.intro")}
+              {feed.total ? ` ${t("trash.count", { count: feed.total })}` : ""}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-[13px] text-[var(--ink-3)]" aria-live="polite">
-              {msg}
+              {msgText(t, msg)}
             </span>
             {(feed.total ?? feed.items.length) > 1 && (
               <Button variant="outline" size="sm" isDisabled={!!busy} onPress={() => restore("all")}>
-                Repor todas
+                {t("trash.restoreAll")}
               </Button>
             )}
           </div>
@@ -72,7 +74,7 @@ export function TrashPage() {
               onOpen={() => {}}
               action={
                 <Button size="sm" variant="secondary" isDisabled={!!busy} onPress={() => restore(c.id)} className="bg-black/70 backdrop-blur">
-                  Repor
+                  {t("trash.restore")}
                 </Button>
               }
             />
@@ -81,8 +83,8 @@ export function TrashPage() {
         <Sentinel onVisible={feed.loadMore} disabled={feed.loading || !feed.hasMore} armKey={feed.items.length} />
 
         <footer className="flex min-h-[160px] flex-col items-center justify-center gap-3 py-12 text-center">
-          {feed.error && <p className="text-[14px] text-[var(--ink-2)]">{feed.error}</p>}
-          {!feed.error && !feed.loading && feed.total === 0 && <p className="text-[15px] text-white/80">O lixo está vazio.</p>}
+          {feed.error && <p className="text-[14px] text-[var(--ink-2)]">{t("gallery.loadFailed")}</p>}
+          {!feed.error && !feed.loading && feed.total === 0 && <p className="text-[15px] text-white/80">{t("trash.empty")}</p>}
         </footer>
       </main>
     </div>

@@ -1,3 +1,5 @@
+import type { CaptureKind, ItemType } from "@recorte/shared";
+
 export const fold = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 const STOP = new Set(
@@ -20,38 +22,16 @@ export const domainOf = (url: string) => {
   }
 };
 
-const rtf = new Intl.RelativeTimeFormat("pt-PT", { numeric: "auto" });
-const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-  ["year", 31536000],
-  ["month", 2592000],
-  ["week", 604800],
-  ["day", 86400],
-  ["hour", 3600],
-  ["minute", 60],
-];
+/** Message keys for the item kinds and types (`t(kindKey(k))`). */
+export const kindKey = <K extends CaptureKind>(k: K) => `kind.${k}` as const;
+export const typeKey = <K extends ItemType>(k: K) => `type.${k}` as const;
+export const ITEM_TYPES: readonly ItemType[] = ["screenshot", "link", "post", "article"];
 
-export function timeAgo(iso: string, now = Date.now()) {
-  const diff = (Date.parse(iso) - now) / 1000;
-  for (const [unit, secs] of UNITS) if (Math.abs(diff) >= secs) return rtf.format(Math.round(diff / secs), unit);
-  return "agora mesmo";
-}
-
-export const fullDate = (iso: string) =>
-  new Intl.DateTimeFormat("pt-PT", { dateStyle: "long", timeStyle: "short" }).format(new Date(iso));
-
-export const kindLabel = {
-  area: "Área selecionada",
-  visible: "Parte visível",
-  full: "Página inteira",
-  image: "Imagem guardada",
-  link: "Link guardado",
-  page: "Página guardada (link)",
-} as const;
-
-export const typeLabel = { screenshot: "Captura", link: "Link", post: "Publicação", article: "Artigo" } as const;
-
-/** Colour names the server extracts (packages/ai/src/colors.ts), with a swatch for the filter. */
-export const COLORS: { name: string; hex: string }[] = [
+/**
+ * Colour names the server extracts (packages/ai/src/colors.ts), with a swatch for the filter. The names are the
+ * filter values the server matches on; the label shown is `t(colorKey(name))`.
+ */
+export const COLORS = [
   { name: "preto", hex: "#111" },
   { name: "branco", hex: "#f4f4f4" },
   { name: "cinzento", hex: "#8a8a8a" },
@@ -64,6 +44,10 @@ export const COLORS: { name: string; hex: string }[] = [
   { name: "rosa", hex: "#e93d82" },
   { name: "castanho", hex: "#8d5a3b" },
   { name: "bege", hex: "#d8c3a5" },
-];
+] as const;
+export type ColorName = (typeof COLORS)[number]["name"];
+export const isColorName = (v: string | undefined): v is ColorName => COLORS.some((c) => c.name === v);
+/** Label key for a colour filter value; an unknown value (old link) is shown as is. */
+export const colorKey = (name: ColorName) => `color.${name}` as const;
 
 export const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);

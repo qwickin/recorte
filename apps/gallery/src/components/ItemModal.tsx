@@ -5,7 +5,8 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, ty
 import { api, originalUrl } from "../api";
 import { PHONE, useMedia } from "../hooks/useMedia";
 import { displayTags, displayTitle, hiddenAiTags } from "../lib/item";
-import { fullDate, kindLabel, timeAgo, typeLabel } from "../lib/text";
+import { type MessageKey, useFormat, useT } from "../i18n";
+import { kindKey, typeKey } from "../lib/text";
 import { CheckIcon, ChevronIcon, CloseIcon, CopyIcon, ExternalIcon, TrashIcon } from "./icons";
 import { ZoomImage } from "./ZoomImage";
 
@@ -66,6 +67,7 @@ function IconAction({ label, onPress, isDisabled, danger, children }: { label: s
 
 /** A link's video (x.com): a poster with a play button until clicked, then the embed iframe. */
 function LinkEmbed({ url, title }: { url: string; title: string }) {
+  const t = useT();
   const [on, setOn] = useState(false);
   if (on) {
     return (
@@ -85,7 +87,7 @@ function LinkEmbed({ url, title }: { url: string; title: string }) {
     );
   }
   return (
-    <button type="button" onClick={() => setOn(true)} className="link-play" aria-label="Ver o vídeo">
+    <button type="button" onClick={() => setOn(true)} className="link-play" aria-label={t("detail.playVideo")}>
       <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
         <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
       </svg>
@@ -114,6 +116,8 @@ async function copyText(text: string): Promise<void> {
 }
 
 export function ItemModal({ summary, categories, onCategoryCreated, onClose, onPrev, onNext, onTag, onSite, onChanged, onDeleted, onOpen }: Props) {
+  const t = useT();
+  const fmt = useFormat();
   // Keep the last summary rendered while the exit animation runs.
   const last = useRef<ItemSummary | null>(summary);
   if (summary) last.current = summary;
@@ -131,7 +135,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
   const [tagDraft, setTagDraft] = useState("");
   const [newCat, setNewCat] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageKey | null>(null);
   const [copied, setCopied] = useState(false);
   const [related, setRelated] = useState<ItemSummary[]>([]);
   const phone = useMedia(PHONE);
@@ -196,7 +200,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
       if (shownId.current === next.id) setItem(next); // the user may have moved on with ←/→
       onChanged(next);
     } catch {
-      setError("Não foi possível guardar. Tenta de novo.");
+      setError("common.saveFailed");
     } finally {
       setSaving(false);
     }
@@ -247,7 +251,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
       setNewCat(null);
       await save({ categoryId: c.id });
     } catch (e) {
-      setError((e as { code?: string }).code === "name_taken" ? "Já existe uma categoria com esse nome." : "Não foi possível criar a categoria.");
+      setError((e as { code?: string }).code === "name_taken" ? "common.categoryTaken" : "detail.categoryFailed");
     }
   };
 
@@ -258,7 +262,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      setError("O navegador não deixou copiar.");
+      setError("detail.copyFailed");
     }
   };
 
@@ -268,7 +272,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
       await api.deleteItem(item.id);
       onDeleted(item.id);
     } catch {
-      setError("Não foi possível apagar.");
+      setError("common.deleteFailed");
     }
   };
 
@@ -287,7 +291,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
         {/* Phones: a full-screen sheet, the image on top and the details scrolling below it. */}
         <Modal.Container placement={phone ? "bottom" : "center"} size={phone ? "full" : undefined} className="sm:p-8">
           <Modal.Dialog
-            aria-label={s?.title ?? "Captura"}
+            aria-label={s?.title ?? t("detail.capture")}
             className="detail-dialog max-w-none overflow-hidden p-0"
             style={{ "--glow": s?.color } as CSSProperties}
           >
@@ -319,10 +323,10 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                   {item?.link?.embedUrl && <LinkEmbed key={item.id} url={item.link.embedUrl} title={s.title} />}
                   {(onPrev || onNext) && (
                     <div className="pointer-events-none absolute inset-x-0 bottom-3 z-[2] flex justify-between px-3">
-                      <button type="button" disabled={!onPrev} onClick={onPrev} aria-label="Captura anterior" className="nav-arrow pointer-events-auto">
+                      <button type="button" disabled={!onPrev} onClick={onPrev} aria-label={t("detail.previous")} className="nav-arrow pointer-events-auto">
                         <ChevronIcon className="rotate-180" />
                       </button>
-                      <button type="button" disabled={!onNext} onClick={onNext} aria-label="Captura seguinte" className="nav-arrow pointer-events-auto">
+                      <button type="button" disabled={!onNext} onClick={onNext} aria-label={t("detail.next")} className="nav-arrow pointer-events-auto">
                         <ChevronIcon />
                       </button>
                     </div>
@@ -335,13 +339,13 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                       <Spinner size="sm" color="current" className="text-white/50" />
                     </div>
                   )}
-                  {loadError && <p className="py-10 text-center text-[14px] text-[var(--ink-2)]">Não foi possível abrir esta captura.</p>}
+                  {loadError && <p className="py-10 text-center text-[14px] text-[var(--ink-2)]">{t("detail.openFailed")}</p>}
 
                   {item && (
                     <>
                       <header className="flex flex-col gap-2 pr-8">
                         <label className="sr-only" htmlFor="item-title">
-                          Título
+                          {t("detail.titleLabel")}
                         </label>
                         <textarea
                           id="item-title"
@@ -359,56 +363,56 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
                       <div className="flex flex-wrap items-center gap-1.5">
                         <a href={item.source.url} target="_blank" rel="noreferrer noopener" className={buttonVariants({ size: "sm", variant: "primary" })}>
-                          <ExternalIcon /> {item.type === "link" ? "Abrir link" : "Abrir página"}
+                          <ExternalIcon /> {item.type === "link" ? t("detail.openLink") : t("detail.openPage")}
                         </a>
-                        <IconAction label={copied ? "Texto copiado" : "Copiar texto"} onPress={copy} isDisabled={!text}>
+                        <IconAction label={copied ? t("detail.copied") : t("detail.copy")} onPress={copy} isDisabled={!text}>
                           {copied ? <CheckIcon /> : <CopyIcon />}
                         </IconAction>
-                        <IconAction label="Apagar (vai para o lixo)" onPress={remove} danger>
+                        <IconAction label={t("detail.delete")} onPress={remove} danger>
                           <TrashIcon />
                         </IconAction>
                       </div>
 
-                      <dl className="grid grid-cols-[88px_minmax(0,1fr)] gap-x-3 gap-y-2 text-[13px]">
-                        <dt className="text-[var(--ink-3)]">Página</dt>
+                      <dl className="grid grid-cols-[minmax(88px,max-content)_minmax(0,1fr)] gap-x-3 gap-y-2 text-[13px]">
+                        <dt className="text-[var(--ink-3)]">{t("detail.page")}</dt>
                         <dd className="truncate text-[var(--ink-2)]" title={item.source.pageTitle}>
                           <button type="button" className="link-quiet" onClick={() => onSite(item.source.site)}>
                             {item.source.site}
                           </button>
                         </dd>
-                        <dt className="text-[var(--ink-3)]">{item.type === "link" ? "Guardado" : "Capturada"}</dt>
-                        <dd className="text-[var(--ink-2)]" title={fullDate(item.createdAt)}>
-                          {timeAgo(item.createdAt)}
+                        <dt className="text-[var(--ink-3)]">{item.type === "link" ? t("detail.saved") : t("detail.captured")}</dt>
+                        <dd className="text-[var(--ink-2)]" title={fmt.date(item.createdAt)}>
+                          {fmt.relative(item.createdAt)}
                         </dd>
-                        <dt className="text-[var(--ink-3)]">Tipo</dt>
+                        <dt className="text-[var(--ink-3)]">{t("detail.type")}</dt>
                         <dd className="text-[var(--ink-2)]">
-                          {item.kind ? kindLabel[item.kind] : typeLabel[item.type]}
+                          {item.kind ? t(kindKey(item.kind)) : t(typeKey(item.type))}
                           {item.media[0] ? `, ${item.media[0].width}×${item.media[0].height}` : ""}
-                          {item.truncated ? " (cortada)" : ""}
+                          {item.truncated ? t("detail.cropped") : ""}
                         </dd>
-                        <dt className="self-center text-[var(--ink-3)]">Categoria</dt>
+                        <dt className="self-center text-[var(--ink-3)]">{t("detail.category")}</dt>
                         <dd>
                           {newCat === null ? (
                             <select
-                              aria-label="Categoria"
+                              aria-label={t("detail.category")}
                               value={item.user.categoryId ?? ""}
                               onChange={(e) => onCategory(e.target.value)}
                               className={`${field} py-1.5`}
                             >
-                              <option value="">Sem categoria</option>
+                              <option value="">{t("common.noCategory")}</option>
                               {categories.map((c) => (
                                 <option key={c.id} value={c.id}>
                                   {c.name}
                                 </option>
                               ))}
-                              <option value={NEW_CATEGORY}>Nova categoria…</option>
+                              <option value={NEW_CATEGORY}>{t("detail.newCategory")}</option>
                             </select>
                           ) : (
                             <div className="flex gap-1.5">
                               <input
                                 autoFocus
-                                aria-label="Nome da nova categoria"
-                                placeholder="Nome"
+                                aria-label={t("detail.newCategoryName")}
+                                placeholder={t("detail.name")}
                                 value={newCat}
                                 maxLength={60}
                                 onChange={(e) => setNewCat(e.target.value)}
@@ -416,7 +420,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                                 className={`${field} py-1.5`}
                               />
                               <Button size="sm" variant="secondary" onPress={createCategory}>
-                                Criar
+                                {t("common.create")}
                               </Button>
                             </div>
                           )}
@@ -425,47 +429,47 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
                       <section className="flex flex-col gap-2.5">
                         <h3 className="flex items-center justify-between text-[13px] text-[var(--ink-3)]">
-                          Etiquetas
+                          {t("detail.tags")}
                           <span className="flex items-center gap-1.5 text-[11.5px]">
-                            <span className="origin-dot" data-origin="ai" /> sugerida pela IA
+                            <span className="origin-dot" data-origin="ai" /> {t("detail.aiSuggested")}
                           </span>
                         </h3>
                         <div className="flex flex-wrap gap-1.5">
-                          {shown.map((t) => (
-                            <span key={t.tag} className="tag-chip" data-origin={t.origin}>
-                              <button type="button" onClick={() => onTag(t.tag)} title={t.origin === "ai" ? "Sugerida pela IA" : "Tua"}>
-                                {t.origin === "ai" && <span className="origin-dot" data-origin="ai" />}
-                                {t.tag}
+                          {shown.map((tag) => (
+                            <span key={tag.tag} className="tag-chip" data-origin={tag.origin}>
+                              <button type="button" onClick={() => onTag(tag.tag)} title={tag.origin === "ai" ? t("detail.aiTag") : t("detail.yourTag")}>
+                                {tag.origin === "ai" && <span className="origin-dot" data-origin="ai" />}
+                                {tag.tag}
                               </button>
-                              <button type="button" onClick={() => removeTag(t.tag, t.origin)} aria-label={`Remover etiqueta ${t.tag}`} className="tag-chip-x">
+                              <button type="button" onClick={() => removeTag(tag.tag, tag.origin)} aria-label={t("detail.removeTag", { tag: tag.tag })} className="tag-chip-x">
                                 <CloseIcon width={12} height={12} />
                               </button>
                             </span>
                           ))}
                           <input
-                            aria-label="Adicionar etiqueta"
-                            placeholder="+ etiqueta"
+                            aria-label={t("detail.addTag")}
+                            placeholder={t("detail.addTagPlaceholder")}
                             value={tagDraft}
                             maxLength={40}
                             onChange={(e) => setTagDraft(e.target.value)}
                             onKeyDown={enter(addTag)}
                             onBlur={() => tagDraft.trim() && addTag()}
-                            className="h-7 w-28 rounded-full border border-dashed border-white/15 bg-transparent px-3 text-[12.5px] text-white outline-none placeholder:text-white/35 focus:border-white/35"
+                            className="tag-add h-7 w-28 rounded-full border border-dashed border-white/15 bg-transparent px-3 text-[12.5px] text-white outline-none placeholder:text-white/35 focus:border-white/35"
                           />
                         </div>
                         {hidden.length > 0 && (
                           <p className="text-[12px] text-[var(--ink-4)]">
-                            Removidas da IA:{" "}
-                            {hidden.map((t, i) => (
-                              <span key={t}>
+                            {t("detail.hidden")}{" "}
+                            {hidden.map((tag, i) => (
+                              <span key={tag}>
                                 {i > 0 && ", "}
                                 <button
                                   type="button"
                                   className="link-quiet"
-                                  title="Repor esta etiqueta"
-                                  onClick={() => save({ hiddenAiTags: item.user.hiddenAiTags.filter((x) => x !== t) })}
+                                  title={t("detail.restoreTag")}
+                                  onClick={() => save({ hiddenAiTags: item.user.hiddenAiTags.filter((x) => x !== tag) })}
                                 >
-                                  {t}
+                                  {tag}
                                 </button>
                               </span>
                             ))}
@@ -475,13 +479,13 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
                       <section className="flex flex-col gap-2">
                         <label htmlFor="item-note" className="text-[13px] text-[var(--ink-3)]">
-                          Nota
+                          {t("detail.note")}
                         </label>
                         <textarea
                           id="item-note"
                           rows={3}
                           value={note}
-                          placeholder="Escreve uma nota para te lembrares porquê"
+                          placeholder={t("detail.notePlaceholder")}
                           onChange={(e) => setNote(e.target.value)}
                           onBlur={saveNote}
                           onKeyDown={leaveField}
@@ -491,7 +495,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
                       {text && (
                         <section className="flex flex-col gap-2">
-                          <h3 className="text-[13px] text-[var(--ink-3)]">Texto extraído</h3>
+                          <h3 className="text-[13px] text-[var(--ink-3)]">{t("detail.text")}</h3>
                           <blockquote className="line-clamp-6 border-l border-white/15 pl-3 text-[13px] leading-relaxed whitespace-pre-line text-[var(--ink-2)] italic">
                             {text}
                           </blockquote>
@@ -500,7 +504,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
                       {related.length > 0 && (
                         <section className="flex flex-col gap-2.5">
-                          <h3 className="text-[13px] text-[var(--ink-3)]">Relacionadas</h3>
+                          <h3 className="text-[13px] text-[var(--ink-3)]">{t("detail.related")}</h3>
                           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:thin]">
                             {related.map((r) => (
                               <button
@@ -519,14 +523,14 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                       )}
 
                       <p className="mt-auto min-h-[18px] text-[12px] text-[var(--ink-3)]" aria-live="polite">
-                        {error ?? (saving ? "A guardar…" : "")}
+                        {error ? t(error) : saving ? t("common.saving") : ""}
                       </p>
                     </>
                   )}
                 </aside>
               </div>
             )}
-            <Modal.CloseTrigger className="absolute top-3 right-3 bg-black/50 text-white/80 backdrop-blur hover:bg-black/70" />
+            <Modal.CloseTrigger aria-label={t("common.close")} className="absolute top-3 right-3 bg-black/50 text-white/80 backdrop-blur hover:bg-black/70" />
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

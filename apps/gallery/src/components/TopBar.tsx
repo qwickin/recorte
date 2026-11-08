@@ -2,6 +2,7 @@ import { Kbd } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import { Link, navigate, usePath } from "../lib/router";
 import { requestPalette } from "../lib/palette";
+import { type MessageKey, useT } from "../i18n";
 import { isMac } from "../lib/text";
 import { CloseIcon, CropMark, MenuIcon, SearchIcon } from "./icons";
 
@@ -9,14 +10,15 @@ export type FilterChip = { key: string; label: string; onRemove: () => void };
 
 type Props = { chips?: FilterChip[]; onClear?: () => void; onSearch?: () => void };
 
-const NAV = [
-  { href: "/lixo", label: "Lixo" },
-  { href: "/extensao", label: "Extensão" },
-  { href: "/definicoes", label: "Definições" },
+const NAV: { href: string; label: MessageKey }[] = [
+  { href: "/lixo", label: "nav.trash" },
+  { href: "/extensao", label: "nav.extension" },
+  { href: "/definicoes", label: "nav.settings" },
 ];
 
 /** Phones: the sections fold into a menu, so the bar keeps one row (and one height) everywhere. */
 function NavMenu({ path }: { path: string }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -33,17 +35,17 @@ function NavMenu({ path }: { path: string }) {
   useEffect(() => setOpen(false), [path]);
   return (
     <div ref={ref} className="relative md:hidden">
-      <button type="button" aria-label="Secções" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="topbar-icon">
+      <button type="button" aria-label={t("nav.sections")} aria-expanded={open} onClick={() => setOpen((o) => !o)} className="topbar-icon">
         {open ? <CloseIcon width={18} height={18} /> : <MenuIcon width={18} height={18} />}
       </button>
       {open && (
-        <nav className="nav-sheet" aria-label="Secções">
+        <nav className="nav-sheet" aria-label={t("nav.sections")}>
           <Link href="/" aria-current={path === "/" ? "page" : undefined} className="nav-sheet-link nav-link">
-            Galeria
+            {t("nav.gallery")}
           </Link>
           {NAV.map((n) => (
             <Link key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined} className="nav-sheet-link nav-link">
-              {n.label}
+              {t(n.label)}
             </Link>
           ))}
         </nav>
@@ -54,6 +56,7 @@ function NavMenu({ path }: { path: string }) {
 
 export function TopBar({ chips = [], onClear, onSearch }: Props) {
   const path = usePath();
+  const t = useT();
   // The search button is on every page (same bar, same widths: no shift between sections). Away from the
   // gallery it goes there and opens the palette.
   const search = onSearch ?? (() => (requestPalette(), navigate("/")));
@@ -84,7 +87,7 @@ export function TopBar({ chips = [], onClear, onSearch }: Props) {
               key={c.key}
               type="button"
               onClick={c.onRemove}
-              aria-label={`Remover filtro ${c.label}`}
+              aria-label={t("topbar.removeFilter", { label: c.label })}
               className="fade-in flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] py-1 pr-2 pl-3 text-[13px] text-white shadow-[0_0_16px_-6px_rgb(255_255_255/0.3)] transition-colors outline-none hover:bg-white/[0.12] focus-visible:ring-2 focus-visible:ring-white/70 max-sm:min-h-11"
             >
               {c.label}
@@ -93,12 +96,12 @@ export function TopBar({ chips = [], onClear, onSearch }: Props) {
           ))}
           {chips.length > 1 && onClear && (
             <button type="button" onClick={onClear} className="fade-in shrink-0 rounded-md px-2 py-1 text-[13px] text-[var(--ink-3)] max-sm:min-h-11 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/70">
-              Limpar
+              {t("topbar.clear")}
             </button>
           )}
         </div>
 
-        <nav className="hidden shrink-0 items-center gap-1 md:flex" aria-label="Secções">
+        <nav className="hidden shrink-0 items-center gap-1 md:flex" aria-label={t("nav.sections")}>
           {NAV.map((n) => (
             <Link
               key={n.href}
@@ -106,16 +109,16 @@ export function TopBar({ chips = [], onClear, onSearch }: Props) {
               aria-current={path === n.href ? "page" : undefined}
               className="nav-link rounded-md px-2.5 py-1.5 text-[13.5px] text-[var(--ink-3)] outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/70"
             >
-              {n.label}
+              {t(n.label)}
             </Link>
           ))}
         </nav>
 
-        <button type="button" onClick={search} aria-label="Pesquisar capturas" className="search-pill">
+        <button type="button" onClick={search} aria-label={t("topbar.searchLabel")} className="search-pill">
           <SearchIcon />
-          <span className="hidden text-[14px] sm:inline">Pesquisar</span>
+          <span className="hidden text-[14px] sm:inline">{t("topbar.search")}</span>
           <Kbd variant="light" className="hidden sm:inline-flex">
-            {isMac ? <Kbd.Abbr keyValue="command" /> : <Kbd.Abbr keyValue="ctrl" />}
+            {isMac ? <Kbd.Abbr keyValue="command" title={t("kbd.command")} /> : <Kbd.Abbr keyValue="ctrl" title={t("kbd.ctrl")} />}
             <Kbd.Content>K</Kbd.Content>
           </Kbd>
         </button>

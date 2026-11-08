@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { TagCount } from "@recorte/shared";
+import { type MessageKey, useT } from "../i18n";
 import { Link } from "../lib/router";
 
 type Props = {
@@ -51,20 +52,19 @@ function useLaneDurations(deps: unknown) {
   return root;
 }
 
-const EXAMPLES = [
-  ["design system", "receitas", "mapa", "tipografia", "react", "inspiração", "dashboard", "fotografia"],
-  ["artigo", "componente web", "paleta de cores", "viagens", "documentação", "animação", "produto"],
-  ["modo escuro", "ilustração", "código", "notícias", "arquitetura", "landing page", "ux"],
-];
+/** Example tags of the ghost marquee: one comma-separated lane per message. */
+const EXAMPLES: MessageKey[] = ["marquee.examples1", "marquee.examples2", "marquee.examples3"];
 
 /** First visit: a ghost of what the hero will look like, and how to get there. */
 function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
-  const root = useLaneDurations(EXAMPLES);
+  const t = useT();
+  const lanes = useMemo(() => EXAMPLES.map((k) => t(k).split(/\s*,\s*/)), [t]);
+  const root = useLaneDurations(lanes);
   const waiting = !!libraryTotal; // captures exist, the AI has not tagged them yet
   return (
     <div className="flex flex-col items-center">
       <div ref={root} className="marquee marquee-ghost flex w-full flex-col gap-2.5 py-2" aria-hidden="true">
-        {EXAMPLES.map((lane, i) => (
+        {lanes.map((lane, i) => (
           <div key={i} className="marquee-row overflow-hidden py-1" data-dir={i % 2 ? "rtl" : "ltr"}>
             <div className="marquee-track">
               {[0, 1].map((copy) => (
@@ -83,18 +83,20 @@ function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
       <div className="fade-in mt-6 flex min-h-[52px] max-w-[52ch] flex-col items-center gap-2 text-center">
         {libraryTotal === undefined || libraryTotal === null ? null : waiting ? (
           <>
-            <p className="text-[16px] font-light text-white/85">As etiquetas estão a caminho.</p>
-            <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">Aparecem aqui assim que a IA acabar de ver as tuas capturas.</p>
+            <p className="text-[16px] font-light text-white/85">{t("marquee.waitingTitle")}</p>
+            <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">{t("marquee.waitingBody")}</p>
           </>
         ) : (
           <>
-            <p className="text-[16px] font-light text-white/85">Ainda não há etiquetas.</p>
+            <p className="text-[16px] font-light text-white/85">{t("marquee.emptyTitle")}</p>
             <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">
-              Instala a{" "}
-              <Link href="/extensao" className="link-quiet text-white">
-                extensão
-              </Link>{" "}
-              e guarda a primeira captura: as etiquetas aparecem aqui.
+              {t.node("marquee.emptyBody", {
+                extension: (
+                  <Link href="/extensao" className="link-quiet text-white">
+                    {t("marquee.extension")}
+                  </Link>
+                ),
+              })}
             </p>
           </>
         )}
@@ -104,6 +106,7 @@ function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
 }
 
 export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }: Props) {
+  const t = useT();
   const list = tags ?? [];
   const lv = useMemo(() => levels(list), [list]);
   const lanes = useMemo(() => {
@@ -121,7 +124,7 @@ export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }:
   if (!tags.length) return <EmptyHero libraryTotal={libraryTotal} />;
 
   return (
-    <div ref={root} className="marquee flex flex-col gap-2.5 py-2" role="group" aria-label="Etiquetas">
+    <div ref={root} className="marquee flex flex-col gap-2.5 py-2" role="group" aria-label={t("gallery.tags")}>
       {lanes.map((lane, i) => (
         <div key={i} className="marquee-row overflow-hidden py-1" data-dir={i % 2 ? "rtl" : "ltr"}>
           <div className="marquee-track">
@@ -129,22 +132,22 @@ export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }:
             {[0, 1].map((copy) => (
               <div key={copy} className="marquee-run" aria-hidden={copy === 1 || undefined}>
                 {Array.from({ length: lane.reps }, (_, rep) =>
-                  lane.tags.map((t) => {
+                  lane.tags.map((tag) => {
                     const primary = copy === 0 && rep === 0; // only one focusable instance per tag
                     return (
                       <button
-                        key={`${t.tag}-${rep}`}
+                        key={`${tag.tag}-${rep}`}
                         type="button"
                         className="tag focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white/70"
-                        data-level={lv.get(t.tag)}
-                        aria-pressed={selected.includes(t.tag)}
+                        data-level={lv.get(tag.tag)}
+                        aria-pressed={selected.includes(tag.tag)}
                         aria-hidden={primary ? undefined : true}
                         tabIndex={primary ? 0 : -1}
-                        onClick={() => onToggle(t.tag)}
+                        onClick={() => onToggle(tag.tag)}
                       >
-                        {t.tag}
-                        <span className="tag-count" aria-label={`, ${t.count} capturas`}>
-                          {t.count}
+                        {tag.tag}
+                        <span className="tag-count" aria-label={t("marquee.count", { count: tag.count })}>
+                          {tag.count}
                         </span>
                       </button>
                     );

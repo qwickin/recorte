@@ -1,8 +1,9 @@
 import { Button } from "@heroui/react";
-import { type Category, type ItemType, normalizeTags } from "@recorte/shared";
+import { type Category, normalizeTags } from "@recorte/shared";
 import { createContext, use, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { api, type Filters } from "../api";
-import { COLORS, typeLabel } from "../lib/text";
+import { type Msg, msgText, useFormat, useT } from "../i18n";
+import { COLORS, colorKey, isColorName, ITEM_TYPES, typeKey } from "../lib/text";
 import { CloseIcon, SelectIcon } from "./icons";
 
 // The floating bottom Dock: filters (+ "Selecionar") or, while selecting, the bulk actions. Both render
@@ -26,10 +27,11 @@ function DockShell({ label, role, children }: { label: string; role?: string; ch
 const PANEL_W = 300;
 const CLOSE_MS = 150;
 
-const dateLabel = (iso: string) => new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${iso}T12:00:00`));
+const DATE_CHIP: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
 
 /** One chip that opens a panel above the Dock; shows the active value and a clear button once set. */
 function FilterMenu({ label, value, onClear, children }: { label: string; value?: string; onClear: () => void; children: (close: () => void) => ReactNode }) {
+  const t = useT();
   const shell = use(ShellContext);
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -74,7 +76,7 @@ function FilterMenu({ label, value, onClear, children }: { label: string; value?
           {value && <span className="max-w-[12ch] truncate text-white">{value}</span>}
         </button>
         {value && (
-          <button type="button" onClick={onClear} aria-label={`Remover filtro ${label}`} className="filter-chip-x">
+          <button type="button" onClick={onClear} aria-label={t("dock.removeFilter", { label })} className="filter-chip-x">
             <CloseIcon width={13} height={13} />
           </button>
         )}
@@ -100,15 +102,18 @@ type FilterProps = {
 };
 
 export function FilterDock({ filters: f, onChange, categories, sites, onSelect }: FilterProps) {
+  const t = useT();
+  const fmt = useFormat();
+  const dateLabel = (iso: string) => fmt.date(`${iso}T12:00:00`, DATE_CHIP);
   const set = (patch: Partial<Filters>) => onChange({ ...f, ...patch });
   const [siteDraft, setSiteDraft] = useState("");
   const category = categories.find((c) => c.id === f.category);
-  const range = f.from || f.to ? `${f.from ? dateLabel(f.from) : "…"} – ${f.to ? dateLabel(f.to) : "hoje"}` : undefined;
+  const range = f.from || f.to ? `${f.from ? dateLabel(f.from) : "…"} – ${f.to ? dateLabel(f.to) : t("dock.today")}` : undefined;
 
   return (
-    <DockShell label="Filtros" role="toolbar">
+    <DockShell label={t("dock.filters")} role="toolbar">
       <div className="dock-row">
-        <FilterMenu label="Site" value={f.site} onClear={() => set({ site: undefined })}>
+        <FilterMenu label={t("dock.site")} value={f.site} onClear={() => set({ site: undefined })}>
           {(close) => (
             <form
               onSubmit={(e) => {
@@ -120,7 +125,7 @@ export function FilterDock({ filters: f, onChange, categories, sites, onSelect }
               }}
               className="flex flex-col gap-1"
             >
-              <input autoFocus value={siteDraft} onChange={(e) => setSiteDraft(e.target.value)} placeholder="exemplo.pt" aria-label="Site" className={input} />
+              <input autoFocus value={siteDraft} onChange={(e) => setSiteDraft(e.target.value)} placeholder={t("dock.sitePlaceholder")} aria-label={t("dock.site")} className={input} />
               <div className="mt-1 max-h-60 overflow-y-auto">
                 {sites
                   .filter((s) => s.includes(siteDraft.trim().toLowerCase()))
@@ -135,45 +140,45 @@ export function FilterDock({ filters: f, onChange, categories, sites, onSelect }
           )}
         </FilterMenu>
 
-        <FilterMenu label="Tipo" value={f.type ? typeLabel[f.type] : undefined} onClear={() => set({ type: undefined })}>
+        <FilterMenu label={t("dock.type")} value={f.type ? t(typeKey(f.type)) : undefined} onClear={() => set({ type: undefined })}>
           {(close) =>
-            (Object.keys(typeLabel) as ItemType[]).map((t) => (
-              <button key={t} type="button" aria-current={f.type === t} className={option} onClick={() => (set({ type: t }), close())}>
-                {typeLabel[t]}
+            ITEM_TYPES.map((ty) => (
+              <button key={ty} type="button" aria-current={f.type === ty} className={option} onClick={() => (set({ type: ty }), close())}>
+                {t(typeKey(ty))}
               </button>
             ))
           }
         </FilterMenu>
 
-        <FilterMenu label="Cor" value={f.color} onClear={() => set({ color: undefined })}>
+        <FilterMenu label={t("dock.color")} value={f.color && (isColorName(f.color) ? t(colorKey(f.color)) : f.color)} onClear={() => set({ color: undefined })}>
           {(close) => (
             <div className="grid grid-cols-2 gap-0.5">
               {COLORS.map((c) => (
                 <button key={c.name} type="button" aria-current={f.color === c.name} className={option} onClick={() => (set({ color: c.name }), close())}>
                   <span className="h-3.5 w-3.5 shrink-0 rounded-full ring-1 ring-white/20" style={{ background: c.hex }} />
-                  {c.name}
+                  {t(colorKey(c.name))}
                 </button>
               ))}
             </div>
           )}
         </FilterMenu>
 
-        <FilterMenu label="Data" value={range} onClear={() => set({ from: undefined, to: undefined })}>
+        <FilterMenu label={t("dock.date")} value={range} onClear={() => set({ from: undefined, to: undefined })}>
           {() => (
             <div className="flex flex-col gap-2 p-1 text-[12.5px] text-[var(--ink-3)]">
               <label className="flex flex-col gap-1">
-                Desde
+                {t("dock.from")}
                 <input type="date" value={f.from ?? ""} max={f.to} onChange={(e) => set({ from: e.target.value || undefined })} className={input} />
               </label>
               <label className="flex flex-col gap-1">
-                Até
+                {t("dock.to")}
                 <input type="date" value={f.to ?? ""} min={f.from} onChange={(e) => set({ to: e.target.value || undefined })} className={input} />
               </label>
             </div>
           )}
         </FilterMenu>
 
-        <FilterMenu label="Categoria" value={category?.name ?? (f.category ? "…" : undefined)} onClear={() => set({ category: undefined })}>
+        <FilterMenu label={t("dock.category")} value={category?.name ?? (f.category ? "…" : undefined)} onClear={() => set({ category: undefined })}>
           {(close) =>
             categories.length ? (
               categories.map((c) => (
@@ -182,14 +187,14 @@ export function FilterDock({ filters: f, onChange, categories, sites, onSelect }
                 </button>
               ))
             ) : (
-              <p className="px-2.5 py-2 text-[13px] text-[var(--ink-3)]">Ainda não tens categorias. Cria-as no detalhe de uma captura ou nas definições.</p>
+              <p className="px-2.5 py-2 text-[13px] text-[var(--ink-3)]">{t("dock.noCategories")}</p>
             )
           }
         </FilterMenu>
       </div>
       <span className="dock-sep" aria-hidden="true" />
-      <button type="button" onClick={onSelect} className="dock-action" aria-label="Selecionar capturas">
-        <SelectIcon /> <span className="max-sm:sr-only">Selecionar</span>
+      <button type="button" onClick={onSelect} className="dock-action" aria-label={t("dock.selectLabel")}>
+        <SelectIcon /> <span className="max-sm:sr-only">{t("dock.select")}</span>
       </button>
     </DockShell>
   );
@@ -198,7 +203,6 @@ export function FilterDock({ filters: f, onChange, categories, sites, onSelect }
 /** The server's /api/items/bulk limit; larger selections go in several requests. */
 const BULK_MAX = 200;
 const chunks = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
-export const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
 type SelectionProps = {
   ids: string[];
@@ -209,12 +213,13 @@ type SelectionProps = {
 };
 
 export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }: SelectionProps) {
+  const t = useT();
   const [tag, setTag] = useState("");
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<Msg | null>(null);
   const none = ids.length === 0;
 
-  const run = async (fn: () => Promise<string[]>, ok: (n: number) => string, refresh = false) => {
+  const run = async (fn: () => Promise<string[]>, ok: (n: number) => Msg, refresh = false) => {
     setBusy(true);
     setMsg(null);
     try {
@@ -222,7 +227,7 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
       setMsg(ok(ids.length));
       onDone(removed, refresh);
     } catch {
-      setMsg("Algo falhou. Tenta de novo.");
+      setMsg({ key: "dock.failed", error: true });
     } finally {
       setBusy(false);
     }
@@ -233,7 +238,7 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
       const done: string[] = [];
       for (const part of chunks(ids, BULK_MAX)) done.push(...(await api.bulk({ ids: part, action: "delete" })).ids);
       return done;
-    }, (n) => `${plural(n, "captura movida", "capturas movidas")} para o lixo`);
+    }, (n) => ({ key: "dock.deleted", vars: { count: n } }));
 
   // PATCH replaces user.tags, so each item is merged on its own (summary tags also hold AI tags).
   const addTag = () => {
@@ -248,28 +253,28 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
         await api.patchItem(id, { tags: merged, ...(unhide.length !== m.user.hiddenAiTags.length ? { hiddenAiTags: unhide } : {}) });
       }
       return [];
-    }, (n) => `“${add[0]}” juntada a ${plural(n, "captura", "capturas")}`);
+    }, (n) => ({ key: "dock.tagAdded", vars: { tag: add[0]!, count: n } }));
   };
 
   const setCategory = (categoryId: string) =>
     run(async () => {
       for (const part of chunks(ids, BULK_MAX)) await api.bulk({ ids: part, action: "patch", patch: { categoryId: categoryId || null } });
       return [];
-    }, (n) => `Categoria mudada em ${plural(n, "captura", "capturas")}`, true);
+    }, (n) => ({ key: "dock.categoryChanged", vars: { count: n } }), true);
 
   return (
-    <DockShell label="Ações para as capturas selecionadas" role="toolbar">
+    <DockShell label={t("dock.selectionLabel")} role="toolbar">
       <div className="dock-selection">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="shrink-0 pl-2 text-[13.5px] text-white tabular-nums">{none ? "Escolhe capturas" : plural(ids.length, "selecionada", "selecionadas")}</span>
+          <span className="shrink-0 pl-2 text-[13.5px] text-white tabular-nums">{none ? t("dock.pick") : t("dock.selected", { count: ids.length })}</span>
           <button type="button" onClick={onSelectAll} className="dock-link">
-            Todas
+            {t("dock.all")}
           </button>
           <span className="min-w-0 truncate text-[12.5px] text-[var(--ink-3)] max-sm:sr-only" aria-live="polite">
-            {msg}
+            {msgText(t, msg)}
           </span>
           <button type="button" onClick={onCancel} className="dock-link ml-auto sm:hidden">
-            Cancelar
+            {t("common.cancel")}
           </button>
         </div>
         <div className="flex min-w-0 items-center gap-2">
@@ -283,18 +288,18 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
             <input
               value={tag}
               onChange={(e) => setTag(e.target.value)}
-              placeholder="Juntar etiqueta"
-              aria-label="Juntar etiqueta"
+              placeholder={t("dock.addTag")}
+              aria-label={t("dock.addTag")}
               maxLength={40}
               disabled={none || busy}
               className="dock-field w-full sm:w-36"
             />
           </form>
-          <select aria-label="Mudar categoria" value="__" disabled={none || busy} onChange={(e) => setCategory(e.target.value)} className="dock-field max-w-[9.5rem] text-[var(--ink-2)] [color-scheme:dark]">
+          <select aria-label={t("dock.changeCategory")} value="__" disabled={none || busy} onChange={(e) => setCategory(e.target.value)} className="dock-field max-w-[9.5rem] text-[var(--ink-2)] [color-scheme:dark]">
             <option value="__" disabled>
-              Categoria…
+              {t("dock.categoryPlaceholder")}
             </option>
-            <option value="">Sem categoria</option>
+            <option value="">{t("common.noCategory")}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -302,10 +307,10 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
             ))}
           </select>
           <Button size="sm" variant="danger-soft" isDisabled={none || busy} onPress={del} className="dock-danger shrink-0">
-            Apagar
+            {t("common.delete")}
           </Button>
           <button type="button" onClick={onCancel} className="dock-link max-sm:hidden">
-            Cancelar
+            {t("common.cancel")}
           </button>
         </div>
       </div>

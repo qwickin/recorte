@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useT } from "../i18n";
 import { clampView, initialView, isZoomed, panBy, pinchView, sameView, wheelFactor, zoomAt, type Point, type Size, type View } from "../lib/zoom";
 
 type Props = {
@@ -26,6 +27,7 @@ const reduced = () => typeof matchMedia === "function" && matchMedia("(prefers-r
  * from a rAF loop (no React render per frame).
  */
 export function ZoomImage({ src, alt, width, height }: Props) {
+  const t = useT();
   const box = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLImageElement>(null);
   const natural = useRef<Size | null>(width && height ? { w: width, h: height } : null);
@@ -234,7 +236,7 @@ export function ZoomImage({ src, alt, width, height }: Props) {
       data-dragging={dragging || undefined}
       tabIndex={0}
       role="img"
-      aria-label={`${alt}. Roda do rato ou + e − para fazer zoom, 0 para repor.`}
+      aria-label={t("zoom.label", { alt })}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -255,7 +257,7 @@ export function ZoomImage({ src, alt, width, height }: Props) {
         style={n ? { width: n.w, height: n.h } : undefined}
       />
       <p className="zoom-hint" data-hidden={!hint || !ready || undefined} aria-hidden="true">
-        {touch ? "Junta dois dedos para fazer zoom" : "Usa a roda do rato para fazer zoom"}
+        {touch ? t("zoom.hintTouch") : t("zoom.hintMouse")}
       </p>
     </div>
   );

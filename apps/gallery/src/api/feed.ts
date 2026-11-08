@@ -65,7 +65,8 @@ export type FeedState = {
   loading: boolean;
   stale: boolean; // showing the previous filter's items while the new first page loads
   total: number | null;
-  error: string | null;
+  /** A code, not copy: the page shows its own translated message. */
+  error: "load_failed" | null;
 };
 
 export const INITIAL_FEED: FeedState = { items: [], hasMore: true, loading: false, stale: false, total: null, error: null };
@@ -106,7 +107,7 @@ export function createFeedLoader(
       set({ items: mergePage(state.items, page, reset), hasMore: !p.done, loading: false, stale: false, total: page.total, error: null });
     } catch (e) {
       if (p !== pager || (e as Error).name === "AbortError") return;
-      set({ ...state, loading: false, stale: false, error: "Não foi possível carregar mais capturas." });
+      set({ ...state, loading: false, stale: false, error: "load_failed" });
     }
   }
 

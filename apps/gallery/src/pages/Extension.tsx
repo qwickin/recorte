@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { Devices } from "../components/Devices";
 import { Page, Section } from "../components/Page";
+import { useT } from "../i18n";
 
 export function ExtensionPage() {
+  const t = useT();
   const [info, setInfo] = useState<ExtensionInfo | null>(null);
   const [devices, setDevices] = useState<Device[] | null>(null);
 
@@ -18,49 +20,37 @@ export function ExtensionPage() {
   const server = window.location.origin;
 
   return (
-    <Page title="Extensão" intro="A extensão captura áreas, a parte visível ou a página inteira e envia tudo para este servidor.">
-      <Section title="Descarregar" description={info ? `Versão ${info.version}` : undefined}>
+    <Page title={t("extension.title")} intro={t("extension.intro")}>
+      <Section title={t("extension.download")} description={info ? t("common.version", { version: info.version }) : undefined}>
         <div className="flex flex-wrap gap-3">
           <a href={info?.chromeZip ?? "/downloads/recorte-chrome.zip"} download className={buttonVariants({ variant: "primary" })}>
-            Descarregar para Chrome (ZIP){v}
+            {t("extension.downloadChrome", { version: v })}
           </a>
           <a href={info?.firefoxZip ?? "/downloads/recorte-firefox.zip"} download className={buttonVariants({ variant: "outline" })}>
-            Descarregar para Firefox (ZIP){v}
+            {t("extension.downloadFirefox", { version: v })}
           </a>
         </div>
       </Section>
 
-      <Section title="Instalar">
+      <Section title={t("extension.install")}>
         <div className="grid gap-6 sm:grid-cols-2">
           <ol className="steps">
-            <li className="text-white">Chrome, Edge, Brave</li>
-            <li>Descompacta o ZIP numa pasta que vais manter.</li>
-            <li>
-              Abre <code>chrome://extensions</code> e liga o <em>Modo de programador</em>.
-            </li>
-            <li>
-              Carrega em <em>Carregar expandida</em> e escolhe a pasta.
-            </li>
+            <li className="text-white">{t("install.chromeTitle")}</li>
+            <li>{t("install.unzip")}</li>
+            <li>{t.node("install.chromeOpen", { url: <code>chrome://extensions</code>, devMode: <em>{t("install.devMode")}</em> })}</li>
+            <li>{t.node("install.chromeLoad", { loadUnpacked: <em>{t("install.loadUnpacked")}</em> })}</li>
           </ol>
           <ol className="steps">
             <li className="text-white">Firefox</li>
-            <li>
-              Abre <code>about:debugging#/runtime/this-firefox</code>.
-            </li>
-            <li>
-              Carrega em <em>Carregar extra temporário</em> e escolhe o ZIP.
-            </li>
-            <li className="text-[var(--ink-3)]">
-              Um extra temporário sai quando o Firefox fecha; repete este passo depois de reiniciar.
-            </li>
+            <li>{t.node("install.firefoxOpen", { url: <code>about:debugging#/runtime/this-firefox</code> })}</li>
+            <li>{t.node("install.firefoxLoad", { loadTemporary: <em>{t("install.loadTemporary")}</em> })}</li>
+            <li className="text-[var(--ink-3)]">{t("install.firefoxTemporary")}</li>
           </ol>
         </div>
-        <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">
-          Nas opções da extensão, indica o servidor <code>{server}</code>, o teu email e a palavra-passe.
-        </p>
+        <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">{t.node("extension.optionsHint", { server: <code>{server}</code> })}</p>
       </Section>
 
-      <Section title="Dispositivos ligados" description="Cada navegador com a extensão aparece aqui, com a versão instalada.">
+      <Section title={t("extension.devices")} description={t("extension.devicesDescription")}>
         <Devices devices={devices} latest={info?.version} />
       </Section>
     </Page>

@@ -6,6 +6,7 @@ import { ExtensionPage } from "./pages/Extension";
 import { GalleryPage } from "./pages/Gallery";
 import { SettingsPage } from "./pages/Settings";
 import { TrashPage } from "./pages/Trash";
+import { type MessageKey, useT } from "./i18n";
 import { navigate, usePath } from "./lib/router";
 
 const PAGES: Record<string, () => React.JSX.Element> = {
@@ -15,13 +16,13 @@ const PAGES: Record<string, () => React.JSX.Element> = {
   "/lixo": TrashPage,
 };
 
-const TITLES: Record<string, string> = {
-  "/": "Recorte",
-  "/extensao": "Extensão · Recorte",
-  "/definicoes": "Definições · Recorte",
-  "/lixo": "Lixo · Recorte",
-  "/login": "Entrar · Recorte",
-  "/setup": "Configurar · Recorte",
+// The URL slugs stay as they were: installed extensions link to /extensao.
+const TITLES: Record<string, MessageKey> = {
+  "/extensao": "title.extension",
+  "/definicoes": "title.settings",
+  "/lixo": "title.trash",
+  "/login": "title.login",
+  "/setup": "title.setup",
 };
 
 /** Signed-in pages: first-run goes to /setup, no session goes to /login (the client redirects on 401). */
@@ -52,11 +53,12 @@ function Private({ path }: { path: string }) {
 }
 
 function NotFound() {
+  const t = useT();
   return (
     <main className="hero-light flex min-h-dvh flex-col items-center justify-center gap-4 text-center">
-      <p className="text-[30px] font-extralight text-white">Esta página não existe.</p>
+      <p className="text-[30px] font-extralight text-white">{t("notFound.title")}</p>
       <a href="/" className="text-[14px] text-[var(--ink-2)] underline decoration-white/30 underline-offset-4" onClick={(e) => (e.preventDefault(), navigate("/"))}>
-        Voltar à galeria
+        {t("notFound.back")}
       </a>
     </main>
   );
@@ -64,9 +66,11 @@ function NotFound() {
 
 export default function App() {
   const path = usePath();
+  const t = useT();
+  const title = TITLES[path];
   useEffect(() => {
-    document.title = TITLES[path] ?? "Recorte";
-  }, [path]);
+    document.title = title ? t(title) : "Recorte";
+  }, [title, t]);
   if (path === "/login") return <LoginPage />;
   if (path === "/setup") return <SetupPage />;
   // Leaving /login or /setup mounts this afresh, so the session check runs again.

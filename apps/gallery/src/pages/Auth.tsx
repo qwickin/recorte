@@ -4,16 +4,21 @@ import { API } from "@recorte/shared";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { ApiError, api } from "../api";
 import { CropMark } from "../components/icons";
+import { LanguageSelect } from "../components/LanguageSelect";
 import { inputClass } from "../components/Page";
 import { ServerSettingsForm } from "../components/ServerSettingsForm";
+import { type MessageKey, useT } from "../i18n";
 import { navigate } from "../lib/router";
 
 function AuthCard({ title, intro, children, wide }: { title: string; intro: ReactNode; children: ReactNode; wide?: boolean }) {
   return (
     <main className="hero-light flex min-h-dvh items-center justify-center px-4 py-16">
       <div className={`fade-in w-full ${wide ? "max-w-[480px]" : "max-w-[380px]"}`}>
-        <div className="mb-10 flex items-center gap-2 text-[17px] font-light text-white">
-          <CropMark width={18} height={18} className="text-white/80" /> Recorte
+        <div className="mb-10 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-[17px] font-light text-white">
+            <CropMark width={18} height={18} className="text-white/80" /> Recorte
+          </div>
+          <LanguageSelect compact />
         </div>
         <h1 className="text-[30px] leading-tight font-extralight tracking-[-0.02em] text-white">{title}</h1>
         <p className="mt-2 mb-8 text-[14px] leading-relaxed text-[var(--ink-3)]">{intro}</p>
@@ -33,9 +38,10 @@ function Field({ label, ...p }: { label: string } & React.InputHTMLAttributes<HT
 }
 
 export function LoginPage() {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -50,33 +56,34 @@ export function LoginPage() {
       await api.login({ email: email.trim(), password });
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? "Email ou palavra-passe errados." : "Não foi possível entrar. Tenta de novo.");
+      setError(err instanceof ApiError && err.status === 401 ? "login.wrong" : "login.failed");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <AuthCard title="Entrar" intro="As tuas capturas ficam neste servidor. Entra com o teu email e a palavra-passe.">
+    <AuthCard title={t("login.title")} intro={t("login.intro")}>
       <form onSubmit={submit} className="flex flex-col gap-4">
-        <Field label="Email" type="email" name="email" autoComplete="username" inputMode="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Field label="Palavra-passe" type="password" name="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+        <Field label={t("common.email")} type="email" name="email" autoComplete="username" inputMode="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
+        <Field label={t("common.password")} type="password" name="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         <p className="min-h-5 text-[13px] text-[#ff8a8a]" role="alert">
-          {error}
+          {error && t(error)}
         </p>
         <Button type="submit" variant="primary" isDisabled={busy} className="h-11">
-          {busy ? "A entrar…" : "Entrar"}
+          {busy ? t("login.busy") : t("login.submit")}
         </Button>
       </form>
     </AuthCard>
   );
 }
 
-const STEPS = ["Conta", "Servidor", "Extensão"] as const;
+const STEPS: MessageKey[] = ["setup.stepAccount", "setup.stepServer", "setup.stepExtension"];
 
 function StepDots({ step }: { step: number }) {
+  const t = useT();
   return (
-    <ol className="mb-8 flex items-center gap-2" aria-label={`Passo ${step + 1} de ${STEPS.length}`}>
+    <ol className="mb-8 flex flex-wrap items-center gap-2" aria-label={t("setup.step", { step: step + 1, total: STEPS.length })}>
       {STEPS.map((name, i) => (
         <li key={name} className="flex items-center gap-2">
           <span
@@ -87,7 +94,7 @@ function StepDots({ step }: { step: number }) {
           >
             {i + 1}
           </span>
-          <span className={`text-[12.5px] ${i === step ? "text-white" : "text-[var(--ink-3)]"}`}>{name}</span>
+          <span className={`text-[12.5px] ${i === step ? "text-white" : "text-[var(--ink-3)]"}`}>{t(name)}</span>
           {i < STEPS.length - 1 && <span className="mx-1 h-px w-5 bg-white/15" aria-hidden />}
         </li>
       ))}
@@ -96,17 +103,18 @@ function StepDots({ step }: { step: number }) {
 }
 
 function AccountStep({ onDone, onClosed }: { onDone: () => void; onClosed: () => void }) {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError("Indica um email válido.");
-    if (password.length < 8) return setError("Usa pelo menos 8 caracteres na palavra-passe.");
-    if (password !== confirm) return setError("As palavras-passe não coincidem.");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setError("setup.invalidEmail");
+    if (password.length < 8) return setError("setup.shortPassword");
+    if (password !== confirm) return setError("setup.mismatch");
     setBusy(true);
     setError(null);
     try {
@@ -116,7 +124,7 @@ function AccountStep({ onDone, onClosed }: { onDone: () => void; onClosed: () =>
       const code = err instanceof ApiError ? err.code : "";
       if (code === "setup_closed") return onClosed();
       if (code === "already_set_up") return navigate("/login", { replace: true });
-      setError(code === "invalid_request" ? "Confirma o email e usa uma palavra-passe com pelo menos 8 caracteres." : "Não foi possível guardar. Tenta de novo.");
+      setError(code === "invalid_request" ? "setup.invalidRequest" : "common.saveFailed");
     } finally {
       setBusy(false);
     }
@@ -124,24 +132,24 @@ function AccountStep({ onDone, onClosed }: { onDone: () => void; onClosed: () =>
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <Field label="Email" type="email" name="email" autoComplete="username" inputMode="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
-      <Field label="Palavra-passe" type="password" name="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
-      <Field label="Confirmar palavra-passe" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+      <Field label={t("common.email")} type="email" name="email" autoComplete="username" inputMode="email" required autoFocus value={email} onChange={(e) => setEmail(e.target.value)} />
+      <Field label={t("common.password")} type="password" name="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+      <Field label={t("setup.confirmPassword")} type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
       <p className="text-[12.5px] leading-relaxed text-[var(--ink-3)]">
-        Servem para entrar na galeria e para ligar a extensão. O email é só o teu nome de utilizador: o servidor não envia emails. Se esqueceres a
-        palavra-passe, repõe-na no servidor com <code>recorte reset-password &lt;email&gt;</code>.
+        {t.node("setup.accountHelp", { command: <code>recorte reset-password &lt;email&gt;</code> })}
       </p>
       <p className="min-h-5 text-[13px] text-[#ff8a8a]" role="alert">
-        {error}
+        {error && t(error)}
       </p>
       <Button type="submit" variant="primary" isDisabled={busy} className="h-11">
-        {busy ? "A guardar…" : "Continuar"}
+        {busy ? t("common.saving") : t("setup.continue")}
       </Button>
     </form>
   );
 }
 
 function ExtensionStep() {
+  const t = useT();
   const server = window.location.origin;
   return (
     <div className="flex flex-col gap-6">
@@ -154,49 +162,48 @@ function ExtensionStep() {
         </a>
       </div>
       <ol className="steps">
-        <li className="text-white">Chrome, Edge, Brave</li>
-        <li>Descompacta o ZIP numa pasta que vais manter.</li>
+        <li className="text-white">{t("install.chromeTitle")}</li>
+        <li>{t("install.unzip")}</li>
         <li>
-          Abre <code>chrome://extensions</code>, liga o <em>Modo de programador</em> e carrega em <em>Carregar expandida</em>.
+          {t.node("install.chromeSetupStep", {
+            url: <code>chrome://extensions</code>,
+            devMode: <em>{t("install.devMode")}</em>,
+            loadUnpacked: <em>{t("install.loadUnpacked")}</em>,
+          })}
         </li>
       </ol>
       <ol className="steps">
         <li className="text-white">Firefox</li>
-        <li>
-          Abre <code>about:debugging#/runtime/this-firefox</code> e carrega em <em>Carregar extra temporário</em>.
-        </li>
+        <li>{t.node("install.firefoxSetupStep", { url: <code>about:debugging#/runtime/this-firefox</code>, loadTemporary: <em>{t("install.loadTemporary")}</em> })}</li>
       </ol>
       <p className="rounded-2xl border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-[13px] leading-relaxed text-[var(--ink-2)]">
-        Na extensão: URL público <code>{server}</code>, o teu email e a palavra-passe.
+        {t.node("setup.extensionHint", { server: <code>{server}</code> })}
       </p>
       <Button variant="secondary" className="h-11" onPress={() => navigate("/", { replace: true })}>
-        Abrir a galeria
+        {t("setup.openGallery")}
       </Button>
     </div>
   );
 }
 
 function SetupClosed() {
+  const t = useT();
   return (
     <div className="flex flex-col gap-4 text-[14px] leading-relaxed text-[var(--ink-2)]" role="alert">
-      <p>
-        A configuração inicial só fica aberta durante <b className="font-normal text-white">15 minutos</b> depois de o servidor arrancar, e esse tempo
-        já passou.
-      </p>
-      <p>
-        Reinicia o container (<code>docker restart recorte</code>, ou o nome que lhe deste) e volta a abrir esta página nos 15 minutos seguintes.
-      </p>
+      <p>{t.node("setup.closedBody", { minutes: <b className="font-normal text-white">{t("setup.closedMinutes")}</b> })}</p>
+      <p>{t.node("setup.closedRestart", { command: <code>docker restart recorte</code> })}</p>
     </div>
   );
 }
 
-const STEP_TEXT: { title: string; intro: string }[] = [
-  { title: "Bem-vindo ao Recorte", intro: "Cria a conta do dono: o teu email e uma palavra-passe." },
-  { title: "Servidor", intro: "Confirma o endereço com que abres o Recorte. A IA na cloud é opcional e podes mudá-la depois em Definições." },
-  { title: "Extensão", intro: "Instala a extensão no browser para começares a guardar capturas." },
+const STEP_TEXT: { title: MessageKey; intro: MessageKey }[] = [
+  { title: "setup.accountTitle", intro: "setup.accountIntro" },
+  { title: "setup.serverTitle", intro: "setup.serverIntro" },
+  { title: "setup.extensionTitle", intro: "setup.extensionIntro" },
 ];
 
 export function SetupPage() {
+  const t = useT();
   const [step, setStep] = useState<number | null>(null);
   const [closed, setClosed] = useState(false);
 
@@ -211,22 +218,27 @@ export function SetupPage() {
     );
   }, []);
 
-  if (step === null) return <AuthCard title="Configurar" intro="A verificar o servidor…">{null}</AuthCard>;
-  if (closed) return <AuthCard title="Configuração fechada" intro="Por segurança, o servidor só aceita a configuração inicial logo depois de arrancar."><SetupClosed /></AuthCard>;
+  if (step === null) return <AuthCard title={t("setup.title")} intro={t("setup.checking")}>{null}</AuthCard>;
+  if (closed)
+    return (
+      <AuthCard title={t("setup.closedTitle")} intro={t("setup.closedIntro")}>
+        <SetupClosed />
+      </AuthCard>
+    );
 
-  const t = STEP_TEXT[step]!;
+  const text = STEP_TEXT[step]!;
   return (
-    <AuthCard title={t.title} intro={t.intro} wide={step > 0}>
+    <AuthCard title={t(text.title)} intro={t(text.intro)} wide={step > 0}>
       <StepDots step={step} />
       {step === 0 && <AccountStep onDone={() => setStep(1)} onClosed={() => setClosed(true)} />}
       {step === 1 && (
         <ServerSettingsForm
           prefillOrigin
-          submitLabel="Guardar e continuar"
+          submitLabel={t("setup.saveContinue")}
           onSaved={() => setStep(2)}
           extraActions={
             <Button variant="ghost" className="h-11 text-[var(--ink-3)]" onPress={() => setStep(2)}>
-              Saltar
+              {t("setup.skip")}
             </Button>
           }
         />

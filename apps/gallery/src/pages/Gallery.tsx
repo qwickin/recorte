@@ -5,7 +5,7 @@ import { flushSync } from "react-dom";
 import { api, EMPTY_FILTERS, hasFilters, type Filters } from "../api";
 import { CaptureTile } from "../components/CaptureTile";
 import { CommandPalette } from "../components/CommandPalette";
-import { FilterDock, plural, SelectionDock } from "../components/Dock";
+import { FilterDock, SelectionDock } from "../components/Dock";
 import { isTyping, ItemModal } from "../components/ItemModal";
 import { Masonry } from "../components/Masonry";
 import { Sentinel } from "../components/Sentinel";
@@ -16,11 +16,11 @@ import { useItemFeed } from "../hooks/useItemFeed";
 import { displayTags, displayTitle, matchesFilters } from "../lib/item";
 import { inLoadedRange } from "../api/feed";
 import { takePaletteRequest } from "../lib/palette";
-import { isMac, typeLabel } from "../lib/text";
+import { useFormat, useT } from "../i18n";
+import { colorKey, isColorName, isMac, typeKey } from "../lib/text";
 
 const ratio = (c: ItemSummary) => (c.width > 0 ? c.height / c.width : 0.62);
 const keyOf = (c: ItemSummary) => c.id;
-const andList = new Intl.ListFormat("pt-PT", { type: "conjunction" });
 
 /**
  * Swaps the filters Dock and the selection Dock as one shared-layout morph: both carry
@@ -34,6 +34,8 @@ function morph(update: () => void) {
 }
 
 export function GalleryPage() {
+  const t = useT();
+  const fmt = useFormat();
   // null until the first response: the empty hero must not flash on every load.
   const [tags, setTags] = useState<TagCount[] | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -160,23 +162,25 @@ export function GalleryPage() {
     setTimeout(() => setDetail(c), 160); // let the palette leave first
   };
 
+  const colorLabel = (c: string) => (isColorName(c) ? t(colorKey(c)) : c);
+  const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? t("gallery.category");
   const chips: FilterChip[] = [
     ...filters.tags.map((t) => ({ key: `tag:${t}`, label: t, onRemove: () => toggleTag(t) })),
     ...(filters.site ? [{ key: "site", label: filters.site, onRemove: () => changeFilters({ ...filters, site: undefined }) }] : []),
-    ...(filters.type ? [{ key: "type", label: typeLabel[filters.type], onRemove: () => changeFilters({ ...filters, type: undefined }) }] : []),
-    ...(filters.color ? [{ key: "color", label: filters.color, onRemove: () => changeFilters({ ...filters, color: undefined }) }] : []),
+    ...(filters.type ? [{ key: "type", label: t(typeKey(filters.type)), onRemove: () => changeFilters({ ...filters, type: undefined }) }] : []),
+    ...(filters.color ? [{ key: "color", label: colorLabel(filters.color), onRemove: () => changeFilters({ ...filters, color: undefined }) }] : []),
     ...(filters.category
-      ? [{ key: "cat", label: categories.find((c) => c.id === filters.category)?.name ?? "categoria", onRemove: () => changeFilters({ ...filters, category: undefined }) }]
+      ? [{ key: "cat", label: categoryName(filters.category), onRemove: () => changeFilters({ ...filters, category: undefined }) }]
       : []),
-    ...(filters.from || filters.to ? [{ key: "date", label: "data", onRemove: () => changeFilters({ ...filters, from: undefined, to: undefined }) }] : []),
+    ...(filters.from || filters.to ? [{ key: "date", label: t("gallery.date"), onRemove: () => changeFilters({ ...filters, from: undefined, to: undefined }) }] : []),
   ];
 
   const describe = () => {
     const parts: string[] = [];
-    if (filters.tags.length) parts.push(`com ${andList.format(filters.tags)}`);
-    if (filters.site) parts.push(`de ${filters.site}`);
-    if (filters.color) parts.push(`em ${filters.color}`);
-    if (filters.category) parts.push(`em ${categories.find((c) => c.id === filters.category)?.name ?? "categoria"}`);
+    if (filters.tags.length) parts.push(t("gallery.withTags", { tags: fmt.list(filters.tags) }));
+    if (filters.site) parts.push(t("gallery.fromSite", { site: filters.site }));
+    if (filters.color) parts.push(t("gallery.inColor", { color: colorLabel(filters.color) }));
+    if (filters.category) parts.push(t("gallery.inCategory", { category: categoryName(filters.category) }));
     return parts.join(" ");
   };
 
@@ -227,14 +231,14 @@ export function GalleryPage() {
       <TopBar chips={chips} onClear={() => changeFilters(EMPTY_FILTERS)} onSearch={() => setPaletteOpen(true)} />
 
       <main className="mx-auto max-w-[1680px] pb-28">
-        <section className="hero-light -mx-4 px-4 pt-6 pb-6 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10" aria-label="Etiquetas">
+        <section className="hero-light -mx-4 px-4 pt-6 pb-6 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10" aria-label={t("gallery.tags")}>
           <TagMarquee tags={tags} selected={filters.tags} onToggle={toggleTag} libraryTotal={libraryTotal} />
           {/* Reserved while the tags load (no jump when they arrive); the empty hero brings its own copy. */}
           {(tags === null || tags.length > 0) && (
             <p aria-hidden={tags === null || undefined} className={`${tags === null ? "invisible" : "fade-in"} mx-auto mt-6 max-w-[62ch] text-center text-[14px] leading-relaxed text-[var(--ink-3)]`}>
-              {libraryTotal === null ? "…" : plural(libraryTotal, "captura", "capturas")} e {plural(tags?.length ?? 0, "etiqueta", "etiquetas")}. Clica numa etiqueta para filtrar
+              {t("gallery.summary", { captures: libraryTotal === null ? "…" : t("common.captures", { count: libraryTotal }), tags: tags?.length ?? 0 })}
               <span className="kbd-hint">
-                , ou carrega em <span className="text-[var(--ink-2)]">{isMac ? "⌘K" : "Ctrl K"}</span> para pesquisar pelo que te lembras da imagem
+                {t.node("gallery.summarySearch", { shortcut: <span className="text-[var(--ink-2)]">{isMac ? "⌘K" : "Ctrl K"}</span> })}
               </span>
               .
             </p>
@@ -245,7 +249,7 @@ export function GalleryPage() {
         <div className="flex min-h-10 items-center py-2 text-[13px] text-[var(--ink-3)]" aria-live="polite">
           {hasFilters(filters) && feed.total !== null && !feed.stale && (
             <span className="fade-in">
-              {plural(feed.total, "captura", "capturas")} {describe()}
+              {t("gallery.results", { count: feed.total, filters: describe() })}
             </span>
           )}
         </div>
@@ -274,24 +278,24 @@ export function GalleryPage() {
         <footer className="flex min-h-[160px] flex-col items-center justify-center gap-3 py-12 text-center">
           {feed.error && (
             <>
-              <p className="text-[14px] text-[var(--ink-2)]">{feed.error}</p>
+              <p className="text-[14px] text-[var(--ink-2)]">{t("gallery.loadFailed")}</p>
               <Button size="sm" variant="outline" onPress={feed.items.length ? feed.loadMore : feed.reload}>
-                Tentar de novo
+                {t("common.retry")}
               </Button>
             </>
           )}
           {!feed.error && !feed.loading && !feed.stale && feed.total === 0 && hasFilters(filters) && (
             <>
-              <p className="text-[15px] text-white/80">Nenhuma captura corresponde a estes filtros.</p>
+              <p className="text-[15px] text-white/80">{t("gallery.noMatch")}</p>
               <Button size="sm" variant="outline" onPress={() => (filters.tags.length ? toggleTag(filters.tags.at(-1)!) : changeFilters(EMPTY_FILTERS))}>
-                {filters.tags.length ? `Remover “${filters.tags.at(-1)}”` : "Limpar filtros"}
+                {filters.tags.length ? t("gallery.removeTag", { tag: filters.tags.at(-1)! }) : t("gallery.clearFilters")}
               </Button>
             </>
           )}
           {!feed.error && !feed.hasMore && !feed.loading && feed.items.length > 0 && (
             <p className="fade-in flex items-center gap-4 text-[13px] text-[var(--ink-3)]">
               <span className="h-px w-16 bg-gradient-to-r from-transparent to-white/20" />
-              Chegaste à primeira captura
+              {t("gallery.end")}
               <span className="h-px w-16 bg-gradient-to-l from-transparent to-white/20" />
             </p>
           )}
@@ -319,7 +323,7 @@ export function GalleryPage() {
       <ItemModal
         summary={detail}
         categories={categories}
-        onCategoryCreated={(c) => setCategories((cs) => [...cs, c].sort((a, b) => a.name.localeCompare(b.name, "pt")))}
+        onCategoryCreated={(c) => setCategories((cs) => [...cs, c].sort((a, b) => fmt.compare(a.name, b.name)))}
         onClose={() => setDetail(null)}
         onPrev={prev}
         onNext={next}
