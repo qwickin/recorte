@@ -1,5 +1,5 @@
 import type { Item, ItemPatch } from "@recorte/shared";
-import { normalizeTags } from "@recorte/shared";
+import { canonicalTags } from "@recorte/shared";
 import type { Deps } from "../deps";
 import type { SearchDoc } from "../search";
 import { displayTitle, displayedTags, itemsRepo, summaryFromMeta } from "./repo";
@@ -70,9 +70,10 @@ export function itemService(deps: Deps) {
       const user = { ...m.user };
       if (p.title !== undefined) user.title = p.title.trim() || undefined;
       if (p.note !== undefined) user.note = p.note.trim() || undefined;
-      if (p.tags !== undefined) user.tags = normalizeTags(p.tags);
+      // Typed text that is a label of an AI tag (any of the five languages) is stored as its ID (PATCH and bulk).
+      if (p.tags !== undefined) user.tags = canonicalTags(p.tags);
       if (p.categoryId !== undefined) user.categoryId = p.categoryId;
-      if (p.hiddenAiTags !== undefined) user.hiddenAiTags = normalizeTags(p.hiddenAiTags);
+      if (p.hiddenAiTags !== undefined) user.hiddenAiTags = canonicalTags(p.hiddenAiTags);
       if (user.title === undefined) delete user.title;
       if (user.note === undefined) delete user.note;
       const next: Item = { ...m, user, updatedAt: new Date().toISOString() };

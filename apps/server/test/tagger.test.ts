@@ -10,9 +10,9 @@ const page = (id: string) => dataset.find((r) => r.id === id)!;
 const tagger = createTopicTagger();
 
 describe("text tagger (shipped approach)", () => {
-  it("fluidfunctionalism.com/docs/surfaces: a UI components page, not just 'documentação'", async () => {
+  it("fluidfunctionalism.com/docs/surfaces: a UI components page, not just documentation", async () => {
     const tags = await tagItem(tagger, topicInput(page("ff-surfaces")), null);
-    expect(tags).toEqual(expect.arrayContaining(["componentes ui", "dialog", "dropdown", "sombras", "documentação"]));
+    expect(tags).toEqual(expect.arrayContaining(["ui components", "dialog", "dropdown", "shadows", "documentation"]));
   });
 
   it("screenshot evidence: the visual tags in the vocabulary are appended, up to 7", async () => {
@@ -21,6 +21,9 @@ describe("text tagger (shipped approach)", () => {
     const tags = await tagItem(tagger, input, { tipo: [], visual: ["não é etiqueta", "modo escuro"], scores: {} });
     expect(tags.slice(0, base.length)).toEqual(base);
     expect(tags).not.toContain("não é etiqueta");
+    // What comes out are tag IDs, never the internal pt-PT names.
+    expect(tags).toContain("dark mode");
+    expect(tags).not.toContain("modo escuro");
     expect(tags.length).toBeLessThanOrEqual(7);
   });
 });

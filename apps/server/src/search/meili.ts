@@ -1,4 +1,4 @@
-import { labelSynonyms } from "@recorte/ai";
+import { tagLabel, tagLabelsAll } from "@recorte/shared";
 import { type EnqueuedTaskPromise, Meilisearch } from "meilisearch";
 import type { Search, SearchDoc, SearchQuery, SearchResult } from "./index";
 
@@ -8,6 +8,7 @@ export const EMBEDDER_MODEL = "sentence-transformers/paraphrase-multilingual-Min
 const REQUEST_TIMEOUT_MS = 5_000;
 const SETTINGS_WAIT_MS = 10 * 60_000;
 
+/** The embedder's text. `tagWords` is the English label of each tag (compact: the 2000-byte budget is for the text). */
 export const DOCUMENT_TEMPLATE =
   "{{doc.title}}. {{doc.note}} {{doc.tagWords}} {{doc.keys}} {{doc.description}} {{doc.text|truncatewords: 120}}";
 
@@ -27,9 +28,15 @@ export function safeHighlight(s: string): string {
 /** Escapes a value for a Meilisearch filter string literal. */
 export const filterValue = (v: string): string => `"${v.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 
-/** Meilisearch document: tags also appear as pt label + English synonyms (`tagWords`); createdAt is epoch ms. */
+/**
+ * Meilisearch document. Two tag fields: `tags` holds the IDs (filterable, what the gallery filters on) and
+ * `tagLabels` the labels of every tag in all five languages (searchable: "receta" or "dark mode" find a recipe or
+ * a dark-mode capture whatever the viewer's language). A tag the person typed is in both as typed. `tagWords` (English
+ * labels) feeds the embedder's template. createdAt is epoch ms.
+ */
 export function toMeiliDoc(d: SearchDoc): Record<string, unknown> {
-  const tagWords = [...new Set(d.tags.flatMap((t) => labelSynonyms(t)))];
+  const tagLabels = [...new Set(d.tags.flatMap((t) => tagLabelsAll(t)))];
+  const tagWords = [...new Set(d.tags.map((t) => tagLabel(t, "en-US")))];
   return {
     id: d.id,
     userId: d.userId,
@@ -39,6 +46,7 @@ export function toMeiliDoc(d: SearchDoc): Record<string, unknown> {
     note: d.note,
     description: d.description,
     tags: d.tags,
+    tagLabels,
     tagWords,
     keys: d.keys,
     text: d.text,
@@ -82,6 +90,11 @@ export class MeiliSearch implements Search {
     if (done.status === "failed") throw new Error(`meili task failed: ${done.error?.message ?? "unknown"}`);
   }
 
+  /**
+   * Creates the index if needed and (re)applies the settings on every start, so an existing index picks up changed
+   * settings too (a new searchable field, a new template). Documents written before such a change are re-sent by
+   * the startup tag migration (an `index` job per live item).
+   */
   async ensureIndex(): Promise<void> {
     try {
       await this.client.getIndex(INDEX_UID);
@@ -90,7 +103,7 @@ export class MeiliSearch implements Search {
     }
     await this.wait(
       this.idx.updateSettings({
-        searchableAttributes: ["title", "note", "tagWords", "keys", "description", "text", "site"],
+        searchableAttributes: ["title", "note", "tagLabels", "keys", "description", "text", "site"],
         filterableAttributes: ["userId", "type", "site", "tags", "categoryId", "colors", "createdAt"],
         sortableAttributes: ["createdAt"],
         embedders: {

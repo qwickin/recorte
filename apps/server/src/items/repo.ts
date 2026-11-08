@@ -1,4 +1,4 @@
-import { type Item, type ItemPage, type ItemSummary, type ListQuery, type TagCount, aiTags, normalizeTags } from "@recorte/shared";
+import { type Item, type ItemPage, type ItemSummary, type ListQuery, type TagCount, aiTags, canonicalTags } from "@recorte/shared";
 import type { Db } from "../db";
 
 export class BadCursor extends Error {}
@@ -140,7 +140,7 @@ export function itemsRepo(db: Db) {
     list(userId: string, q: ListQuery): ItemPage {
       const where = ["i.user_id = ?", q.trash ? "i.deleted_at IS NOT NULL" : "i.deleted_at IS NULL"];
       const params: (string | number)[] = [userId];
-      const tags = normalizeTags(q.tags ?? []);
+      const tags = canonicalTags(q.tags ?? []);
       if (tags.length) {
         where.push(
           `i.id IN (SELECT item_id FROM item_tags WHERE tag IN (${tags.map(() => "?").join(",")}) GROUP BY item_id HAVING COUNT(DISTINCT tag) = ?)`,

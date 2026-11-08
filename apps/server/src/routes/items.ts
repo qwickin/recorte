@@ -1,5 +1,5 @@
 import { extractColors } from "@recorte/ai";
-import { type Item, ItemPatch, ListQuery, UploadMeta, normalizeTags } from "@recorte/shared";
+import { type Item, ItemPatch, ListQuery, UploadMeta, canonicalTags } from "@recorte/shared";
 import type { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { z } from "zod";
@@ -96,7 +96,8 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
         user: {
           ...(parsed.title?.trim() ? { title: parsed.title.trim() } : {}),
           ...(parsed.note?.trim() ? { note: parsed.note.trim() } : {}),
-          tags: normalizeTags(parsed.tags),
+          // A typed tag that is the label of an AI tag (any language) is stored as its ID.
+          tags: canonicalTags(parsed.tags),
           categoryId: parsed.categoryId,
           hiddenAiTags: [],
         },

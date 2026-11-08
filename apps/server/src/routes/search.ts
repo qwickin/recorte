@@ -1,4 +1,4 @@
-import { ListQuery, type SearchHit, normalizeTags } from "@recorte/shared";
+import { ListQuery, type SearchHit, canonicalTags } from "@recorte/shared";
 import type { Hono } from "hono";
 import { z } from "zod";
 import { type AppEnv, requireUser } from "../auth/middleware";
@@ -19,7 +19,7 @@ export function searchRoutes(app: Hono<AppEnv>, deps: Deps): void {
     const userId = c.var.userId; // always the session's user, never a query parameter
     let results;
     try {
-      results = await deps.search.search({ ...p.data, userId, tags: normalizeTags(p.data.tags ?? []) });
+      results = await deps.search.search({ ...p.data, userId, tags: canonicalTags(p.data.tags ?? []) });
     } catch (e) {
       console.warn("search failed:", (e as Error).message);
       return c.json({ error: "search_unavailable" }, 503);

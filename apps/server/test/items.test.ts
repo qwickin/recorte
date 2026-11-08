@@ -86,10 +86,10 @@ describe("items", () => {
     expect((await get(t, "/api/items?cursor=!!!", cookie)).status).toBe(400);
   });
 
-  it("tags AND filter, normalised on upload", async () => {
+  it("tags AND filter, normalised on upload (labels of AI tags, in any language, become their ID)", async () => {
     const { t, cookie } = await setup();
-    const a = (await (await upload(t, cookie, { tags: [" Lisboa ", "lisboa", "Modo  Escuro"] })).json()) as ItemSummary;
-    expect(a.tags).toEqual(["lisboa", "modo escuro"]);
+    const a = (await (await upload(t, cookie, { tags: [" Lisboa ", "lisbon", "Modo  Escuro", "Viagem  2024"] })).json()) as ItemSummary;
+    expect(a.tags).toEqual(["lisbon", "dark mode", "viagem 2024"]);
     await upload(t, cookie, { tags: ["lisboa"] });
     const both = (await (await get(t, "/api/items?tags=lisboa,modo%20escuro", cookie)).json()) as { items: ItemSummary[]; total: number };
     expect(both.items.map((i) => i.id)).toEqual([a.id]);
@@ -154,12 +154,16 @@ describe("items", () => {
     storage.writeMeta(m);
     itemsRepo(t.db).upsertFromMeta(m);
     const counts = async () => (await (await get(t, "/api/tags", cookie)).json()) as { tag: string; count: number; origin: string }[];
-    expect((await counts()).map((c) => c.tag).sort()).toEqual(["lisboa", "mapa", "modo escuro"]);
-    expect((await counts()).find((c) => c.tag === "mapa")!.origin).toBe("ai");
+    // The screenshot fallback (raw tipo/visual keys) shows as tag IDs; the typed "lisboa" is the ID too.
+    expect((await counts()).map((c) => c.tag).sort()).toEqual(["dark mode", "lisbon", "map"]);
+    expect((await counts()).find((c) => c.tag === "map")!.origin).toBe("ai");
+    expect((await counts()).find((c) => c.tag === "lisbon")!.origin).toBe("user");
+    // Hiding by a label (here pt-BR "Mapa") stores the ID.
     await send(t, "PATCH", `/api/items/${a.id}`, cookie, { hiddenAiTags: ["Mapa"] });
-    expect((await counts()).map((c) => c.tag).sort()).toEqual(["lisboa", "modo escuro"]);
+    expect(storage.readMeta(row.user_id, a.id)!.user.hiddenAiTags).toEqual(["map"]);
+    expect((await counts()).map((c) => c.tag).sort()).toEqual(["dark mode", "lisbon"]);
     const s = (await (await get(t, "/api/items", cookie)).json()) as { items: ItemSummary[] };
-    expect(s.items[0]!.tags).toEqual(["lisboa", "modo escuro"]);
+    expect(s.items[0]!.tags).toEqual(["lisbon", "dark mode"]);
   });
 
   it("delete then restore", async () => {
@@ -210,6 +214,22 @@ describe("items", () => {
     await send(t, "POST", "/api/items/bulk", cookie, { ids: [a.id], action: "patch", patch: { tags: ["x"] } });
     const p = (await (await get(t, "/api/items?tags=x", cookie)).json()) as { items: ItemSummary[] };
     expect(p.items.map((i) => i.id)).toEqual([a.id]);
+  });
+
+  it("typed tags become IDs at PATCH and bulk too (labels only, never the tagger's aliases); filters accept labels", async () => {
+    const { t, cookie } = await setup();
+    const a = (await (await upload(t, cookie)).json()) as ItemSummary;
+    const b = (await (await upload(t, cookie)).json()) as ItemSummary;
+    const r = await send(t, "PATCH", `/api/items/${a.id}`, cookie, { tags: ["Modo Escuro", "receta", "telemóvel", "dark mode"], hiddenAiTags: ["Lisbonne"] });
+    const m = (await r.json()) as { user: { tags: string[]; hiddenAiTags: string[] } };
+    expect(m.user.tags).toEqual(["dark mode", "recipe", "telemóvel"]);
+    expect(m.user.hiddenAiTags).toEqual(["lisbon"]);
+    await send(t, "POST", "/api/items/bulk", cookie, { ids: [b.id], action: "patch", patch: { tags: ["Mode sombre", "Ricetta"] } });
+    const both = (await (await get(t, "/api/items?tags=modo%20oscuro,recette", cookie)).json()) as { items: ItemSummary[] };
+    expect(both.items.map((i) => i.id).sort()).toEqual([a.id, b.id].sort());
+    const counts = (await (await get(t, "/api/tags", cookie)).json()) as { tag: string; count: number }[];
+    expect(counts.find((c) => c.tag === "dark mode")!.count).toBe(2);
+    expect(counts.some((c) => c.tag === "modo escuro" || c.tag === "mode sombre")).toBe(false);
   });
 
   it("files route: 401 without auth, 404 for unknown names, traversal and other users", async () => {

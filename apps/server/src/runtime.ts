@@ -7,6 +7,7 @@ import { createPipeline } from "./pipeline";
 import type { SqliteQueue } from "./queue";
 import type { Search } from "./search";
 import { effectiveSettings } from "./settings";
+import { migrateTagIds } from "./tag-migration";
 
 /** Loads the model on first use, once; a failed load is retried on the next job. */
 export function lazyClassifier(load: () => Promise<Classifier>): () => Promise<Classifier> {
@@ -94,6 +95,9 @@ export function startRuntime(deps: Deps & { queue: SqliteQueue }, opts: { classi
       },
     },
   });
+  // Order matters: tags become IDs (user tags and hidden AI tags included) before any job can run, then the
+  // tagger upgrade re-tags into IDs, then the worker starts.
+  migrateTagIds(deps);
   retagOutdated(deps);
   worker.start();
 

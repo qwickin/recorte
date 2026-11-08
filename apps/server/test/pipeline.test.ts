@@ -63,8 +63,8 @@ describe("pipeline", () => {
     // raw screenshot output is kept; the shown AI tags are the text tagger's + the visual tags
     expect(m.ai.tipo).toEqual(["mapa"]);
     expect(m.ai.visual).toEqual(["modo escuro"]);
-    expect(m.ai.topics).toEqual(expect.arrayContaining(["lisboa", "mapa", "modo escuro"]));
-    expect(m.ai.model).toContain("topics-v1");
+    expect(m.ai.topics).toEqual(expect.arrayContaining(["lisbon", "map", "dark mode"]));
+    expect(m.ai.model).toContain("topics-v2");
     expect(m.ai.keys.length).toBeGreaterThan(0);
     expect(m.ai.keys.some((k) => k.includes("lisboa"))).toBe(true);
     expect(m.ai.processedAt).not.toBeNull();
@@ -75,7 +75,7 @@ describe("pipeline", () => {
     expect(row.title).toBe("O meu título");
     const tags = (t.db.prepare("SELECT tag FROM item_tags WHERE item_id = ? ORDER BY pos").all(a.id) as { tag: string }[]).map((r) => r.tag);
     expect(tags).toEqual(["viagem", "novo", ...m.ai.topics!]);
-    expect(search.docs.get(a.id)?.tags).toContain("mapa");
+    expect(search.docs.get(a.id)?.tags).toContain("map");
     expect(events).toContain("item.updated");
   });
 
@@ -134,7 +134,7 @@ describe("pipeline", () => {
     // Restore brings it back with the AI tags.
     await t.app.request(`/api/items/${a.id}/restore`, { method: "POST", headers: { cookie } });
     const list = (await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { items: ItemSummary[] };
-    expect(list.items.find((i) => i.id === a.id)?.tags).toContain("mapa");
+    expect(list.items.find((i) => i.id === a.id)?.tags).toContain("map");
   });
 
   it("cloud step adds title/description/keys; a cloud failure does not fail the job", async () => {
@@ -322,7 +322,7 @@ describe("admin", () => {
     expect(await res.json()).toEqual({ items: 2, removed: 1, indexed: true, adopted: 0, unreadable: 0 });
     const after = (await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { items: ItemSummary[] };
     expect(after.items).toEqual(snapshot.items);
-    expect(after.items[0]!.tags).toEqual(["viagem", "lisboa", "mapa", "cidade"]);
+    expect(after.items[0]!.tags).toEqual(["viagem", "lisbon", "map", "city"]);
     expect((t.db.prepare("SELECT COUNT(*) AS n FROM item_colors WHERE item_id = ?").get(a.id) as { n: number }).n).toBeGreaterThan(0);
     const trash = (await (await t.app.request("/api/items?trash=1", { headers: { cookie } })).json()) as { total: number };
     expect(trash.total).toBe(1);
@@ -440,11 +440,13 @@ describe("meili helpers", () => {
     expect(f.filter((x) => x.startsWith("userId"))).toHaveLength(1);
   });
 
-  it("index docs carry createdAt as epoch ms and tags with English synonyms", () => {
-    const doc = toMeiliDoc({ id: "i", userId: "u", type: "screenshot", site: "s", title: "t", note: "", description: "", tags: ["mapa", "meu"], keys: [], text: "", colors: [], categoryId: null, createdAt: "2026-01-01T00:00:00.000Z" });
+  it("index docs: createdAt as epoch ms; tag IDs to filter on, labels in all five languages to search", () => {
+    const doc = toMeiliDoc({ id: "i", userId: "u", type: "screenshot", site: "s", title: "t", note: "", description: "", tags: ["recipe", "dark mode", "meu"], keys: [], text: "", colors: [], categoryId: null, createdAt: "2026-01-01T00:00:00.000Z" });
     expect(doc.createdAt).toBe(Date.parse("2026-01-01T00:00:00.000Z"));
-    expect(doc.tagWords as string[]).toContain("mapa");
-    expect(doc.tagWords as string[]).toContain("map");
+    expect(doc.tags).toEqual(["recipe", "dark mode", "meu"]);
+    expect(doc.tagLabels).toEqual(["recipe", "receita", "receta", "recette", "ricetta", "dark mode", "modo escuro", "modo oscuro", "mode sombre", "modalità scura", "meu"]);
+    // The embedder's template gets the compact English labels only.
+    expect(doc.tagWords).toEqual(["recipe", "dark mode", "meu"]);
   });
 
   it("highlights are HTML-escaped except our <mark> tags", () => {
@@ -612,7 +614,7 @@ describe("saved links (type link)", () => {
     expect(m.ai.keys).toContain("cartografia");
     expect(m.ai.model).toMatch(/\+cloud$/);
     expect(m.ai.tipo).toEqual(["mapa"]);
-    expect(m.ai.topics).toEqual(expect.arrayContaining(["lisboa", "mapa"]));
+    expect(m.ai.topics).toEqual(expect.arrayContaining(["lisbon", "map"]));
   });
 
   it("retags every live item once per tagger version, at startup", async () => {
@@ -645,7 +647,7 @@ describe("saved links (type link)", () => {
         expect(m.ai.processedAt).not.toBeNull();
         expect(m.ai.tipo).toEqual([]);
         expect(m.ai.keys.length).toBeGreaterThan(0); // keywords still run
-        expect(m.ai.topics).toEqual(expect.arrayContaining(["lisboa", "mapa"])); // and so do the text tags
+        expect(m.ai.topics).toEqual(expect.arrayContaining(["lisbon", "map"])); // and so do the text tags
       }
       expect(warn.mock.calls.filter((c) => String(c[0]).includes("classifier unavailable"))).toHaveLength(1);
     } finally {
