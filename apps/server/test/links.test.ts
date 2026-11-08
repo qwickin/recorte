@@ -133,6 +133,7 @@ describe("fetchLink for x.com (fixture through the crawler UA)", () => {
     expect(l.video).toBe(true);
     expect(l.embedUrl).toBe(xEmbedUrl("1854321987654321098"));
     expect(l.description).toMatch(/combobox component/);
+    expect(l.text).toBe(l.description); // not the login-wall body
   });
 
   it("a text post has no embed", async () => {

@@ -45,14 +45,19 @@ function LinkEmbed({ url, title }: { url: string; title: string }) {
   const [on, setOn] = useState(false);
   if (on) {
     return (
-      <iframe
-        src={url}
-        title={title}
-        className="fade-in absolute inset-0 z-[1] block h-full min-h-[320px] w-full border-0 bg-black"
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-        sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
-        referrerPolicy="no-referrer"
-      />
+      <div className="fade-in absolute inset-0 z-[1] flex justify-center bg-black">
+        <iframe
+          src={url}
+          title={title}
+          // color-scheme "light" = the same as the embed's own document, so Chrome keeps its canvas transparent
+          // (a mismatch paints it opaque white) and the black column shows around the post.
+          style={{ colorScheme: "light" }}
+          className="block h-full min-h-[320px] w-[min(560px,100%)] border-0 pt-6"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-presentation"
+          referrerPolicy="no-referrer"
+        />
+      </div>
     );
   }
   return (

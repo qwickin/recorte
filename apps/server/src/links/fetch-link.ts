@@ -78,7 +78,8 @@ export async function fetchLink(url: string, opts: SafeFetchOptions = {}): Promi
   }
   if (!best) throw lastError instanceof Error ? lastError : new FetchFailedError("x.com did not answer");
   const id = tweetId(best.canonicalUrl ?? best.finalUrl) ?? tweetId(url);
-  return { ...best, ...(id && best.video ? { embedUrl: xEmbedUrl(id) } : {}) };
+  // x.com's HTML body is a login wall ("Entrar ou inscrever-se…"): the post's own text is the description.
+  return { ...best, text: best.description ?? "", ...(id && best.video ? { embedUrl: xEmbedUrl(id) } : {}) };
 }
 
 /** Downloads an image (og:image, favicon) through the same SSRF guard. */
