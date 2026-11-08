@@ -6,8 +6,8 @@ import { effectiveSettings } from "./settings";
 /** The boot hint shown while there is no owner. */
 export function setupHint(db: Db, config: Config): string {
   const publicUrl = effectiveSettings(db, config).publicUrl;
-  const base = publicUrl ?? `http://<IP-deste-servidor>:${config.port}`;
-  return `Abre ${base}/setup nos próximos 15 minutos para configurar.`;
+  const base = publicUrl ?? `http://<this-server-IP>:${config.port}`;
+  return `Open ${base}/setup within the next 15 minutes to set up Recorte.`;
 }
 
 /** First-run provisioning: ADMIN_EMAIL + ADMIN_PASSWORD create the owner; otherwise the /setup window is announced. */

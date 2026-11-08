@@ -17,8 +17,9 @@ const LoginBody = z.object({ email: z.string().max(256), password: z.string().ma
 const DeviceBody = z.object({ email: z.string().max(256), password: z.string().max(256), name: z.string().trim().min(1).max(80) });
 const PasswordBody = z.object({ currentPassword: z.string().max(256), newPassword: Password });
 
+/** For API clients (curl): the gallery shows its own translated copy for the `setup_closed` code. */
 export const SETUP_CLOSED_MESSAGE =
-  "A configuração inicial só está aberta nos primeiros 15 minutos depois de o servidor arrancar. Reinicia o container (docker restart …) e abre /setup outra vez.";
+  "Initial setup is only open for the first 15 minutes after the server starts. Restart the container (docker restart …) and open /setup again.";
 
 async function body<T extends z.ZodType>(c: { req: { json(): Promise<unknown> } }, schema: T): Promise<z.infer<T> | null> {
   try {

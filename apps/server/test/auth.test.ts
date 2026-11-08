@@ -101,9 +101,9 @@ describe("boot", () => {
     const t = await makeApp();
     const log = vi.fn();
     await bootstrap(t.db, loadConfig({ PORT: "9000" }), log);
-    expect(log).toHaveBeenCalledWith("Abre http://<IP-deste-servidor>:9000/setup nos próximos 15 minutos para configurar.");
+    expect(log).toHaveBeenCalledWith("Open http://<this-server-IP>:9000/setup within the next 15 minutes to set up Recorte.");
     await bootstrap(t.db, loadConfig({ PUBLIC_URL: "https://r.example.pt/" }), log);
-    expect(log).toHaveBeenLastCalledWith("Abre https://r.example.pt/setup nos próximos 15 minutos para configurar.");
+    expect(log).toHaveBeenLastCalledWith("Open https://r.example.pt/setup within the next 15 minutes to set up Recorte.");
     expect(countUsers(t.db)).toBe(0);
   });
   it("creates the owner from ADMIN_EMAIL + ADMIN_PASSWORD, without logging the password", async () => {
@@ -129,7 +129,7 @@ describe("boot", () => {
     expect(countUsers(t.db)).toBe(0);
     const out = log.mock.calls.flat().join("\n");
     expect(out).toMatch(why);
-    expect(out).toMatch(/\/setup nos próximos 15 minutos/);
+    expect(out).toMatch(/\/setup within the next 15 minutes/);
   });
 });
 
@@ -181,7 +181,7 @@ describe("setup", () => {
     expect(r.status).toBe(403);
     const b = (await r.json()) as { error: string; message: string };
     expect(b.error).toBe("setup_closed");
-    expect(b.message).toMatch(/Reinicia o container/);
+    expect(b.message).toMatch(/Restart the container/);
     expect(countUsers(t.db)).toBe(0);
   });
   it("wall-clock steps do not move the window", async () => {
