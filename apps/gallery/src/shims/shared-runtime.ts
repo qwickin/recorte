@@ -3,3 +3,4 @@
 export * from "../../../../packages/shared/src/api";
 export * from "../../../../packages/shared/src/tags";
 export * from "../../../../packages/shared/src/version";
+export * from "../../../../packages/shared/src/i18n";
