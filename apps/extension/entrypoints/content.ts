@@ -2,6 +2,7 @@ import { browser } from "wxt/browser";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { showToast } from "@/lib/dialog";
 import { extractText } from "@/lib/extract";
+import { getT } from "@/lib/i18n/browser";
 import type { BackgroundMessage, ContentMessage, ExtractResult, LocatedImage, PageMetrics } from "@/lib/messages";
 import { selectArea } from "@/lib/overlay";
 import { HOST_TAG, mount, nextFrames, removeAllUi } from "@/lib/ui";
@@ -89,7 +90,9 @@ export default defineContentScript({
         case "recorte:start-area":
           removeAllUi();
           // Reply now; the selection comes back as its own message (survives a service-worker restart).
-          void selectArea().then((rect) => send({ type: "recorte:area-selected", rect }));
+          void getT()
+            .then((t) => selectArea(t("overlay.hint")))
+            .then((rect) => send({ type: "recorte:area-selected", rect }));
           return { ok: true };
         case "recorte:metrics":
           removeAllUi();
@@ -171,11 +174,7 @@ export default defineContentScript({
           showToast(
             msg.text,
             msg.tone,
-            msg.action === "open-gallery"
-              ? { label: "Abrir", run: () => void send({ type: "recorte:open-gallery" }) }
-              : msg.action === "open-options"
-                ? { label: "Ligar", run: () => void send({ type: "recorte:open-options" }) }
-                : undefined,
+            msg.action && { label: msg.action.label, run: () => void send({ type: msg.action!.run === "open-gallery" ? "recorte:open-gallery" : "recorte:open-options" }) },
           );
           return { ok: true };
       }

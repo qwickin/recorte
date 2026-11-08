@@ -18,14 +18,15 @@ const CSS = `
 
 const MIN_SIZE = 4;
 
-export function selectArea(): Promise<Rect | null> {
+/** `hint`: the translated "drag to select" line (the content script reads the language). */
+export function selectArea(hintText: string): Promise<Rect | null> {
   const ui = mount(CSS, { interactive: true, name: "overlay" });
   const dim = h("div", { class: "dim" });
   const sel = h("div", { class: "sel" });
   const size = h("div", { class: "size" });
   sel.hidden = true;
   size.hidden = true;
-  const hint = h("div", { class: "hint" }, "Arrasta para selecionar · Esc para cancelar");
+  const hint = h("div", { class: "hint" }, hintText);
   const layer = h("div", { class: "layer", tabindex: "-1" }, dim, sel, size, hint);
   ui.container.append(layer);
   layer.focus();

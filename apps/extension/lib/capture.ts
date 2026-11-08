@@ -34,7 +34,7 @@ export async function dataUrlToBitmap(dataUrl: string): Promise<ImageBitmap> {
 function canvas2d(w: number, h: number): [OffscreenCanvas, OffscreenCanvasRenderingContext2D] {
   const c = new OffscreenCanvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
   const ctx = c.getContext("2d");
-  if (!ctx) throw new Error("OffscreenCanvas 2D indisponível");
+  if (!ctx) throw new Error("OffscreenCanvas 2D unavailable");
   ctx.imageSmoothingQuality = "high";
   return [c, ctx];
 }

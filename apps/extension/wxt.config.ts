@@ -1,18 +1,21 @@
 import { defineConfig } from "wxt";
-import { COMMAND_LABELS, SUGGESTED_KEYS } from "./lib/shortcuts";
+import { COMMANDS, SUGGESTED_KEYS } from "./lib/shortcuts";
 
 /**
  * One generic build for every server: the server URL is configured at runtime in the options page.
  * The version comes from EXTENSION_VERSION (computed from git in CI, Task 8); local builds default to 0.0.0.
  * Chrome builds MV3; Firefox builds MV2 (WXT default) so host permissions are granted at install time.
+ * The name, description and shortcut names come from public/_locales (the browser shows them in its own language);
+ * everything else uses the runtime dictionaries in lib/i18n, so the Options language override applies.
  */
 const version = process.env.EXTENSION_VERSION?.trim() || "0.0.0";
 if (!/^\d+(\.\d+){0,3}$/.test(version)) throw new Error(`EXTENSION_VERSION must be numeric (got "${version}")`);
 
 export default defineConfig({
   manifest: ({ browser }) => ({
-    name: "Recorte",
-    description: "Guarda capturas de ecrã, com texto e etiquetas, no teu servidor Recorte.",
+    name: "__MSG_extName__",
+    description: "__MSG_extDescription__",
+    default_locale: "en",
     version,
     permissions: [
       "activeTab",
@@ -28,7 +31,10 @@ export default defineConfig({
     action: { default_title: "Recorte" },
     // Per-platform suggestions (lib/shortcuts.ts): ⌃⇧ on macOS, Alt+Shift elsewhere. The user can remap them.
     commands: Object.fromEntries(
-      Object.entries(SUGGESTED_KEYS).map(([name, keys]) => [name, { suggested_key: { ...keys }, description: COMMAND_LABELS[name] }]),
+      Object.entries(SUGGESTED_KEYS).map(([name, keys]) => [
+        name,
+        { suggested_key: { ...keys }, description: `__MSG_${COMMANDS[name as keyof typeof COMMANDS].manifest}__` },
+      ]),
     ),
     web_accessible_resources: [{ resources: ["fonts/*.woff2", "dialog.html"], matches: ["<all_urls>"] }],
     ...(browser === "firefox"

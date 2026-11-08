@@ -251,7 +251,7 @@ export function extractText(doc: Document, req: ExtractRequest, ignore?: Element
   // A full page: the selection already is the page's main text; do not send it twice.
   if (req.kind === "full") return { selection: readableText(doc), meta, headings: hs, alts: altsIn(doc, null), page: page("", []) };
   const whole = readableText(doc);
-  // "Guardar link"/"Guardar esta página": no area, the page itself is the content.
+  // "Save link"/"Save this page": no area, the page itself is the content.
   if (req.kind === "link" || req.kind === "page") return { selection: "", meta, headings: hs, alts: [], page: page(whole, []) };
   const viewport: Rect = { x: 0, y: 0, width: innerWidth, height: innerHeight };
   const rect = req.rect ?? viewport;

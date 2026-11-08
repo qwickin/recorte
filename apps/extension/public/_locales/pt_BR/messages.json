@@ -1,0 +1,17 @@
+{
+  "extName": {
+    "message": "Recorte"
+  },
+  "extDescription": {
+    "message": "Salve capturas de tela, com texto e tags, no seu servidor Recorte."
+  },
+  "cmdCaptureArea": {
+    "message": "Capturar área"
+  },
+  "cmdCaptureVisible": {
+    "message": "Capturar parte visível"
+  },
+  "cmdCaptureFull": {
+    "message": "Capturar página inteira"
+  }
+}

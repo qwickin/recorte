@@ -92,7 +92,7 @@ export function capItemText(text: ItemText, max = MAX_TEXT_CHARS): ItemText {
 }
 
 export interface MetaInput {
-  /** Default "screenshot"; "link" for "Guardar link" (kind link/page, no image). */
+  /** Default "screenshot"; "link" for "Save link" (kind link/page, no image). */
   type?: ItemType;
   kind: CaptureKind;
   url: string;
@@ -108,7 +108,7 @@ export interface MetaInput {
 
 /** Builds the `meta` part of `POST /api/items`. Throws for non-http(s) pages — those cannot be captured. */
 export function buildUploadMeta(input: MetaInput): UploadMeta {
-  if (!isHttpUrl(input.url)) throw new Error("Só se podem guardar páginas http:// ou https://.");
+  if (!isHttpUrl(input.url)) throw new Error("Only http:// or https:// pages can be saved.");
   const title = input.title?.trim();
   const note = input.note?.trim();
   const meta: UploadMeta = {

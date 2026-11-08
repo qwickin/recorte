@@ -2,17 +2,21 @@ import "@/assets/base.css";
 import "./style.css";
 import { browser } from "wxt/browser";
 import { isHttpUrl } from "@/lib/api";
+import { localizeDom, type T } from "@/lib/i18n";
+import { getT } from "@/lib/i18n/browser";
 import { formatShortcut, isMacPlatform } from "@/lib/shortcuts";
 import type { BackgroundMessage, Status } from "@/lib/messages";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const send = <T>(m: BackgroundMessage) => browser.runtime.sendMessage(m) as Promise<T>;
 
+let t: T;
+
 async function shortcuts(): Promise<void> {
   try {
     for (const c of await browser.commands.getAll()) {
       const el = document.querySelector<HTMLElement>(`kbd[data-cmd="${c.name}"]`);
-      if (el) el.textContent = formatShortcut(c.shortcut, isMacPlatform());
+      if (el) el.textContent = formatShortcut(c.shortcut, isMacPlatform(), { space: t("key.space") });
     }
   } catch {
     // not supported
@@ -33,16 +37,17 @@ function render(s: Status, tabOk: boolean): void {
   for (const b of document.querySelectorAll<HTMLButtonElement>(".mode")) b.disabled = !tabOk || !s.configured;
   $<HTMLButtonElement>("gallery").disabled = !s.configured;
   $("queue").textContent =
-    (s.pending === 0 ? "Fila vazia" : s.pending === 1 ? "1 captura por enviar" : `${s.pending} capturas por enviar`) +
-    (s.parked ? ` · ${s.parked} de outra ligação` : "");
+    (s.pending === 0 ? t("popup.queueEmpty") : t("popup.queuePending", { count: s.pending })) + (s.parked ? t("popup.queueParked", { count: s.parked }) : "");
   $("retry").hidden = s.pending === 0 || s.authNeeded;
   const discard = $<HTMLButtonElement>("discard");
   discard.hidden = s.pending === 0;
-  discard.textContent = "Descartar";
+  discard.textContent = t("popup.discard");
   delete discard.dataset.armed;
 }
 
 async function main(): Promise<void> {
+  t = await getT();
+  localizeDom(document, t);
   void shortcuts();
   const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
   const tabOk = isHttpUrl(tab?.url);
@@ -67,7 +72,7 @@ async function main(): Promise<void> {
   $("auth").addEventListener("click", openOptions);
   $("setup").addEventListener("click", openOptions);
   $("retry").addEventListener("click", async () => {
-    $("queue").textContent = "A enviar…";
+    $("queue").textContent = t("popup.sending");
     await send({ type: "recorte:retry-queue" });
     render(await send<Status>({ type: "recorte:status" }), tabOk);
   });
@@ -76,7 +81,7 @@ async function main(): Promise<void> {
     const b = $<HTMLButtonElement>("discard");
     if (!b.dataset.armed) {
       b.dataset.armed = "1";
-      b.textContent = "Confirmar descarte";
+      b.textContent = t("popup.discardConfirm");
       return;
     }
     await send({ type: "recorte:discard-pending" });

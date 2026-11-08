@@ -1,0 +1,22 @@
+{
+  "extName": {
+    "message": "Recorte",
+    "description": "Extension name (a product name: keep it as is)."
+  },
+  "extDescription": {
+    "message": "Save screenshots, with their text and tags, to your Recorte server.",
+    "description": "Extension description in the browser's extension list (max 132 characters)."
+  },
+  "cmdCaptureArea": {
+    "message": "Capture area",
+    "description": "Keyboard shortcut name: drag to capture part of the page."
+  },
+  "cmdCaptureVisible": {
+    "message": "Capture visible part",
+    "description": "Keyboard shortcut name: capture what is visible in the window."
+  },
+  "cmdCaptureFull": {
+    "message": "Capture whole page",
+    "description": "Keyboard shortcut name: capture the whole scrolling page."
+  }
+}

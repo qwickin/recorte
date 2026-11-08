@@ -4,17 +4,22 @@ import { browser } from "wxt/browser";
 import { ApiError, fetchMe, normalizeServerUrl, registerDevice, revokeDevice } from "@/lib/api";
 import type { BackgroundMessage, Status } from "@/lib/messages";
 import { type Settings, accountOf, connectionOf, extensionVersion, getSettings, setSettings } from "@/lib/settings";
-import { COMMAND_LABELS, formatShortcut, isMacPlatform } from "@/lib/shortcuts";
+import { COMMANDS, formatShortcut, isCommandName, isMacPlatform } from "@/lib/shortcuts";
+import { DEFAULT_LOCALE, isLocale, LOCALE_NAMES, LOCALES } from "@recorte/shared";
+import { localizeDom, makeT, resolveLocale, type T } from "@/lib/i18n";
+import { getT, LOCALE_KEY, onLocaleChange, uiLanguage } from "@/lib/i18n/browser";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const send = <T = unknown>(m: BackgroundMessage) => browser.runtime.sendMessage(m) as Promise<T>;
 const isFirefox = import.meta.env.FIREFOX;
 
+let t: T = makeT(DEFAULT_LOCALE);
+
 function defaultDeviceName(): string {
   const ua = navigator.userAgent;
   const os = /Mac/.test(ua) ? "macOS" : /Windows/.test(ua) ? "Windows" : /Android/.test(ua) ? "Android" : /Linux/.test(ua) ? "Linux" : "";
   const b = isFirefox ? "Firefox" : /Edg\//.test(ua) ? "Edge" : "Chrome";
-  return os ? `${b} em ${os}` : b;
+  return os ? t("options.deviceDefault", { browser: b, os }) : b;
 }
 
 let forceLogin = false;
@@ -22,8 +27,25 @@ let forceLogin = false;
 async function renderQueue(): Promise<void> {
   const st = await send<Status>({ type: "recorte:status" });
   $("parked").hidden = st.parked === 0;
-  $("parked-text").textContent =
-    st.parked === 1 ? "1 captura por enviar de outra ligação (servidor ou conta)." : `${st.parked} capturas por enviar de outra ligação (servidor ou conta).`;
+  $("parked-text").textContent = t("options.parked", { count: st.parked });
+}
+
+function renderLanguage(s: Settings): void {
+  const select = $<HTMLSelectElement>("language");
+  const auto = document.createElement("option");
+  auto.value = "";
+  auto.textContent = t("options.languageAuto", { language: LOCALE_NAMES[resolveLocale(null, uiLanguage())] });
+  select.replaceChildren(
+    auto,
+    ...LOCALES.map((l) => {
+      const o = document.createElement("option");
+      o.value = l;
+      o.lang = l;
+      o.textContent = LOCALE_NAMES[l];
+      return o;
+    }),
+  );
+  select.value = s.locale ?? "";
 }
 
 function render(s: Settings): void {
@@ -49,12 +71,12 @@ async function renderShortcuts(): Promise<void> {
     const cmds = await browser.commands.getAll();
     list.replaceChildren(
       ...cmds
-        .filter((c) => c.name && COMMAND_LABELS[c.name])
+        .filter((c) => isCommandName(c.name))
         .map((c) => {
           const li = document.createElement("li");
           const k = document.createElement("kbd");
-          k.textContent = formatShortcut(c.shortcut, isMacPlatform()) || "sem atalho";
-          li.append(COMMAND_LABELS[c.name!]!, k);
+          k.textContent = formatShortcut(c.shortcut, isMacPlatform(), { space: t("key.space") }) || t("options.noShortcut");
+          li.append(t(COMMANDS[c.name as keyof typeof COMMANDS].ui), k);
           return li;
         }),
     );
@@ -62,12 +84,12 @@ async function renderShortcuts(): Promise<void> {
     list.replaceChildren();
   }
   const hint = $("shortcuts-hint");
-  if (isFirefox) hint.textContent = "Para mudar: about:addons → engrenagem → Gerir atalhos de extensões.";
+  if (isFirefox) hint.textContent = t("options.shortcutsFirefox");
   else {
     hint.textContent = "";
     const a = document.createElement("a");
     a.href = "#";
-    a.textContent = "Mudar atalhos";
+    a.textContent = t("options.shortcutsChange");
     a.addEventListener("click", (e) => {
       e.preventDefault();
       void browser.tabs.create({ url: "chrome://extensions/shortcuts" });
@@ -76,11 +98,27 @@ async function renderShortcuts(): Promise<void> {
   }
 }
 
-async function main(): Promise<void> {
-  $<HTMLInputElement>("device").value = defaultDeviceName();
-  $("version").textContent = `Versão ${extensionVersion()}`;
-  render(await getSettings());
+/** Static copy, the language list, the shortcuts and everything render() writes, in the current language. */
+async function localize(): Promise<void> {
+  const before = defaultDeviceName();
+  t = await getT();
+  localizeDom(document, t);
+  const device = $<HTMLInputElement>("device");
+  if (!device.value || device.value === before) device.value = defaultDeviceName();
+  $("version").textContent = t("options.version", { version: extensionVersion() });
+  const s = await getSettings();
+  renderLanguage(s);
+  render(s);
   void renderShortcuts();
+}
+
+async function main(): Promise<void> {
+  await localize();
+  onLocaleChange(() => void localize());
+  $<HTMLSelectElement>("language").addEventListener("change", (e) => {
+    const v = (e.target as HTMLSelectElement).value;
+    void browser.storage.local.set({ [LOCALE_KEY]: isLocale(v) ? v : null });
+  });
 
   $("login").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -91,13 +129,13 @@ async function main(): Promise<void> {
     const email = $<HTMLInputElement>("email").value.trim();
     const name = $<HTMLInputElement>("device").value.trim() || defaultDeviceName();
     if (!server) {
-      err.textContent = "URL do servidor inválido.";
+      err.textContent = t("options.invalidServer");
       err.hidden = false;
       return;
     }
     const btn = $<HTMLButtonElement>("connect");
     btn.disabled = true;
-    btn.textContent = "A ligar…";
+    btn.textContent = t("options.connecting");
     try {
       const { token, id } = await registerDevice(server, email, passwordInput.value, name);
       // The account id scopes the offline queue: captures are only ever sent to the account they were made for.
@@ -111,15 +149,15 @@ async function main(): Promise<void> {
       err.textContent =
         e2 instanceof ApiError
           ? e2.status === 401
-            ? "Email ou palavra-passe errados."
+            ? t("options.wrongCredentials")
             : e2.status === 429
-              ? "Demasiadas tentativas. Espera um pouco."
-              : `O servidor respondeu ${e2.status}.`
-          : "Não foi possível contactar o servidor. Confirma o URL.";
+              ? t("options.tooMany")
+              : t("options.serverStatus", { status: String(e2.status) })
+          : t("options.unreachable");
       err.hidden = false;
     } finally {
       btn.disabled = false;
-      btn.textContent = "Ligar";
+      btn.textContent = t("options.connect");
     }
   });
 
@@ -137,10 +175,7 @@ async function main(): Promise<void> {
     const { pending } = await send<Status>({ type: "recorte:status" });
     const discard =
       pending > 0 &&
-      confirm(
-        `Há ${pending === 1 ? "1 captura" : `${pending} capturas`} por enviar para esta conta.\n\n` +
-          "OK: descartar.\nCancelar: manter na fila (só será enviada se voltares a ligar esta conta neste servidor).",
-      );
+      confirm(t("options.disconnectConfirm", { count: pending }));
     const account = accountOf(s);
     const conn = connectionOf(s);
     if (conn && s.deviceId && !s.authNeeded) await revokeDevice(conn, extensionVersion(), s.deviceId).catch(() => {});
@@ -150,7 +185,7 @@ async function main(): Promise<void> {
     render(await getSettings());
   });
   $("discard-parked").addEventListener("click", async () => {
-    if (!confirm("Descartar as capturas de outras ligações? Não há forma de as recuperar.")) return;
+    if (!confirm(t("options.discardParkedConfirm"))) return;
     await send({ type: "recorte:discard-parked" });
     void renderQueue();
   });

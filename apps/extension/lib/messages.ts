@@ -42,7 +42,7 @@ export type BackgroundMessage =
   | { type: "recorte:draft-info"; draftId: string }
   /** Without `account`: drop captures of every other connection. With it: drop that connection's captures. */
   | { type: "recorte:discard-parked"; account?: string }
-  /** Drops the current connection's waiting captures (popup "Descartar"). */
+  /** Drops the current connection's waiting captures (popup "Discard"). */
   | { type: "recorte:discard-pending" }
   | { type: "recorte:tags" }
   | { type: "recorte:categories" }
@@ -61,12 +61,13 @@ export type ContentMessage =
   | { type: "recorte:scroll-to"; y: number; hideFixed: boolean }
   | { type: "recorte:restore"; x: number; y: number }
   | { type: "recorte:locate-image"; srcUrl: string }
-  /** Text/title of the <a> the context menu was opened on ("Guardar link"). */
+  /** Text/title of the <a> the context menu was opened on ("Save link"). */
   | { type: "recorte:link-text"; url: string }
   | { type: "recorte:extract"; kind: CaptureKind; rect?: Rect; image?: { alt: string; caption: string } }
   | { type: "recorte:dialog"; draftId: string }
   | { type: "recorte:close-dialog" }
-  | { type: "recorte:toast"; text: string; tone: "ok" | "error"; action?: "open-gallery" | "open-options" }
+  /** `text` and the action's `label` come translated from the background. */
+  | { type: "recorte:toast"; text: string; tone: "ok" | "error"; action?: { run: "open-gallery" | "open-options"; label: string } }
   | { type: "recorte:prepare-capture" };
 
 /** What the dialog page needs to show a draft. */
@@ -83,7 +84,7 @@ export interface DraftInfo {
 export interface LinkPreview {
   url: string;
   description?: string;
-  /** og:image from the page's DOM ("Guardar esta página"); the server downloads its own copy. */
+  /** og:image from the page's DOM ("Save this page"); the server downloads its own copy. */
   image?: string;
 }
 

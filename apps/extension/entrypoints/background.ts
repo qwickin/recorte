@@ -25,6 +25,8 @@ import {
 } from "@/lib/capture";
 import type { Rect } from "@/lib/extract";
 import { TabChangedError, makeTabGuard } from "@/lib/guard";
+import { CodedError, errorMessage, type T } from "@/lib/i18n";
+import { getT, onLocaleChange } from "@/lib/i18n/browser";
 import type {
   BackgroundMessage,
   ContentMessage,
@@ -71,7 +73,7 @@ async function notify(id: string, title: string, message: string, withOpenButton
     title,
     message,
   };
-  if (withOpenButton && !isFirefox) opts.buttons = [{ title: "Abrir" }];
+  if (withOpenButton && !isFirefox) opts.buttons = [{ title: (await getT())("notify.open") }];
   try {
     await browser.notifications.clear(id);
     await browser.notifications.create(id, opts);
@@ -186,28 +188,26 @@ async function runDrain(force: boolean): Promise<DrainResult | null> {
     return null;
   }
   const version = extensionVersion();
+  const t = await getT();
   const r = await drainQueue(store, (item) => uploadItem(conn, version, item.image, item.mime, item.meta, item.id), { account, force });
 
   if (r.saved.length && s.authNeeded) await setSettings({ authNeeded: false });
   for (const { item } of r.saved) {
     await toastOrNotify(
       item.tabId,
-      { type: "recorte:toast", text: "Guardado", tone: "ok", action: "open-gallery" },
-      () => notify(`recorte-saved-${item.id}`, "Guardado", item.meta.title || item.meta.pageTitle || "Captura guardada no Recorte.", true),
+      { type: "recorte:toast", text: t("toast.saved"), tone: "ok", action: { run: "open-gallery", label: t("toast.open") } },
+      () => notify(`recorte-saved-${item.id}`, t("notify.savedTitle"), item.meta.title || item.meta.pageTitle || t("notify.savedBody"), true),
     );
   }
   for (const { item, status } of r.dropped) {
-    const why =
-      status === 413
-        ? "A imagem é demasiado grande para o servidor."
-        : "O servidor recusou esta captura.";
-    await notify(`recorte-dropped-${item.id}`, "Não foi possível guardar", `${why} (${item.meta.pageTitle || item.meta.url})`);
+    const why = status === 413 ? t("notify.tooLarge") : t("notify.refused");
+    await notify(`recorte-dropped-${item.id}`, t("notify.droppedTitle"), `${why} (${item.meta.pageTitle || item.meta.url})`);
   }
   if (r.authNeeded) {
     const first = !(await getSettings()).authNeeded;
     await setSettings({ authNeeded: true });
     if (first) {
-      await notify("recorte-auth", "Volta a ligar a extensão", "O servidor recusou o acesso. As capturas ficam guardadas na fila até voltares a ligar.");
+      await notify("recorte-auth", t("notify.authTitle"), t("notify.authBody"));
     }
   }
   await browser.alarms.clear(ALARM_RETRY);
@@ -235,13 +235,14 @@ async function activeTab(): Promise<Tab | undefined> {
 /** Entry point for every trigger (popup, commands, context menu). */
 async function startCapture(tab: Tab | undefined, kind: CaptureKind, srcUrl?: string): Promise<void> {
   if (!tab?.id || tab.windowId === undefined) return;
+  const t = await getT();
   if (!isHttpUrl(tab.url)) {
-    await notify("recorte-unsupported", "Não é possível capturar esta página", "O Recorte só captura páginas http:// ou https://.");
+    await notify("recorte-unsupported", t("notify.unsupportedTitle"), t("notify.unsupportedBody"));
     return;
   }
   const s = await getSettings();
   if (!connectionOf(s)) {
-    await notify("recorte-setup", "Liga a extensão ao servidor", "Abre as opções do Recorte e entra com a tua conta.");
+    await notify("recorte-setup", t("notify.setupTitle"), t("notify.setupBody"));
     await browser.runtime.openOptionsPage();
     return;
   }
@@ -265,15 +266,16 @@ function guardFor(tab: Tab): () => Promise<void> {
 }
 
 async function captureFailed(tab: Tab, e: unknown): Promise<void> {
+  const t = await getT();
   if (e instanceof TabChangedError) {
     // The user is on another tab now: a system notification, not an in-page toast.
-    await notify("recorte-capture-error", "Recorte", e.message);
+    await notify("recorte-capture-error", "Recorte", errorMessage(t, e));
     return;
   }
   console.error("[recorte] capture failed", e);
-  const message = e instanceof Error ? e.message : String(e);
-  await toastOrNotify(tab.id, { type: "recorte:toast", text: `Não foi possível capturar: ${message}`, tone: "error" }, () =>
-    notify("recorte-capture-error", "Não foi possível capturar", message),
+  const message = errorMessage(t, e);
+  await toastOrNotify(tab.id, { type: "recorte:toast", text: t("toast.captureFailed", { reason: message }), tone: "error" }, () =>
+    notify("recorte-capture-error", t("notify.captureFailedTitle"), message),
   );
 }
 
@@ -304,7 +306,7 @@ async function captureKind(tab: Tab, kind: Exclude<CaptureKind, "area">, srcUrl?
       restore: (x, y) => toTab<void>(tabId, { type: "recorte:restore", x, y }),
     }, guard);
   }
-  // "Guardar esta imagem": scroll to the element, capture, crop to its box. If the element cannot be found
+  // "Save this image": scroll to the element, capture, crop to its box. If the element cannot be found
   // (e.g. inside an iframe), fetch the image itself.
   const located = srcUrl ? await toTab<LocatedImage | null>(tabId, { type: "recorte:locate-image", srcUrl }) : null;
   if (located) {
@@ -319,10 +321,10 @@ async function captureKind(tab: Tab, kind: Exclude<CaptureKind, "area">, srcUrl?
       await toTab(tabId, { type: "recorte:restore", x: located.scroll.x, y: located.scroll.y }).catch(() => {});
     }
   }
-  if (!srcUrl) throw new Error("imagem não encontrada");
+  if (!srcUrl) throw new CodedError("error.imageNotFound");
   // No cookies: the page's ambient credentials must not be used by the extension.
   const res = await fetch(srcUrl, { credentials: "omit" });
-  if (!res.ok) throw new Error(`imagem indisponível (HTTP ${res.status})`);
+  if (!res.ok) throw new CodedError("error.imageUnavailable", { status: String(res.status) });
   const bmp = await createImageBitmap(await res.blob());
   const canvas = bitmapToCanvas(bmp);
   bmp.close();
@@ -342,7 +344,7 @@ async function finishCapture(tab: Tab, kind: CaptureKind, c: Captured): Promise<
   const encoded = await encodeImage(c.canvas);
   const s = await connectedSettings();
   const account = accountOf(s);
-  if (!account) throw new Error("não foi possível identificar a conta no servidor");
+  if (!account) throw new CodedError("error.noAccount");
   if (s.saveWithoutAsking) {
     await store.put({ ...newQueueItem(encoded.data, encoded.mime, meta, account), tabId });
     await updateBadge();
@@ -376,19 +378,20 @@ async function draftInfo(draftId: string): Promise<DraftInfo | null> {
 const EMPTY_TEXT = { selection: "", meta: {}, headings: [], alts: [] };
 
 /**
- * "Guardar link no Recorte" (context menu on a link) and "Guardar esta página (link)" (on the page). Same
+ * "Save link to Recorte" (context menu on a link) and "Save this page (link)" (on the page). Same
  * pre-save dialog; the item is `type: "link"` without an image: the server fetches the URL and its OG image.
  * For the page itself the extension also sends its own DOM extraction (works behind logins).
  */
 async function startLink(tab: Tab | undefined, kind: "link" | "page", linkUrl?: string, linkText?: string): Promise<void> {
   const url = kind === "page" ? tab?.url : linkUrl;
+  const t = await getT();
   if (!isHttpUrl(url)) {
-    await notify("recorte-unsupported", "Não é possível guardar este link", "O Recorte só guarda links http:// ou https://.");
+    await notify("recorte-unsupported", t("notify.linkUnsupportedTitle"), t("notify.linkUnsupportedBody"));
     return;
   }
   const s = await getSettings();
   if (!connectionOf(s)) {
-    await notify("recorte-setup", "Liga a extensão ao servidor", "Abre as opções do Recorte e entra com a tua conta.");
+    await notify("recorte-setup", t("notify.setupTitle"), t("notify.setupBody"));
     await browser.runtime.openOptionsPage();
     return;
   }
@@ -420,7 +423,7 @@ async function startLink(tab: Tab | undefined, kind: "link" | "page", linkUrl?: 
     const meta = buildUploadMeta({ type: "link", kind, url, pageTitle, text });
     const s2 = await connectedSettings();
     const account = accountOf(s2);
-    if (!account) throw new Error("não foi possível identificar a conta no servidor");
+    if (!account) throw new CodedError("error.noAccount");
     const empty = new ArrayBuffer(0);
     if (s2.saveWithoutAsking || !canTalk) {
       await store.put({ ...newQueueItem(empty, "", meta, account), tabId: tabId ?? null });
@@ -527,14 +530,21 @@ async function getStatus(): Promise<Status> {
   };
 }
 
-const errText = (e: unknown) =>
-  e instanceof ApiError && e.status === 401 ? "Volta a ligar a extensão" : e instanceof Error ? e.message : String(e);
+/** Errors the dialog page shows: translated here (API codes too, e.g. a category name already taken). */
+const errText = (t: T, e: unknown) =>
+  e instanceof ApiError && e.status === 401
+    ? t("error.reconnect")
+    : e instanceof ApiError && e.code === "name_taken"
+      ? t("dialog.categoryTaken")
+      : errorMessage(t, e);
 
-async function withConn<T>(f: (c: NonNullable<ReturnType<typeof connectionOf>>, v: string) => Promise<T>): Promise<T> {
+async function withConn<R>(f: (c: NonNullable<ReturnType<typeof connectionOf>>, v: string) => Promise<R>): Promise<R> {
   const conn = connectionOf(await getSettings());
-  if (!conn) throw new Error("Extensão não ligada ao servidor");
+  if (!conn) throw new CodedError("error.notConnected");
   return f(conn, extensionVersion());
 }
+
+const failed = async (e: unknown) => ({ ok: false as const, error: errText(await getT(), e) });
 
 // ----------------------------------------------------------------------------------------------- messages
 
@@ -594,20 +604,11 @@ async function handleOther(msg: BackgroundMessage, sender: Browser.runtime.Messa
       return { ok: true };
     }
     case "recorte:tags":
-      return withConn((c, v) => fetchTags(c, v)).then(
-        (tags) => ({ ok: true, tags }),
-        (e) => ({ ok: false, error: errText(e) }),
-      );
+      return withConn((c, v) => fetchTags(c, v)).then((tags) => ({ ok: true, tags }), failed);
     case "recorte:categories":
-      return withConn((c, v) => fetchCategories(c, v)).then(
-        (categories) => ({ ok: true, categories }),
-        (e) => ({ ok: false, error: errText(e) }),
-      );
+      return withConn((c, v) => fetchCategories(c, v)).then((categories) => ({ ok: true, categories }), failed);
     case "recorte:create-category":
-      return withConn((c, v) => createCategory(c, v, msg.name)).then(
-        (category) => ({ ok: true, category }),
-        (e) => ({ ok: false, error: errText(e) }),
-      );
+      return withConn((c, v) => createCategory(c, v, msg.name)).then((category) => ({ ok: true, category }), failed);
     case "recorte:open-gallery":
       await openGallery();
       return { ok: true };
@@ -626,29 +627,40 @@ async function handleOther(msg: BackgroundMessage, sender: Browser.runtime.Messa
   }
 }
 
-function setupMenus(): void {
-  browser.contextMenus.removeAll().then(() => {
-    browser.contextMenus.create({ id: MENU_IMAGE, title: "Guardar esta imagem", contexts: ["image"] });
-    browser.contextMenus.create({ id: MENU_LINK, title: "Guardar link no Recorte", contexts: ["link"] });
-    browser.contextMenus.create({ id: MENU_PAGE, title: "Guardar esta página (link)", contexts: ["page"] });
-  });
+/**
+ * Context menus in the extension's language; rebuilt when the Options language changes. Serialized: two quick
+ * changes must not interleave removeAll/create (duplicate-id errors).
+ */
+let menus: Promise<void> = Promise.resolve();
+function setupMenus(): Promise<void> {
+  menus = menus
+    .catch(() => {})
+    .then(async () => {
+      const t = await getT();
+      await browser.contextMenus.removeAll();
+      browser.contextMenus.create({ id: MENU_IMAGE, title: t("menu.saveImage"), contexts: ["image"] });
+      browser.contextMenus.create({ id: MENU_LINK, title: t("menu.saveLink"), contexts: ["link"] });
+      browser.contextMenus.create({ id: MENU_PAGE, title: t("menu.savePage"), contexts: ["page"] });
+    });
+  return menus;
 }
 
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
-    setupMenus();
+    void setupMenus();
     void updateBadge();
   });
   browser.runtime.onStartup.addListener(() => {
-    setupMenus();
+    void setupMenus();
     void drain();
   });
+  onLocaleChange(() => void setupMenus());
 
   browser.runtime.onMessage.addListener((raw: unknown, sender, sendResponse: (r: unknown) => void) => {
     const msg = raw as BackgroundMessage;
     if (!msg || typeof msg.type !== "string" || !msg.type.startsWith("recorte:")) return;
     if (sender.id !== browser.runtime.id) return;
-    handleMessage(msg, sender).then(sendResponse, (e: unknown) => sendResponse({ ok: false, error: errText(e) }));
+    handleMessage(msg, sender).then(sendResponse, async (e: unknown) => sendResponse(await failed(e)));
     return true;
   });
 

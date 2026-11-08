@@ -1,5 +1,6 @@
 import { browser } from "wxt/browser";
 import { DIALOG_CSS, renderSaveDialog } from "@/lib/dialog";
+import { getT } from "@/lib/i18n/browser";
 import type { BackgroundMessage, CategoriesResponse, CategoryResponse, DraftInfo, TagsResponse } from "@/lib/messages";
 import { BASE_CSS } from "@/lib/ui";
 
@@ -20,7 +21,9 @@ html, body { margin: 0; background: transparent; color-scheme: normal; overflow:
 document.head.append(style);
 
 async function main(): Promise<void> {
-  const info = await send<DraftInfo | null>({ type: "recorte:draft-info", draftId });
+  const [info, t] = await Promise.all([send<DraftInfo | null>({ type: "recorte:draft-info", draftId }), getT()]);
+  document.documentElement.lang = t.locale;
+  document.title = t("dialog.label");
   if (!info) {
     await send({ type: "recorte:draft-cancel", draftId });
     return;
@@ -31,6 +34,7 @@ async function main(): Promise<void> {
     title: info.title,
     site: info.site,
     truncated: info.truncated,
+    t,
     loadTags: async () => {
       const r = await send<TagsResponse>({ type: "recorte:tags" });
       if (!r.ok) throw new Error(r.error);

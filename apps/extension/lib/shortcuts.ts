@@ -39,7 +39,7 @@ const OTHER_NAME: Record<string, string> = {
 const KEY_NAME: Record<string, string> = {
   comma: ",",
   period: ".",
-  space: "Espaço",
+  space: "Space",
   up: "↑",
   down: "↓",
   left: "←",
@@ -49,8 +49,8 @@ const KEY_NAME: Record<string, string> = {
 export const isMacPlatform = (nav: { platform?: string; userAgent?: string } = globalThis.navigator ?? {}): boolean =>
   /Mac|iPhone|iPad/.test(nav.platform || nav.userAgent || "");
 
-/** "" when there is no binding. */
-export function formatShortcut(raw: string | undefined | null, mac: boolean): string {
+/** "" when there is no binding. `keyNames` overrides key labels (the UI language's name for "space"). */
+export function formatShortcut(raw: string | undefined | null, mac: boolean, keyNames: Partial<Record<string, string>> = {}): string {
   const s = (raw ?? "").trim();
   if (!s) return "";
   // Already in symbols (Chrome on macOS): keep, but normalise the modifier order.
@@ -62,7 +62,7 @@ export function formatShortcut(raw: string | undefined | null, mac: boolean): st
   }
   const parts = s.split("+").map((p) => p.trim()).filter(Boolean);
   const key = parts.pop() ?? "";
-  const keyLabel = KEY_NAME[key.toLowerCase()] ?? (key.length === 1 ? key.toUpperCase() : key);
+  const keyLabel = keyNames[key.toLowerCase()] ?? KEY_NAME[key.toLowerCase()] ?? (key.length === 1 ? key.toUpperCase() : key);
   if (mac) {
     const mods = new Set(parts.map((p) => MAC_SYMBOL[p.toLowerCase()] ?? p));
     return MAC_ORDER.filter((m) => mods.has(m)).join("") + keyLabel;
@@ -71,11 +71,14 @@ export function formatShortcut(raw: string | undefined | null, mac: boolean): st
   return [...new Set(names), keyLabel].join("+");
 }
 
-export const COMMAND_LABELS: Record<string, string> = {
-  "capture-area": "Capturar área",
-  "capture-visible": "Capturar parte visível",
-  "capture-full": "Capturar página inteira",
-};
+/** Each command's name: `manifest` is the public/_locales message the browser shows; `ui` the runtime key (Options list). */
+export const COMMANDS = {
+  "capture-area": { manifest: "cmdCaptureArea", ui: "command.captureArea" },
+  "capture-visible": { manifest: "cmdCaptureVisible", ui: "command.captureVisible" },
+  "capture-full": { manifest: "cmdCaptureFull", ui: "command.captureFull" },
+} as const;
+export type CommandName = keyof typeof COMMANDS;
+export const isCommandName = (n: string | undefined): n is CommandName => !!n && n in COMMANDS;
 
 /**
  * Suggested bindings (manifest `commands.*.suggested_key`). On macOS ⌃⇧ (MacCtrl+Shift): ⌘⇧3/4/5/6 are the

@@ -1,3 +1,5 @@
+import { CodedError } from "./i18n";
+
 /**
  * `captureVisibleTab(windowId)` captures whatever tab is active in that window. A capture must therefore check,
  * right before (and after) each call, that the tab it started on is still the active one and still shows the
@@ -17,9 +19,10 @@ export interface CaptureTarget {
   url: string;
 }
 
-export class TabChangedError extends Error {
+/** Its text is the "error.tabChanged" message, translated where it is shown (see CodedError). */
+export class TabChangedError extends CodedError {
   constructor() {
-    super("Captura cancelada: mudaste de separador");
+    super("error.tabChanged");
     this.name = "TabChangedError";
   }
 }

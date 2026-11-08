@@ -1,3 +1,4 @@
+import { errorMessage, makeT } from "../lib/i18n";
 import { describe, expect, it, vi } from "vitest";
 import { TabChangedError, isSameTarget, makeTabGuard } from "../lib/guard";
 import { captureVisible } from "../lib/capture";
@@ -22,7 +23,11 @@ describe("tab guard", () => {
       makeTabGuard(target, async () => {
         throw new Error("No tab with id: 7");
       })(),
-    ).rejects.toThrow("Captura cancelada: mudaste de separador");
+    ).rejects.toMatchObject({ name: "TabChangedError", key: "error.tabChanged" });
+    // Shown translated: English by default.
+    const e = await makeTabGuard(target, async () => ({ ...tab, active: false }))().catch((x: unknown) => x);
+    expect(errorMessage(makeT("en-US"), e)).toBe("Capture cancelled: you switched tabs");
+    expect(errorMessage(makeT("pt-BR"), e)).toBe("Captura cancelada: você mudou de aba");
   });
 });
 

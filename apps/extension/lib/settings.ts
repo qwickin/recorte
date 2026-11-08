@@ -1,3 +1,4 @@
+import type { Locale } from "@recorte/shared";
 import { browser } from "wxt/browser";
 import type { Connection } from "./api";
 import { accountKey } from "./queue";
@@ -11,8 +12,10 @@ export interface Settings {
   userId: string | null;
   /** The account's email (shown in the options; pre-fills a reconnect). */
   email: string | null;
-  /** "Guardar sem perguntar": skip the pre-save dialog. */
+  /** "Save without asking": skip the pre-save dialog. */
   saveWithoutAsking: boolean;
+  /** Options language override (lib/i18n/browser.ts LOCALE_KEY); null = follow the browser. */
+  locale: Locale | null;
   /** Set when the server answered 401 (token revoked/expired). Cleared on a new login. */
   authNeeded: boolean;
 }
@@ -24,6 +27,7 @@ const DEFAULTS: Settings = {
   userId: null,
   email: null,
   saveWithoutAsking: false,
+  locale: null,
   authNeeded: false,
 };
 

@@ -1,4 +1,6 @@
-import { type Category, type TagCount, normalizeTag, normalizeTags } from "@recorte/shared";
+import { type Category, DEFAULT_LOCALE, formatNumber, normalizeTag, normalizeTags, type TagCount } from "@recorte/shared";
+import { makeT, type T } from "./i18n";
+import { MAX_FULL_PAGE_HEIGHT } from "./stitch";
 import type { DialogInput, LinkPreview } from "./messages";
 import { h, mount } from "./ui";
 
@@ -18,13 +20,15 @@ export interface DialogOptions {
   loadTags(): Promise<TagCount[]>;
   loadCategories(): Promise<Category[]>;
   createCategory(name: string): Promise<Category>;
+  /** The extension's UI language (lib/i18n/browser getT); English when omitted. */
+  t?: T;
 }
 
 export const DIALOG_CSS = `
 .backdrop { position: fixed; inset: 0; background: rgb(0 0 0 / .62); backdrop-filter: blur(6px);
   display: grid; place-items: center; padding: 24px; animation: rc-dim .18s ease-out; }
 /* The panel always fits the viewport, whatever the capture size: the preview is contained, the form body scrolls
-   and the footer (Cancelar / Guardar) stays visible. */
+   and the footer (Cancel / Save) stays visible. */
 .panel { position: relative; width: min(920px, 100%); height: min(640px, calc(100vh - 48px)); display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(300px, 1fr); grid-template-rows: minmax(0, 1fr);
   background: #000; border-radius: 18px; overflow: hidden;
@@ -117,6 +121,7 @@ const fold = (s: string) => normalizeTag(s).normalize("NFD").replace(/\p{M}/gu, 
 
 /** Renders the dialog into `container`; resolves with the user's input, or null when cancelled. */
 export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Promise<DialogInput | null> {
+  const t = o.t ?? makeT(DEFAULT_LOCALE);
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
   return new Promise((resolve) => {
@@ -129,13 +134,13 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     };
 
     // --- fields
-    const titleInput = h("input", { class: "input", type: "text", "aria-label": "Título", maxlength: "500" });
+    const titleInput = h("input", { class: "input", type: "text", "aria-label": t("dialog.title"), maxlength: "500" });
     titleInput.value = o.title;
     // Plain Enter must not submit implicitly: saving is Cmd/Ctrl+Enter or the button.
     titleInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !(e.metaKey || e.ctrlKey)) e.preventDefault();
     });
-    const noteInput = h("textarea", { rows: "3", "aria-label": "Nota", placeholder: "Porque guardaste isto?" });
+    const noteInput = h("textarea", { rows: "3", "aria-label": t("dialog.note"), placeholder: t("dialog.notePlaceholder") });
 
     const tags: string[] = [];
     let allTags: TagCount[] = [];
@@ -143,8 +148,8 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     const tagInput = h("input", {
       class: "tag-input",
       type: "text",
-      "aria-label": "Etiquetas",
-      placeholder: "Adicionar etiqueta",
+      "aria-label": t("dialog.tags"),
+      placeholder: t("dialog.addTag"),
       autocomplete: "off",
     });
     const suggest = h("ul", { class: "suggest", role: "listbox" });
@@ -154,20 +159,20 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
 
     const renderChips = () => {
       chips.replaceChildren(
-        ...tags.map((t) => {
-          const x = h("button", { type: "button", "aria-label": `Remover ${t}` }, "×");
+        ...tags.map((tag) => {
+          const x = h("button", { type: "button", "aria-label": t("dialog.removeTag", { tag }) }, "×");
           x.addEventListener("click", () => {
-            tags.splice(tags.indexOf(t), 1);
+            tags.splice(tags.indexOf(tag), 1);
             renderChips();
             tagInput.focus();
           });
-          return h("span", { class: "chip" }, t, x);
+          return h("span", { class: "chip" }, tag, x);
         }),
         tagInput,
       );
     };
     const addTag = (raw: string) => {
-      for (const t of normalizeTags(raw.split(","))) if (!tags.includes(t)) tags.push(t);
+      for (const tag of normalizeTags(raw.split(","))) if (!tags.includes(tag)) tags.push(tag);
       tagInput.value = "";
       renderChips();
       updateSuggest();
@@ -177,15 +182,15 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
       const q = fold(tagInput.value);
       suggestions = q
         ? allTags
-            .filter((t) => !tags.includes(t.tag) && fold(t.tag).includes(q))
+            .filter((x) => !tags.includes(x.tag) && fold(x.tag).includes(q))
             .sort((a, b) => Number(fold(b.tag).startsWith(q)) - Number(fold(a.tag).startsWith(q)) || b.count - a.count)
             .slice(0, 8)
-            .map((t) => t.tag)
+            .map((x) => x.tag)
         : [];
       active = suggestions.length ? 0 : -1;
       suggest.replaceChildren(
         ...suggestions.map((s, i) => {
-          const count = allTags.find((t) => t.tag === s)?.count ?? 0;
+          const count = allTags.find((x) => x.tag === s)?.count ?? 0;
           const li = h("li", { role: "option", "aria-selected": String(i === active) }, h("span", {}, s), h("span", { class: "n" }, String(count)));
           li.addEventListener("mousedown", (e) => {
             e.preventDefault();
@@ -226,18 +231,18 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
 
     // --- category
     const NEW = "__new__";
-    const select = h("select", { "aria-label": "Categoria" });
+    const select = h("select", { "aria-label": t("dialog.category") });
     const newRow = h("div", { class: "row" });
-    const newInput = h("input", { class: "input", type: "text", placeholder: "Nome da categoria", "aria-label": "Nova categoria" });
-    const newBtn = h("button", { class: "btn ghost", type: "button" }, "Criar");
+    const newInput = h("input", { class: "input", type: "text", placeholder: t("dialog.categoryName"), "aria-label": t("dialog.newCategoryLabel") });
+    const newBtn = h("button", { class: "btn ghost", type: "button" }, t("dialog.create"));
     newRow.append(newInput, newBtn);
     newRow.hidden = true;
     let categories: Category[] = [];
     const renderSelect = (selected: string) => {
       select.replaceChildren(
-        h("option", { value: "" }, "Sem categoria"),
+        h("option", { value: "" }, t("dialog.noCategory")),
         ...categories.map((c) => h("option", { value: c.id }, c.name)),
-        h("option", { value: NEW }, "+ Nova categoria…"),
+        h("option", { value: NEW }, t("dialog.newCategory")),
       );
       select.value = selected;
     };
@@ -264,14 +269,14 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
       newBtn.disabled = true;
       try {
         const c = await o.createCategory(name);
-        categories = [...categories.filter((x) => x.id !== c.id), c].sort((a, b) => a.name.localeCompare(b.name, "pt"));
+        categories = [...categories.filter((x) => x.id !== c.id), c].sort((a, b) => a.name.localeCompare(b.name, t.locale));
         lastCategory = c.id;
         renderSelect(c.id);
         newRow.hidden = true;
         newInput.value = "";
         error.hidden = true;
       } catch (e) {
-        showError(e instanceof Error ? e.message : "Não foi possível criar a categoria.");
+        showError(e instanceof Error && e.message ? e.message : t("dialog.createFailed"));
       } finally {
         newBtn.disabled = false;
       }
@@ -282,8 +287,8 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     });
 
     // --- data (through the background; never fetch from the page)
-    o.loadTags().then((t) => {
-      allTags = t;
+    o.loadTags().then((list) => {
+      allTags = list;
       if (tagInput.value) updateSuggest();
     }, () => {});
     o.loadCategories().then(
@@ -295,9 +300,9 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     );
 
     // --- layout
-    const img = h("img", { alt: "Pré-visualização da captura", src: o.preview });
-    const save = h("button", { class: "btn primary", type: "submit" }, "Guardar", h("kbd", {}, isMac ? "⌘↵" : "Ctrl+↵"));
-    const cancel = h("button", { class: "btn ghost", type: "button" }, "Cancelar", h("kbd", {}, "Esc"));
+    const img = h("img", { alt: t("dialog.preview"), src: o.preview });
+    const save = h("button", { class: "btn primary", type: "submit" }, t("dialog.save"), h("kbd", {}, isMac ? "⌘↵" : "Ctrl+↵"));
+    const cancel = h("button", { class: "btn ghost", type: "button" }, t("dialog.cancel"), h("kbd", {}, "Esc"));
     const form = h(
       "form",
       {},
@@ -305,11 +310,11 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
         "div",
         { class: "body" },
         h("header", {}, h("span", { class: "brand" }, "Recorte"), h("span", { class: "site" }, o.site)),
-        h("label", { class: "field" }, h("span", { class: "label" }, "Título"), titleInput),
-        h("label", { class: "field" }, h("span", { class: "label" }, "Nota"), noteInput),
-        h("div", { class: "field" }, h("span", { class: "label" }, "Etiquetas"), chips, suggest),
-        h("div", { class: "field" }, h("span", { class: "label" }, "Categoria"), select, newRow),
-        o.truncated && h("p", { class: "note" }, "A página é muito alta: foram guardados os primeiros 12 000 px."),
+        h("label", { class: "field" }, h("span", { class: "label" }, t("dialog.title")), titleInput),
+        h("label", { class: "field" }, h("span", { class: "label" }, t("dialog.note")), noteInput),
+        h("div", { class: "field" }, h("span", { class: "label" }, t("dialog.tags")), chips, suggest),
+        h("div", { class: "field" }, h("span", { class: "label" }, t("dialog.category")), select, newRow),
+        o.truncated && h("p", { class: "note" }, t("dialog.truncated", { px: formatNumber(MAX_FULL_PAGE_HEIGHT, t.locale) })),
         error,
       ),
       h("footer", {}, cancel, save),
@@ -317,9 +322,9 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     const preview = h("div", { class: "preview" }, o.link ? linkCard(o.link, o.site, o.title) : img);
     // A very tall capture is shrunk to fit: say it is whole.
     img.addEventListener("load", () => {
-      if (img.naturalHeight > img.naturalWidth * 3) preview.append(h("span", { class: "tall" }, "Página inteira (reduzida para caber)"));
+      if (img.naturalHeight > img.naturalWidth * 3) preview.append(h("span", { class: "tall" }, t("dialog.tall")));
     });
-    const panel = h("div", { class: "panel", role: "dialog", "aria-modal": "true", "aria-label": "Guardar no Recorte" }, preview, form);
+    const panel = h("div", { class: "panel", role: "dialog", "aria-modal": "true", "aria-label": t("dialog.label") }, preview, form);
     const backdrop = h("div", { class: "backdrop" }, panel);
     container.append(backdrop);
 
@@ -334,7 +339,7 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     };
     form.addEventListener("submit", (e) => (e.preventDefault(), submit()));
     cancel.addEventListener("click", () => finish(null));
-    // A click outside the panel does nothing: only Cancelar / Esc discard the capture.
+    // A click outside the panel does nothing: only Cancel / Esc discard the capture.
     container.ownerDocument.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();

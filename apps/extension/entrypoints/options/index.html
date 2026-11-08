@@ -1,68 +1,75 @@
 <!doctype html>
-<html lang="pt-PT">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recorte — Opções</title>
+    <title data-i18n="options.pageTitle">Recorte</title>
     <meta name="manifest.open_in_tab" content="true" />
   </head>
   <body>
     <main class="options">
       <header>
         <h1>Recorte</h1>
-        <p class="muted">Liga a extensão ao teu servidor com o URL público, o teu email e a palavra-passe. A palavra-passe serve só para criar um token deste dispositivo e nunca fica guardada.</p>
+        <p class="muted" data-i18n="options.intro"></p>
       </header>
 
       <section class="card" id="connected" hidden>
         <div>
-          <span class="label">Ligado</span>
-          <p class="who"><span class="muted">Servidor</span> <span id="who-server"></span></p>
-          <p class="who" id="who-email-row" hidden><span class="muted">Conta</span> <span id="who-email"></span></p>
-          <p class="error" id="auth-needed" hidden>O servidor recusou o token deste dispositivo. Volta a ligar a extensão — as capturas pendentes ficam na fila.</p>
+          <span class="label" data-i18n="options.connected"></span>
+          <p class="who"><span class="muted" data-i18n="options.server"></span> <span id="who-server"></span></p>
+          <p class="who" id="who-email-row" hidden><span class="muted" data-i18n="options.account"></span> <span id="who-email"></span></p>
+          <p class="error" id="auth-needed" hidden data-i18n="options.authNeeded"></p>
         </div>
         <div class="actions">
-          <button class="btn ghost" id="reconnect" type="button">Voltar a ligar</button>
-          <button class="btn ghost" id="disconnect" type="button">Desligar</button>
+          <button class="btn ghost" id="reconnect" type="button" data-i18n="options.reconnect"></button>
+          <button class="btn ghost" id="disconnect" type="button" data-i18n="options.disconnect"></button>
         </div>
       </section>
 
       <form class="card" id="login" autocomplete="on">
-        <label class="field"><span class="label">URL do servidor</span>
+        <label class="field"><span class="label" data-i18n="options.serverUrl"></span>
           <input class="input" id="server" name="server" type="text" inputmode="url" placeholder="http://192.168.1.20:8080" required autocomplete="url" spellcheck="false" />
         </label>
-        <label class="field"><span class="label">Email</span>
+        <label class="field"><span class="label" data-i18n="options.email"></span>
           <input class="input" id="email" name="email" type="email" inputmode="email" required autocomplete="username" spellcheck="false" />
         </label>
-        <label class="field"><span class="label">Palavra-passe</span>
+        <label class="field"><span class="label" data-i18n="options.password"></span>
           <input class="input" id="password" name="password" type="password" required autocomplete="current-password" />
         </label>
-        <label class="field"><span class="label">Nome deste dispositivo <span class="muted">(opcional)</span></span>
+        <label class="field"><span class="label"><span data-i18n="options.deviceName"></span> <span class="muted" data-i18n="options.optional"></span></span>
           <input class="input" id="device" name="device" type="text" maxlength="80" />
         </label>
         <p class="error" id="login-error" hidden></p>
         <div class="actions">
-          <button class="btn ghost" id="cancel-login" type="button" hidden>Cancelar</button>
-          <button class="btn primary" id="connect" type="submit">Ligar</button>
+          <button class="btn ghost" id="cancel-login" type="button" hidden data-i18n="options.cancel"></button>
+          <button class="btn primary" id="connect" type="submit" data-i18n="options.connect"></button>
         </div>
       </form>
 
       <section class="card parked" id="parked" hidden>
-        <p><span id="parked-text"></span><br /><span class="muted small">Ficam guardadas e só são enviadas quando voltares a ligar essa conta neste servidor.</span></p>
-        <div class="actions"><button class="btn ghost" id="discard-parked" type="button">Descartar</button></div>
+        <p><span id="parked-text"></span><br /><span class="muted small" data-i18n="options.parkedHint"></span></p>
+        <div class="actions"><button class="btn ghost" id="discard-parked" type="button" data-i18n="options.discard"></button></div>
       </section>
 
       <section class="card">
         <label class="toggle">
           <input type="checkbox" id="save-without-asking" />
           <span>
-            <b>Guardar sem perguntar</b><br />
-            <span class="muted">Envia logo a captura, sem o diálogo de título, nota, etiquetas e categoria.</span>
+            <b data-i18n="options.saveWithoutAsking"></b><br />
+            <span class="muted" data-i18n="options.saveWithoutAskingHint"></span>
           </span>
         </label>
       </section>
 
       <section class="card">
-        <span class="label">Atalhos</span>
+        <label class="field"><span class="label" data-i18n="options.language"></span>
+          <select class="input" id="language"></select>
+        </label>
+        <p class="muted small" data-i18n="options.languageHint"></p>
+      </section>
+
+      <section class="card">
+        <span class="label" data-i18n="options.shortcuts"></span>
         <ul class="shortcuts" id="shortcuts"></ul>
         <p class="muted small" id="shortcuts-hint"></p>
       </section>
