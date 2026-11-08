@@ -6,7 +6,8 @@
 //   no environment at all), on a free 127.0.0.1 port with a throw-away named volume.
 // - Completes /setup through the API with email + password (inside the 15-minute window), saves the
 //   public URL, gets a device token, uploads two captures, waits for the AI tags, then drives the gallery in
-//   Chromium: login (email + password), tiles, ⌘K/Ctrl+K "doce português" (grid of image cards, arrow keys), ZIP download. Ends with reset-password.
+//   Chromium (en-US): login (email + password), tiles, ⌘K/Ctrl+K "doce português" (grid of image cards, arrow keys), ZIP download,
+//   then the language: a French browser gets French copy, and switching to pt-BR in Settings changes the UI. Ends with reset-password.
 // - Always removes the container and the volume (set E2E_KEEP=1 to leave them).
 // - Chromium: $CHROMIUM_PATH, else the newest Chromium in the Playwright cache, else playwright-core's default.
 // The first run needs internet: Meilisearch downloads its embedding model on first start.
@@ -191,7 +192,7 @@ test("docker run with no configuration: healthy, /setup open, Meilisearch only o
   assert.equal(health.ok, true);
   assert.equal(health.version, v.APP_VERSION);
   assert.deepEqual(await (await fetch(`${base}/api/setup`)).json(), { needsSetup: true, open: true });
-  assert.match(logs(), /Abre http:\/\/\S+:8080\/setup nos próximos 15 minutos para configurar/);
+  assert.match(logs(), /Open http:\/\/\S+:8080\/setup within the next 15 minutes/);
 
   // Only 8080 is published; Meilisearch answers inside the container on 127.0.0.1:7700 and listens nowhere else.
   assert.deepEqual(docker(["port", RUN], { quiet: true }).trim().split("\n").map((l) => l.split(" ")[0]), ["8080/tcp"]);
@@ -312,23 +313,26 @@ test("search 'doce português' finds the pastel de nata (API, waits for the embe
 test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download", { timeout: 5 * 60_000 }, async () => {
   const executablePath = chromiumPath();
   browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  // Pinned: the copy below is the English default, whatever language this machine reports.
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: "en-US" });
   const page = await ctx.newPage();
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
 
   await page.goto(base + "/");
   await page.waitForURL(/\/login/);
+  assert.equal(await page.locator("html").getAttribute("lang"), "en-US");
+  assert.equal(await page.title(), "Sign in · Recorte");
   await page.getByLabel("Email").fill(EMAIL);
-  await page.getByLabel("Palavra-passe").fill(PASSWORD);
-  await page.getByRole("button", { name: "Entrar" }).click();
+  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in" }).click();
 
   for (const key of ["map", "nata"] as const) {
     await page.locator(`[aria-label^="${CAPTURES[key].title},"]`).first().waitFor({ state: "visible", timeout: 30_000 });
   }
 
   await page.keyboard.press("ControlOrMeta+k");
-  const input = page.getByPlaceholder("Descreve a captura que procuras");
+  const input = page.getByPlaceholder("Describe the capture you’re looking for");
   await input.waitFor({ state: "visible" });
   await input.fill("doce português");
   const option = page.getByRole("option").filter({ hasText: "Pastel de nata" }).first();
@@ -360,7 +364,31 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download
   assert.equal(body.subarray(0, 2).toString(), "PK");
   const anon = await fetch(base + "/downloads/recorte-chrome.zip");
   assert.equal(anon.status, 401, "ZIPs need a session");
+
+  // Switching to pt-BR in Settings changes the UI at once, and the choice survives a reload.
+  await page.goto(base + "/definicoes");
+  await page.getByRole("heading", { name: "Settings", level: 1 }).waitFor();
+  await page.getByLabel("Language").selectOption("pt-BR");
+  await page.getByRole("heading", { name: "Configurações", level: 1 }).waitFor();
+  assert.equal(await page.locator("html").getAttribute("lang"), "pt-BR");
+  assert.equal(await page.title(), "Configurações · Recorte");
+  assert.ok(await page.getByRole("link", { name: "Lixeira" }).isVisible());
+  await page.reload();
+  await page.getByRole("heading", { name: "Configurações", level: 1 }).waitFor();
+  await page.getByRole("link", { name: "Recorte" }).click();
+  await page.getByRole("button", { name: "Pesquisar capturas" }).waitFor();
+  // The hero line appears once the tag counts arrive.
+  await page.getByText(/2 capturas e \d+ tags?\. Clique numa tag para filtrar/).waitFor({ timeout: 15_000 });
   assert.deepEqual(errors, []);
+
+  // A browser in French gets French copy without choosing anything.
+  const fr = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: "fr-FR" });
+  const frPage = await fr.newPage();
+  await frPage.goto(base + "/login");
+  await frPage.getByRole("heading", { name: "Connexion" }).waitFor();
+  assert.equal(await frPage.locator("html").getAttribute("lang"), "fr");
+  assert.ok(await frPage.getByLabel("Mot de passe").isVisible());
+  await fr.close();
 });
 
 test("resources: image size and container memory", async () => {

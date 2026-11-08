@@ -238,6 +238,7 @@ export const en = {
   "dock.selected": "{count, plural, one {# selected} other {# selected}}",
   "dock.all": "All",
   "dock.addTag": "Add tag",
+  "dock.addTagPlaceholder": "Add tag",
   "dock.changeCategory": "Change category",
   "dock.categoryPlaceholder": "Category…",
   "dock.failed": "Something went wrong. Try again.",

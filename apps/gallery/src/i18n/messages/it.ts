@@ -222,6 +222,7 @@ export const it: Messages<typeof en> = {
   "dock.selected": "{count, plural, one {# selezionata} other {# selezionate}}",
   "dock.all": "Tutte",
   "dock.addTag": "Aggiungi tag",
+  "dock.addTagPlaceholder": "+ tag",
   "dock.changeCategory": "Cambia categoria",
   "dock.categoryPlaceholder": "Categoria…",
   "dock.failed": "Qualcosa è andato storto. Riprova.",

@@ -288,7 +288,7 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
             <input
               value={tag}
               onChange={(e) => setTag(e.target.value)}
-              placeholder={t("dock.addTag")}
+              placeholder={t("dock.addTagPlaceholder")}
               aria-label={t("dock.addTag")}
               maxLength={40}
               disabled={none || busy}

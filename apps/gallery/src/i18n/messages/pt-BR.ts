@@ -222,6 +222,7 @@ export const ptBR: Messages<typeof en> = {
   "dock.selected": "{count, plural, one {# selecionada} other {# selecionadas}}",
   "dock.all": "Todas",
   "dock.addTag": "Adicionar tag",
+  "dock.addTagPlaceholder": "+ tag",
   "dock.changeCategory": "Mudar categoria",
   "dock.categoryPlaceholder": "Categoria…",
   "dock.failed": "Algo deu errado. Tente de novo.",
