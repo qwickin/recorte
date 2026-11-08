@@ -513,7 +513,7 @@ export function aiTags(ai: { tipo: string[]; visual: string[]; topics?: string[]
   if (ai.topics?.length) return ai.topics;
   const out: string[] = [];
   for (const raw of [...ai.tipo, ...ai.visual]) {
-    const id = SCREENSHOT_TAG_IDS[raw];
+    const id = Object.hasOwn(SCREENSHOT_TAG_IDS, raw) ? SCREENSHOT_TAG_IDS[raw] : undefined;
     if (id && !out.includes(id)) out.push(id);
   }
   return out;

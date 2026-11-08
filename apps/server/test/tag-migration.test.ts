@@ -114,6 +114,22 @@ describe("tag ID migration", () => {
     expect((t.db.prepare("SELECT value FROM settings WHERE key = 'tagIdsVersion'").get() as { value: string }).value).toBe(TAG_IDS_VERSION);
   });
 
+  it("an item that fails to migrate keeps the version unset, so the next start tries again", async () => {
+    const { upload, deps } = await setup();
+    await upload();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const read = vi.spyOn(deps.storage, "readMeta").mockImplementationOnce(() => { throw new Error("EIO"); });
+    try {
+      expect(migrateTagIds(deps).failed).toBe(1);
+      expect(deps.db.prepare("SELECT value FROM settings WHERE key = 'tagIdsVersion'").get()).toBeUndefined();
+    } finally {
+      read.mockRestore();
+      warn.mockRestore();
+    }
+    expect(migrateTagIds(deps).failed).toBeUndefined();
+    expect(deps.db.prepare("SELECT value FROM settings WHERE key = 'tagIdsVersion'").get()).toBeDefined();
+  });
+
   it("is idempotent: runs once per version, and the mapping of migrated data is a no-op", async () => {
     const { t, upload, deps, userId, legacy, jobs } = await setup();
     const a = await upload();

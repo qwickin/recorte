@@ -14,7 +14,7 @@ export const TAG_IDS_VERSION = "1";
 /** An AI tag as stored before IDs (a pt-PT topic name or a raw screenshot label) → its ID; IDs and the rest unchanged. */
 export function legacyTagId(tag: string): string {
   if (isTagId(tag)) return tag;
-  return topicId(tag) ?? SCREENSHOT_TAG_IDS[tag] ?? tag;
+  return topicId(tag) ?? (Object.hasOwn(SCREENSHOT_TAG_IDS, tag) ? SCREENSHOT_TAG_IDS[tag] : undefined) ?? tag;
 }
 
 const dedupe = (a: string[]): string[] => [...new Set(a)];
@@ -55,13 +55,14 @@ export function migrateItemTags(m: Item): Item | null {
  * the new tag fields; the pipeline never writes `user`, which is why this is not part of the retag.
  * Safe to run again after a crash halfway (the version is written last; the mapping is idempotent).
  */
-export function migrateTagIds(deps: Deps): { items: number; changed: number } {
+export function migrateTagIds(deps: Deps): { items: number; changed: number; failed?: number } {
   const row = deps.db.prepare("SELECT value FROM settings WHERE key = 'tagIdsVersion'").get() as { value: string } | undefined;
   if (row?.value === TAG_IDS_VERSION) return { items: 0, changed: 0 };
   const svc = itemService(deps);
   const repo = itemsRepo(deps.db);
   const rows = deps.db.prepare("SELECT id, user_id AS userId FROM items ORDER BY created_at DESC").all() as { id: string; userId: string }[];
   let changed = 0;
+  let failed = 0;
   for (const { id, userId } of rows) {
     try {
       const m = deps.storage.readMeta(userId, id);
@@ -74,9 +75,12 @@ export function migrateTagIds(deps: Deps): { items: number; changed: number } {
       if (!m.deletedAt) deps.queue.enqueue("index", { id, userId });
     } catch (e) {
       // One unreadable item must not keep the server from starting; it keeps its old tags.
+      failed++;
       console.warn(`tag migration failed for ${id}:`, (e as Error).message);
     }
   }
+  // Not marked done: the next start tries again (the mapping is idempotent), and the caller holds the retag back.
+  if (failed) return { items: rows.length, changed, failed };
   deps.db
     .prepare("INSERT INTO settings (key, value, updated_at) VALUES ('tagIdsVersion', ?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at")
     .run(TAG_IDS_VERSION, new Date().toISOString());

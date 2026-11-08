@@ -97,8 +97,8 @@ export function startRuntime(deps: Deps & { queue: SqliteQueue }, opts: { classi
   });
   // Order matters: tags become IDs (user tags and hidden AI tags included) before any job can run, then the
   // tagger upgrade re-tags into IDs, then the worker starts.
-  migrateTagIds(deps);
-  retagOutdated(deps);
+  // An item the migration could not convert would show again the AI tags its owner removed if re-tagged now.
+  if (!migrateTagIds(deps).failed) retagOutdated(deps);
   worker.start();
 
   const abort = new AbortController();
