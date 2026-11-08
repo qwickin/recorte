@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampRect, expandRect, rectsIntersect } from "../lib/extract";
+import { clampRect, expandRect, pickNearHeadings, rectsIntersect } from "../lib/extract";
 
 describe("rectsIntersect", () => {
   const a = { x: 0, y: 0, width: 100, height: 100 };
@@ -30,5 +30,19 @@ describe("clampRect", () => {
       width: 40,
       height: 580,
     });
+  });
+});
+
+describe("pickNearHeadings", () => {
+  const h = (text: string, y: number, height = 30) => ({ text, rect: { x: 0, y, width: 400, height } });
+  const hs = [h("Página", -900), h("Secção A", -300), h("Secção B", -120), h("Dentro", 140), h("Mais abaixo", 900)];
+  it("takes the headings inside the area, then the closest one above it", () => {
+    expect(pickNearHeadings(hs, { x: 0, y: 100, width: 600, height: 200 })).toEqual(["Dentro", "Secção B"]);
+  });
+  it("an area with no heading inside gets the section above", () => {
+    expect(pickNearHeadings(hs, { x: 0, y: 400, width: 600, height: 300 })).toEqual(["Dentro"]);
+  });
+  it("ignores hidden (zero-height) headings and dedupes", () => {
+    expect(pickNearHeadings([h("Oculto", 10, 0), h("X", -50), h("X", 120)], { x: 0, y: 100, width: 100, height: 100 })).toEqual(["X"]);
   });
 });

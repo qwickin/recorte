@@ -13,7 +13,10 @@ export interface Rect {
 
 /** Margin (CSS px) added around the captured rect when collecting text. */
 export const TEXT_MARGIN = 48;
-export const MAX_HEADINGS = 20;
+export const MAX_HEADINGS = UPLOAD_LIMITS.headings;
+export const MAX_NEAR_HEADINGS = UPLOAD_LIMITS.nearHeadings;
+/** Whole-page Readability text cap (separate from the 20 000-char budget of the other fields). */
+export const MAX_PAGE_TEXT = UPLOAD_LIMITS.pageText;
 const MAX_ALTS = UPLOAD_LIMITS.alts;
 const MAX_OG = UPLOAD_LIMITS.ogKeys;
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE", "SVG", "CANVAS", "IFRAME", "OBJECT", "SELECT"]);
@@ -60,6 +63,53 @@ function pageMeta(doc: Document): ItemText["meta"] {
   }
   if (Object.keys(og).length) meta.og = og;
   return meta;
+}
+
+function metaKeywords(doc: Document): string[] {
+  const raw = doc.querySelector<HTMLMetaElement>('meta[name="keywords" i]')?.content ?? "";
+  const out: string[] = [];
+  for (const k of raw.split(/[,;]/)) {
+    const t = collapse(k).slice(0, UPLOAD_LIMITS.heading);
+    if (t && !out.includes(t)) out.push(t);
+    if (out.length >= UPLOAD_LIMITS.pageKeywords) break;
+  }
+  return out;
+}
+
+export interface PlacedHeading {
+  text: string;
+  /** Viewport coordinates. */
+  rect: Rect;
+}
+
+/**
+ * Headings that describe the captured area: the ones inside it (with the text margin), then the closest one above
+ * it (the section the area belongs to). Nearest first, at most MAX_NEAR_HEADINGS.
+ */
+export function pickNearHeadings(hs: PlacedHeading[], area: Rect, margin = TEXT_MARGIN): string[] {
+  const zone = expandRect(area, margin);
+  const inside = hs.filter((h) => rectsIntersect(h.rect, zone));
+  const above = hs
+    .filter((h) => h.rect.height > 0 && h.rect.y + h.rect.height <= zone.y && !inside.includes(h))
+    .sort((a, b) => b.rect.y - a.rect.y);
+  const out: string[] = [];
+  for (const h of [...inside, ...above.slice(0, 1)]) {
+    if (h.text && !out.includes(h.text)) out.push(h.text);
+    if (out.length >= MAX_NEAR_HEADINGS) break;
+  }
+  return out;
+}
+
+function placedHeadings(doc: Document): PlacedHeading[] {
+  const out: PlacedHeading[] = [];
+  for (const h of doc.querySelectorAll("h1, h2, h3, h4")) {
+    const text = collapse(h.textContent ?? "").slice(0, UPLOAD_LIMITS.heading);
+    if (!text) continue;
+    const r = h.getBoundingClientRect();
+    out.push({ text, rect: { x: r.left, y: r.top, width: r.width, height: r.height } });
+    if (out.length >= 400) break;
+  }
+  return out;
 }
 
 function headings(doc: Document): string[] {
@@ -185,23 +235,38 @@ export interface ExtractRequest {
   image?: { alt: string; caption: string };
 }
 
-/** Text payload of an item, before the 20 000-char cap (applied in buildUploadMeta). */
+/**
+ * Text payload of an item, before the caps (applied in buildUploadMeta). Every capture carries the whole page's
+ * context in `page` (Readability text, meta keywords, headings near the area); the selection is the area's own text.
+ */
 export function extractText(doc: Document, req: ExtractRequest, ignore?: Element | null): ItemText {
   const meta = pageMeta(doc);
   const hs = headings(doc);
-  if (req.kind === "full") return { selection: readableText(doc), meta, headings: hs, alts: altsIn(doc, null) };
+  const keywords = metaKeywords(doc);
+  const page = (text: string, near: string[]): NonNullable<ItemText["page"]> => ({
+    text: text.slice(0, MAX_PAGE_TEXT),
+    ...(keywords.length ? { keywords } : {}),
+    ...(near.length ? { nearHeadings: near } : {}),
+  });
+  // A full page: the selection already is the page's main text; do not send it twice.
+  if (req.kind === "full") return { selection: readableText(doc), meta, headings: hs, alts: altsIn(doc, null), page: page("", []) };
+  const whole = readableText(doc);
+  // "Guardar link"/"Guardar esta página": no area, the page itself is the content.
+  if (req.kind === "link" || req.kind === "page") return { selection: "", meta, headings: hs, alts: [], page: page(whole, []) };
   const viewport: Rect = { x: 0, y: 0, width: innerWidth, height: innerHeight };
   const rect = req.rect ?? viewport;
+  const near = pickNearHeadings(placedHeadings(doc), rect);
   if (req.kind === "image") {
     const alt = collapse(req.image?.alt ?? "");
     const caption = collapse(req.image?.caption ?? "");
     const selection = [alt, caption].filter((s, i, a) => s && a.indexOf(s) === i).join("\n");
-    return { selection, meta, headings: hs, alts: alt ? [alt] : [] };
+    return { selection, meta, headings: hs, alts: alt ? [alt] : [], page: page(whole, near) };
   }
   return {
     selection: textInRect(doc, expandRect(rect, TEXT_MARGIN), ignore),
     meta,
     headings: hs,
     alts: altsIn(doc, expandRect(rect, TEXT_MARGIN)),
+    page: page(whole, near),
   };
 }

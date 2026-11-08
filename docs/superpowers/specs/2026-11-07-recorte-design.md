@@ -110,13 +110,13 @@ caminho para atualizar o Meilisearch de versão: apagar o volume e reindexar.
 Cada item tem um tipo, preparado desde já para as fases 2 e 3:
 
 ```ts
-type ItemType = "screenshot" | "post" | "article";       // post = fase 2 (X.com), article = fase 3
+type ItemType = "screenshot" | "link" | "post" | "article"; // link = "Guardar link"; post/article ficam reservados
 
 type Item = {
   id: string;                    // ULID (ordenável por tempo)
   userId: string;
   type: ItemType;
-  kind?: "area" | "visible" | "full" | "image";           // subtipo de screenshot; "image" = "Guardar esta imagem"
+  kind?: "area" | "visible" | "full" | "image" | "link" | "page"; // "image" = "Guardar esta imagem"; link/page = "Guardar link"
   source: { url: string; site: string; pageTitle: string }; // site = hostname sem "www."
   createdAt: string; updatedAt: string; deletedAt: string | null;
   media: Media[];                // media[0] é a imagem do tile
@@ -129,7 +129,12 @@ type Item = {
     title?: string; description?: string;                                 // só com IA cloud ligada
     model: string; processedAt: string | null;
   };
-  text: { selection: string; meta: { description?: string; og?: Record<string, string> }; headings: string[]; alts: string[] };
+  text: { selection: string; meta: { description?: string; og?: Record<string, string> }; headings: string[]; alts: string[];
+          page?: { text: string; keywords?: string[]; nearHeadings?: string[] } };   // page = contexto da página inteira
+  link?: {                       // type "link": o que o servidor tirou do URL (a og:image, se houver, é media[0])
+    canonicalUrl?: string; title?: string; description?: string; siteName?: string; ogType?: string;
+    favicon?: string; embedUrl?: string; fetchedAt?: string; fetchError?: string;
+  };
   post?: {                       // fase 2 (só o esboço)
     author: { name: string; handle: string; avatar?: string };
     text: string; publishedAt: string; permalink: string; quoted?: { author: string; text: string; permalink: string };
@@ -191,10 +196,15 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
   - o menu de contexto.
 
 **Extração de texto (no content script)**
-- Nós de texto que intersetam o retângulo capturado mais uma margem de 48 px.
-- `document.title`, meta description, `og:*`, h1–h3 da página (até 20) e o `alt` das imagens dentro da área.
-- Na página inteira, o conteúdo principal com Readability (Mozilla).
-- Limite total de 20 000 caracteres. Não se envia HTML bruto.
+- Nós de texto que intersetam o retângulo capturado mais uma margem de 48 px (`text.selection`).
+- `document.title`, meta description, `og:*`, h1–h3 da página (até 40) e o `alt` das imagens dentro da área.
+- **Contexto da página inteira em todas as capturas** (`text.page`, campo aditivo): o texto principal da página com
+  Readability (Mozilla, até 20 000 caracteres, com orçamento próprio), as `meta keywords` e os headings dentro da
+  área ou logo acima dela (`nearHeadings`). Na página inteira, a seleção já é o texto principal e `page.text` fica
+  vazio.
+- Limite de 20 000 caracteres para os outros campos juntos. Não se envia HTML bruto.
+- O servidor pesa as palavras-chave assim: seleção e headings perto dela primeiro; título e headings da página a
+  seguir; o texto da página inteira por último, com um teto por termo para uma página longa não abafar a seleção.
 
 **Diálogo antes de enviar**
 - Injetado na página dentro de Shadow DOM, com o aspeto da galeria.
@@ -284,8 +294,9 @@ Cada pedido envia `Authorization: Bearer <token>` e `X-Extension-Version`.
    - **visual**: só rótulos informativos (`modo escuro`, `gradiente`, `imagens`), cada um com o seu limiar.
    - Não há grupo de **assunto** no classificador: no benchmark errou demasiado (o Hacker News saiu "arte", o arXiv
      "história").
-3. **Palavras-chave:** extração determinística (sem IA) a partir do título, do texto da seleção, dos headings, da
-   meta description e do domínio. Usa stopwords pt e en, unigramas e bigramas, e devolve as 12 melhores em
+3. **Palavras-chave:** extração determinística (sem IA) a partir da seleção e dos headings perto dela, do título, dos
+   headings da página, da meta description e das meta keywords, do domínio e (com menos peso) do texto da página
+   inteira. Usa stopwords pt e en, unigramas e bigramas, e devolve as 12 melhores em
    `ai.keys`.
 4. **IA cloud (opcional, desligada por defeito):**
    - Ativa-se em Definições → Servidor (ou no `/setup`), ou com `AI_CLOUD_URL` (API compatível com OpenAI),

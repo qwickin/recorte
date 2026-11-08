@@ -53,7 +53,8 @@ export function absoluteUrl(server: string, url: string): string {
   return /^https?:\/\//i.test(url) ? url : `${server}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-/** Applies the 20 000-char cap across all text fields: page metadata first, the captured text gets the rest. */
+/** Applies the 20 000-char cap across the text fields (page metadata first, the captured text gets the rest);
+ *  `page` (the whole page's text) is capped separately at the same size. */
 export function capItemText(text: ItemText, max = MAX_TEXT_CHARS): ItemText {
   let budget = max;
   const take = (s: string): string => {
@@ -84,7 +85,10 @@ export function capItemText(text: ItemText, max = MAX_TEXT_CHARS): ItemText {
   const meta: ItemText["meta"] = {};
   if (description !== undefined) meta.description = description;
   if (og && Object.keys(og).length) meta.og = og;
-  return { selection, meta, headings, alts };
+  const out: ItemText = { selection, meta, headings, alts };
+  // The whole-page context has its own budget: it never starves the selection.
+  if (text.page) out.page = { ...text.page, text: text.page.text.slice(0, max) };
+  return out;
 }
 
 export interface MetaInput {

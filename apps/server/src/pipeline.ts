@@ -1,4 +1,4 @@
-import { type Classifier, MODEL_ID, extractColors, extractKeywords } from "@recorte/ai";
+import { type Classifier, type KeywordInput, MODEL_ID, extractColors, extractKeywords } from "@recorte/ai";
 import type { Item } from "@recorte/shared";
 import type { CloudAi } from "./cloud";
 import type { Deps } from "./deps";
@@ -15,6 +15,20 @@ export interface PipelineDeps {
   cloudFrom?: () => CloudAi | null;
 }
 
+/** Keyword sources, by weight: the captured area and its headings, then the page's title/headings, then the rest of the page. */
+export function keywordInput(m: Item): KeywordInput {
+  return {
+    title: m.user.title || m.link?.title || m.source.pageTitle,
+    selection: m.text.selection,
+    nearHeadings: m.text.page?.nearHeadings,
+    headings: m.text.headings,
+    description: m.link?.description ?? m.text.meta.description,
+    keywords: m.text.page?.keywords,
+    site: m.source.site,
+    pageText: m.text.page?.text,
+  };
+}
+
 /** Steps 1-5 of the processing spec. Never touches `user`; the ai block is merged into a fresh read of meta.json. */
 export function createPipeline(p: PipelineDeps) {
   const { deps } = p;
@@ -29,13 +43,7 @@ export function createPipeline(p: PipelineDeps) {
 
     const colors = await extractColors(thumb);
     const cls = await (await p.classifier()).classify(original);
-    const keys = extractKeywords({
-      title: m0.user.title || m0.source.pageTitle,
-      text: m0.text.selection,
-      headings: m0.text.headings,
-      description: m0.text.meta.description,
-      site: m0.source.site,
-    });
+    const keys = extractKeywords(keywordInput(m0));
 
     let cloud: { title?: string; description?: string; keys: string[] } | null = null;
     const cloudAi = p.cloudFrom ? p.cloudFrom() : (p.cloud ?? null);

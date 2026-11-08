@@ -76,6 +76,31 @@ describe("pipeline", () => {
     expect(events).toContain("item.updated");
   });
 
+  it("stores the whole-page context in meta.json and ranks the selection above the page text", async () => {
+    const { t, upload, deps } = await setup();
+    const a = await upload({
+      pageTitle: "Surfaces",
+      text: {
+        selection: "Combobox dropdown with roles Combobox dropdown",
+        meta: {},
+        headings: ["Surfaces"],
+        alts: [],
+        page: { text: "repository github issues ".repeat(80), keywords: ["design system"], nearHeadings: ["Dialog"] },
+      },
+    });
+    const d = deps();
+    const userId = userIdOf(t);
+    await createPipeline({ deps: d, classifier: async () => fakeClassifier() }).process(userId, a.id);
+    const m = JSON.parse(readFileSync(join(d.storage.itemDir(userId, a.id), "meta.json"), "utf8"));
+    expect(m.text.page.nearHeadings).toEqual(["Dialog"]);
+    expect(m.text.page.text).toContain("repository");
+    const keys: string[] = m.ai.keys;
+    expect(keys.slice(0, 3).join(" ")).toMatch(/combobox/);
+    expect(keys.indexOf("dialog")).toBeGreaterThanOrEqual(0);
+    const gh = keys.indexOf("github");
+    expect(gh === -1 || gh > keys.indexOf("dialog")).toBe(true);
+  });
+
   it("is a no-op for a purged item and fails (retryable) when original.webp is missing", async () => {
     const { t, upload, deps } = await setup();
     const a = await upload();

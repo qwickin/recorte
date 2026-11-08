@@ -12,10 +12,14 @@ export function toSearchDoc(m: Item): SearchDoc {
     site: m.source.site,
     title: displayTitle(m),
     note: m.user.note ?? "",
-    description: m.ai.description ?? m.text.meta.description ?? "",
+    description: m.ai.description ?? m.link?.description ?? m.text.meta.description ?? "",
     tags: [...new Set(displayedTags(m).map((t) => t.tag))],
     keys: m.ai.keys,
-    text: [m.text.selection, ...m.text.headings, ...m.text.alts].filter(Boolean).join("\n").slice(0, 4000),
+    // The selection first; the whole page's text fills what is left of the excerpt.
+    text: [m.text.selection, ...(m.text.page?.nearHeadings ?? []), ...m.text.headings, ...m.text.alts, m.text.page?.text ?? ""]
+      .filter(Boolean)
+      .join("\n")
+      .slice(0, 4000),
     colors: m.ai.colors,
     categoryId: m.user.categoryId,
     createdAt: m.createdAt,

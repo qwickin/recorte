@@ -17,11 +17,41 @@ describe("extractKeywords", () => {
     expect(a.length).toBeLessThanOrEqual(5);
     expect(extractKeywords(input, 5)).toEqual(a);
   });
-  it("boosts title and headings over body", () => {
-    const k = extractKeywords({ title: "Zebra", headings: ["Zebra"], text: "apple apple apple banana" }, 2);
+  it("boosts title and headings over the page text", () => {
+    const k = extractKeywords({ title: "Zebra", headings: ["Zebra"], pageText: "apple apple apple banana" }, 2);
     expect(k[0]).toBe("zebra");
   });
   it("returns [] for empty input", () => {
     expect(extractKeywords({})).toEqual([]);
+  });
+
+  it("whole-page context: a frequent page term loses to the selection and the headings near it", () => {
+    const page = "github repository code issues pull requests ".repeat(60) + "footer cookies privacy";
+    const k = extractKeywords(
+      {
+        title: "Surfaces — Fluid Functionalism",
+        selection: "Combobox dropdown role select dialog Combobox dropdown",
+        nearHeadings: ["Dialog"],
+        headings: ["Surfaces", "Overview"],
+        pageText: page,
+      },
+      6,
+    );
+    const top = k.slice(0, 3).join(" | ");
+    expect(top).toContain("combobox");
+    expect(top).toContain("dropdown");
+    expect(k.indexOf("dialog")).toBeGreaterThanOrEqual(0);
+    expect(k.indexOf("dialog")).toBeLessThan(k.indexOf("repository") < 0 ? 99 : k.indexOf("repository"));
+    expect(k.slice(0, 4)).not.toContain("github");
+  });
+  it("page text still contributes when there is no selection", () => {
+    const k = extractKeywords({ title: "Receita", pageText: "bacalhau com natas forno bacalhau natas receita bacalhau" }, 4);
+    expect(k).toContain("bacalhau");
+  });
+  it("meta keywords count, like a description", () => {
+    expect(extractKeywords({ keywords: ["design system", "ui"], pageText: "lorem ipsum dolor" }, 3)).toContain("design system");
+  });
+  it("text is still accepted as the selection (older callers)", () => {
+    expect(extractKeywords({ text: "zebra zebra" }, 1)).toEqual(extractKeywords({ selection: "zebra zebra" }, 1));
   });
 });

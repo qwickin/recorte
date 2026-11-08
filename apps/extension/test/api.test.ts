@@ -55,6 +55,12 @@ describe("capItemText", () => {
     expect(total).toBe(20000);
     expect(t.meta.description).toHaveLength(100);
   });
+  it("caps the whole-page text on its own budget, leaving the selection intact", () => {
+    const t = capItemText({ selection: "s".repeat(500), meta: {}, headings: [], alts: [], page: { text: "p".repeat(30000), nearHeadings: ["H"] } });
+    expect(t.selection).toHaveLength(500);
+    expect(t.page?.text).toHaveLength(20000);
+    expect(t.page?.nearHeadings).toEqual(["H"]);
+  });
 });
 
 describe("server URLs", () => {
