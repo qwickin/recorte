@@ -1,0 +1,95 @@
+{
+ "approach": "current",
+ "threads": 2,
+ "platform": "darwin-arm64",
+ "node": "v24.22.2",
+ "loadMs": 235,
+ "rssBaseMB": 209,
+ "rssLoadedMB": 363,
+ "rssPeakMB": 542,
+ "perItem": [
+  {
+   "id": "h-radix-dialog",
+   "tags": [
+    "modo escuro"
+   ],
+   "ms": 64
+  },
+  {
+   "id": "h-headless-combobox",
+   "tags": [
+    "modo escuro"
+   ],
+   "ms": 52
+  },
+  {
+   "id": "h-mui-select",
+   "tags": [
+    "repositório"
+   ],
+   "ms": 55
+  },
+  {
+   "id": "h-recipe-pt",
+   "tags": [],
+   "ms": 52
+  },
+  {
+   "id": "h-news-pt",
+   "tags": [
+    "wiki",
+    "modo escuro"
+   ],
+   "ms": 51
+  },
+  {
+   "id": "h-gh-ripgrep",
+   "tags": [
+    "repositório"
+   ],
+   "ms": 59
+  },
+  {
+   "id": "h-blog-jvns",
+   "tags": [],
+   "ms": 52
+  },
+  {
+   "id": "h-wiki-belem",
+   "tags": [
+    "wiki"
+   ],
+   "ms": 53
+  },
+  {
+   "id": "h-commons-photo",
+   "tags": [
+    "fotografia"
+   ],
+   "ms": 59
+  },
+  {
+   "id": "h-three-demo",
+   "tags": [
+    "3d",
+    "imagens"
+   ],
+   "ms": 52
+  },
+  {
+   "id": "h-linear-landing",
+   "tags": [
+    "landing page",
+    "modo escuro"
+   ],
+   "ms": 51
+  },
+  {
+   "id": "h-python-docs",
+   "tags": [
+    "wiki"
+   ],
+   "ms": 54
+  }
+ ]
+}

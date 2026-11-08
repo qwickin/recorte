@@ -1,12 +1,12 @@
 // Scores results/*.json against ground-truth.json -> results/summary.md (table + per-page outputs).
-// Usage: tsx score.mts [resultsDir] [approach...]
+// Usage: [GT=ground-truth-holdout.json] tsx score.mts [resultsDir] [approach...]
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const dir = process.argv[2] ?? `${HERE}results`;
 const only = process.argv.slice(3);
-const gt = JSON.parse(readFileSync(`${HERE}ground-truth.json`, "utf8")) as Record<string, string[]>;
+const gt = JSON.parse(readFileSync(`${HERE}${process.env.GT ?? "ground-truth.json"}`, "utf8")) as Record<string, string[]>;
 delete (gt as Record<string, unknown>)._;
 
 interface Res { approach: string; threads: number; platform: string; loadMs: number; rssBaseMB: number; rssLoadedMB: number; rssPeakMB: number; perItem: { id: string; tags: string[]; ms: number }[] }

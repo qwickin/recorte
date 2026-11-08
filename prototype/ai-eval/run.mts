@@ -6,6 +6,7 @@
 //   lex-minilm         + paraphrase-multilingual-MiniLM-L12-v2 (q8) similarity
 //   lex-e5             + multilingual-e5-small (q8) similarity
 //   lex-minilm-visual  lex-minilm + SigLIP2 tipo probabilities as evidence + its visual tags
+// --set holdout: the held-out set (holdout/, results-holdout/).
 //   llm-<model>        lex-minilm candidates (top 25) -> a small instruct LLM picks the tags (qwen3, qwen25, smollm2)
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -20,11 +21,12 @@ const approach = args[0]!;
 const opt = (k: string, d: string) => (args.includes(k) ? args[args.indexOf(k) + 1]! : d);
 const MODELS = opt("--models", process.env.RECORTE_MODEL_DIR ?? `${HERE}../../packages/ai/models`);
 const THREADS = Number(opt("--threads", "2"));
-const OUT = opt("--out", `${HERE}results`);
+const SET = opt("--set", "dataset");
+const OUT = opt("--out", `${HERE}${SET === "dataset" ? "results" : `results-${SET}`}`);
 
 type Row = Item & { image: string | null };
-const data = JSON.parse(readFileSync(`${HERE}dataset/dataset.json`, "utf8")) as Row[];
-const img = (r: Row) => (r.image ? readFileSync(`${HERE}dataset/${r.image}`) : null);
+const data = JSON.parse(readFileSync(`${HERE}${SET}/dataset.json`, "utf8")) as Row[];
+const img = (r: Row) => (r.image ? readFileSync(`${HERE}${SET}/${r.image}`) : null);
 
 const mb = (b: number) => Math.round(b / 1048576);
 const rss0 = process.memoryUsage().rss;

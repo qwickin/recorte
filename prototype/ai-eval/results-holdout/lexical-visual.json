@@ -1,0 +1,317 @@
+{
+ "approach": "lexical-visual",
+ "threads": 2,
+ "platform": "darwin-arm64",
+ "node": "v24.22.2",
+ "loadMs": 135,
+ "rssBaseMB": 201,
+ "rssLoadedMB": 350,
+ "rssPeakMB": 566,
+ "perItem": [
+  {
+   "id": "h-radix-dialog",
+   "tags": [
+    "dialog",
+    "documentação",
+    "componentes ui",
+    "ui design",
+    "botão",
+    "react",
+    "3d"
+   ],
+   "ms": 390,
+   "extra": [
+    "dialog:18.8",
+    "documentação:14.3",
+    "componentes ui:14.0",
+    "ui design:9.6",
+    "botão:7.2",
+    "react:5.6",
+    "3d:4.6",
+    "design:4.4",
+    "perfil:4.3",
+    "tutorial:3.4",
+    "acessibilidade:3.3",
+    "javascript:2.8"
+   ]
+  },
+  {
+   "id": "h-headless-combobox",
+   "tags": [
+    "combobox",
+    "componentes ui",
+    "ui design",
+    "formulário",
+    "dropdown",
+    "3d",
+    "design"
+   ],
+   "ms": 71,
+   "extra": [
+    "combobox:16.1",
+    "componentes ui:13.6",
+    "ui design:10.2",
+    "formulário:8.6",
+    "dropdown:7.7",
+    "documentação:4.8",
+    "3d:4.8",
+    "design:4.0",
+    "react:3.7",
+    "acessibilidade:3.5",
+    "input:2.9",
+    "html:2.7"
+   ]
+  },
+  {
+   "id": "h-mui-select",
+   "tags": [
+    "dropdown",
+    "componentes ui",
+    "ui design",
+    "bolachas",
+    "lista",
+    "design",
+    "react"
+   ],
+   "ms": 223,
+   "extra": [
+    "dropdown:22.5",
+    "componentes ui:11.5",
+    "ui design:9.4",
+    "bolachas:5.2",
+    "lista:5.1",
+    "design:5.0",
+    "react:4.3",
+    "acessibilidade:3.4",
+    "input:3.2",
+    "doces:2.6",
+    "javascript:2.1",
+    "repositório:2.1"
+   ]
+  },
+  {
+   "id": "h-recipe-pt",
+   "tags": [
+    "receita",
+    "sobremesa",
+    "gastronomia",
+    "bolachas",
+    "culinária",
+    "doces",
+    "portugal"
+   ],
+   "ms": 60,
+   "extra": [
+    "receita:13.1",
+    "sobremesa:11.0",
+    "gastronomia:10.3",
+    "bolachas:10.2",
+    "culinária:5.4",
+    "doces:4.0",
+    "portugal:3.0",
+    "privacidade:1.4",
+    "loja:1.4",
+    "política:1.3",
+    "aplicação:1.0",
+    "marketing:1.0"
+   ]
+  },
+  {
+   "id": "h-news-pt",
+   "tags": [
+    "lisboa",
+    "segurança",
+    "portugal",
+    "branding",
+    "google",
+    "privacidade",
+    "direito"
+   ],
+   "ms": 64,
+   "extra": [
+    "lisboa:10.0",
+    "segurança:8.6",
+    "portugal:7.9",
+    "branding:4.0",
+    "google:4.0",
+    "privacidade:4.0",
+    "direito:3.9",
+    "bolachas:2.0",
+    "marketing:2.0",
+    "vinho:2.0",
+    "instagram:1.6",
+    "email:1.3"
+   ]
+  },
+  {
+   "id": "h-gh-ripgrep",
+   "tags": [
+    "repositório",
+    "documentação",
+    "github",
+    "git",
+    "windows",
+    "macos",
+    "bricolage"
+   ],
+   "ms": 75,
+   "extra": [
+    "repositório:13.4",
+    "documentação:10.5",
+    "github:8.2",
+    "changelog:7.4",
+    "git:7.2",
+    "resultados de pesquisa:6.1",
+    "windows:5.5",
+    "macos:5.4",
+    "bricolage:5.2",
+    "código:4.4",
+    "linux:4.0",
+    "arquitetura:3.8"
+   ]
+  },
+  {
+   "id": "h-blog-jvns",
+   "tags": [
+    "ciclismo",
+    "eletrónica",
+    "desporto"
+   ],
+   "ms": 65,
+   "extra": [
+    "ciclismo:16.9",
+    "eletrónica:7.3",
+    "desporto:4.0",
+    "publicação:2.9",
+    "segurança:2.6",
+    "llm:2.1",
+    "tutorial:1.8",
+    "emprego:1.4",
+    "fotografia:1.3",
+    "carros elétricos:1.3",
+    "tipografia:1.0",
+    "artigo:0.7"
+   ]
+  },
+  {
+   "id": "h-wiki-belem",
+   "tags": [
+    "enciclopédia",
+    "lisboa",
+    "portugal",
+    "wikipedia",
+    "história",
+    "arquitetura",
+    "guerra"
+   ],
+   "ms": 81,
+   "extra": [
+    "enciclopédia:15.5",
+    "lisboa:15.5",
+    "portugal:13.7",
+    "wikipedia:7.0",
+    "história:6.1",
+    "arquitetura:4.8",
+    "guerra:3.9",
+    "arte:3.3",
+    "moda:2.8",
+    "cultura:2.5",
+    "família:2.5",
+    "religião:2.5"
+   ]
+  },
+  {
+   "id": "h-commons-photo",
+   "tags": [],
+   "ms": 58,
+   "extra": [
+    "dropdown:3.8",
+    "fotografia:1.8",
+    "3d:0.9",
+    "fórum:0.6",
+    "tutorial:0.6",
+    "repositório:0.5",
+    "animação:0.3",
+    "emprego:0.3",
+    "inspiração:0.3",
+    "internet:0.3",
+    "lista:0.3",
+    "landing page:0.3"
+   ]
+  },
+  {
+   "id": "h-three-demo",
+   "tags": [
+    "webgl",
+    "animação",
+    "3d",
+    "física"
+   ],
+   "ms": 66,
+   "extra": [
+    "webgl:17.8",
+    "animação:5.3",
+    "3d:3.5",
+    "física:3.3",
+    "vídeo:2.5",
+    "matemática:2.5",
+    "realidade virtual:2.5",
+    "ciência:1.6",
+    "performance:1.5",
+    "svg:1.4",
+    "testes:1.4",
+    "cor:1.2"
+   ]
+  },
+  {
+   "id": "h-linear-landing",
+   "tags": [
+    "produto",
+    "inteligência artificial",
+    "ios",
+    "arquitetura",
+    "negócios",
+    "modo escuro"
+   ],
+   "ms": 64,
+   "extra": [
+    "produto:18.8",
+    "aplicação:9.2",
+    "inteligência artificial:8.7",
+    "ios:6.6",
+    "arquitetura:5.4",
+    "negócios:3.0",
+    "performance:2.6",
+    "design:2.5",
+    "react:2.4",
+    "automóveis:2.3",
+    "análise:2.2",
+    "dashboard:1.9"
+   ]
+  },
+  {
+   "id": "h-python-docs",
+   "tags": [
+    "python",
+    "documentação",
+    "llm",
+    "inteligência artificial"
+   ],
+   "ms": 79,
+   "extra": [
+    "python:20.1",
+    "documentação:17.9",
+    "llm:9.5",
+    "input:5.9",
+    "tabela:4.2",
+    "inteligência artificial:4.0",
+    "lista:3.7",
+    "citação:3.5",
+    "command palette:2.6",
+    "programação:2.1",
+    "botão:1.3",
+    "tutorial:1.3"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,318 @@
+{
+ "approach": "lex-e5",
+ "threads": 2,
+ "platform": "darwin-arm64",
+ "node": "v24.22.2",
+ "loadMs": 551,
+ "rssBaseMB": 219,
+ "rssLoadedMB": 696,
+ "rssPeakMB": 945,
+ "perItem": [
+  {
+   "id": "h-radix-dialog",
+   "tags": [
+    "dialog",
+    "componentes ui",
+    "documentação",
+    "ui design",
+    "react",
+    "botão",
+    "3d"
+   ],
+   "ms": 1278,
+   "extra": [
+    "dialog:22.3(l18.8 s3.5 r0)",
+    "componentes ui:14.1(l13.0 s1.1 r0)",
+    "documentação:14.1(l6.1 s0.0 r8)",
+    "ui design:9.6(l5.6 s0.0 r0)",
+    "react:7.9(l5.6 s2.3 r0)",
+    "botão:7.2(l7.2 s0.0 r0)",
+    "perfil:5.9(l4.3 s1.6 r0)",
+    "3d:4.4(l4.4 s0.0 r0)",
+    "design:4.4(l0.4 s0.0 r0)",
+    "javascript:4.0(l0.0 s0.0 r0)",
+    "tutorial:3.4(l3.4 s0.0 r0)",
+    "acessibilidade:3.3(l3.3 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-headless-combobox",
+   "tags": [
+    "combobox",
+    "componentes ui",
+    "ui design",
+    "formulário",
+    "dropdown",
+    "3d",
+    "react"
+   ],
+   "ms": 158,
+   "extra": [
+    "combobox:20.1(l16.1 s4.0 r0)",
+    "componentes ui:14.3(l12.5 s1.8 r0)",
+    "ui design:10.2(l6.2 s0.0 r0)",
+    "formulário:8.5(l8.5 s0.0 r0)",
+    "dropdown:7.7(l7.7 s0.0 r0)",
+    "3d:4.7(l4.7 s0.0 r0)",
+    "documentação:4.6(l4.6 s0.0 r0)",
+    "react:4.5(l3.7 s0.8 r0)",
+    "design:4.0(l0.0 s0.0 r0)",
+    "html:3.8(l2.7 s1.1 r0)",
+    "acessibilidade:3.5(l3.5 s0.0 r0)",
+    "input:3.3(l2.9 s0.4 r0)"
+   ]
+  },
+  {
+   "id": "h-mui-select",
+   "tags": [
+    "dropdown",
+    "componentes ui",
+    "ui design",
+    "react",
+    "bolachas",
+    "lista",
+    "design"
+   ],
+   "ms": 113,
+   "extra": [
+    "dropdown:25.2(l22.5 s2.7 r0)",
+    "componentes ui:14.0(l11.3 s2.7 r0)",
+    "ui design:9.7(l5.4 s0.3 r0)",
+    "react:5.5(l4.3 s1.2 r0)",
+    "bolachas:5.2(l5.2 s0.0 r0)",
+    "lista:5.1(l5.1 s0.0 r0)",
+    "design:5.0(l1.0 s0.0 r0)",
+    "input:3.6(l3.2 s0.4 r0)",
+    "acessibilidade:3.4(l3.4 s0.0 r0)",
+    "combobox:3.3(l1.3 s2.0 r0)",
+    "javascript:2.7(l0.0 s0.0 r0)",
+    "doces:2.6(l0.0 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-recipe-pt",
+   "tags": [
+    "receita",
+    "sobremesa",
+    "gastronomia",
+    "bolachas",
+    "culinária",
+    "doces",
+    "portugal"
+   ],
+   "ms": 41,
+   "extra": [
+    "receita:15.3(l4.8 s2.5 r8)",
+    "sobremesa:11.0(l11.0 s0.0 r0)",
+    "gastronomia:10.3(l10.3 s0.0 r0)",
+    "bolachas:10.2(l10.2 s0.0 r0)",
+    "culinária:5.4(l1.4 s0.0 r0)",
+    "doces:4.0(l0.0 s0.0 r0)",
+    "portugal:3.0(l3.0 s0.0 r0)",
+    "privacidade:1.4(l1.4 s0.0 r0)",
+    "política:1.3(l1.3 s0.0 r0)",
+    "aplicação:1.0(l1.0 s0.0 r0)",
+    "marketing:1.0(l1.0 s0.0 r0)",
+    "navegação:1.0(l1.0 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-news-pt",
+   "tags": [
+    "lisboa",
+    "segurança",
+    "portugal",
+    "branding",
+    "google",
+    "privacidade",
+    "direito"
+   ],
+   "ms": 110,
+   "extra": [
+    "lisboa:10.0(l10.0 s0.0 r0)",
+    "segurança:8.6(l8.6 s0.0 r0)",
+    "portugal:7.9(l3.9 s0.0 r0)",
+    "branding:4.0(l4.0 s0.0 r0)",
+    "google:4.0(l4.0 s0.0 r0)",
+    "privacidade:4.0(l4.0 s0.0 r0)",
+    "direito:3.9(l3.9 s0.0 r0)",
+    "bolachas:2.0(l2.0 s0.0 r0)",
+    "marketing:2.0(l2.0 s0.0 r0)",
+    "vinho:2.0(l2.0 s0.0 r0)",
+    "instagram:1.6(l1.6 s0.0 r0)",
+    "email:1.3(l1.3 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-gh-ripgrep",
+   "tags": [
+    "repositório",
+    "github",
+    "documentação",
+    "git",
+    "windows",
+    "macos",
+    "bricolage"
+   ],
+   "ms": 112,
+   "extra": [
+    "repositório:12.1(l4.1 s0.0 r8)",
+    "github:10.8(l8.2 s2.6 r0)",
+    "documentação:9.7(l9.7 s0.0 r0)",
+    "git:9.0(l3.2 s1.8 r0)",
+    "changelog:7.9(l7.4 s0.5 r0)",
+    "resultados de pesquisa:6.1(l5.9 s0.2 r0)",
+    "windows:5.5(l5.5 s0.0 r0)",
+    "macos:5.4(l5.4 s0.0 r0)",
+    "bricolage:5.2(l5.2 s0.0 r0)",
+    "linux:4.5(l4.0 s0.5 r0)",
+    "código:4.0(l0.0 s0.0 r0)",
+    "arquitetura:3.8(l3.8 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-blog-jvns",
+   "tags": [
+    "ciclismo",
+    "eletrónica",
+    "desporto"
+   ],
+   "ms": 111,
+   "extra": [
+    "ciclismo:16.9(l16.9 s0.0 r0)",
+    "eletrónica:8.3(l7.3 s1.0 r0)",
+    "desporto:4.0(l0.0 s0.0 r0)",
+    "publicação:2.9(l2.9 s0.0 r0)",
+    "tutorial:2.6(l1.8 s0.8 r0)",
+    "segurança:2.6(l2.6 s0.0 r0)",
+    "llm:2.1(l2.1 s0.0 r0)",
+    "emprego:1.4(l1.4 s0.0 r0)",
+    "carros elétricos:1.3(l1.3 s0.0 r0)",
+    "fotografia:1.3(l1.3 s0.0 r0)",
+    "template:1.3(l0.0 s1.3 r0)",
+    "energia:0.8(l0.0 s0.8 r0)"
+   ]
+  },
+  {
+   "id": "h-wiki-belem",
+   "tags": [
+    "lisboa",
+    "enciclopédia",
+    "portugal",
+    "wikipedia",
+    "história",
+    "arquitetura",
+    "guerra"
+   ],
+   "ms": 138,
+   "extra": [
+    "lisboa:15.7(l15.5 s0.2 r0)",
+    "enciclopédia:15.5(l4.0 s0.0 r8)",
+    "portugal:13.7(l9.7 s0.0 r0)",
+    "wikipedia:7.0(l7.0 s0.0 r0)",
+    "história:6.7(l6.1 s0.6 r0)",
+    "arquitetura:4.8(l4.8 s0.0 r0)",
+    "guerra:3.9(l3.9 s0.0 r0)",
+    "arte:3.3(l3.3 s0.0 r0)",
+    "moda:2.8(l2.8 s0.0 r0)",
+    "cultura:2.5(l2.5 s0.0 r0)",
+    "família:2.5(l2.5 s0.0 r0)",
+    "religião:2.5(l2.5 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-commons-photo",
+   "tags": [
+    "wikipedia",
+    "enciclopédia"
+   ],
+   "ms": 61,
+   "extra": [
+    "dropdown:5.0(l3.8 s1.2 r0)",
+    "wikipedia:4.0(l0.0 s4.0 r0)",
+    "enciclopédia:3.3(l0.0 s1.3 r0)",
+    "llm:2.4(l0.0 s2.4 r0)",
+    "linguística:1.3(l0.0 s1.3 r0)",
+    "html:0.8(l0.0 s0.8 r0)",
+    "github:0.7(l0.0 s0.7 r0)",
+    "nlp:0.7(l0.0 s0.7 r0)",
+    "fotografia:0.6(l0.6 s0.0 r0)",
+    "fórum:0.6(l0.6 s0.0 r0)",
+    "tutorial:0.6(l0.6 s0.0 r0)",
+    "mozilla:0.3(l0.0 s0.3 r0)"
+   ]
+  },
+  {
+   "id": "h-three-demo",
+   "tags": [
+    "webgl",
+    "animação",
+    "física"
+   ],
+   "ms": 118,
+   "extra": [
+    "webgl:21.8(l17.8 s4.0 r0)",
+    "animação:8.3(l5.3 s3.0 r0)",
+    "física:3.3(l3.3 s0.0 r0)",
+    "3d:2.8(l0.9 s1.9 r0)",
+    "matemática:2.5(l2.5 s0.0 r0)",
+    "realidade virtual:2.5(l2.5 s0.0 r0)",
+    "vídeo:2.5(l2.5 s0.0 r0)",
+    "ciência:1.6(l0.0 s0.0 r0)",
+    "performance:1.5(l1.5 s0.0 r0)",
+    "svg:1.4(l1.4 s0.0 r0)",
+    "testes:1.4(l1.4 s0.0 r0)",
+    "javascript:1.3(l0.3 s1.0 r0)"
+   ]
+  },
+  {
+   "id": "h-linear-landing",
+   "tags": [
+    "produto",
+    "inteligência artificial",
+    "ios",
+    "arquitetura",
+    "negócios"
+   ],
+   "ms": 110,
+   "extra": [
+    "produto:19.2(l18.8 s0.4 r0)",
+    "aplicação:9.2(l9.2 s0.0 r0)",
+    "inteligência artificial:8.7(l8.7 s0.0 r0)",
+    "ios:6.6(l6.6 s0.0 r0)",
+    "arquitetura:5.4(l5.4 s0.0 r0)",
+    "negócios:3.0(l3.0 s0.0 r0)",
+    "performance:2.9(l2.6 s0.3 r0)",
+    "design:2.5(l2.5 s0.0 r0)",
+    "produtividade:2.4(l1.7 s0.7 r0)",
+    "react:2.4(l2.4 s0.0 r0)",
+    "automóveis:2.3(l2.3 s0.0 r0)",
+    "análise:2.2(l2.2 s0.0 r0)"
+   ]
+  },
+  {
+   "id": "h-python-docs",
+   "tags": [
+    "python",
+    "documentação",
+    "llm",
+    "inteligência artificial"
+   ],
+   "ms": 120,
+   "extra": [
+    "python:21.5(l20.1 s1.4 r0)",
+    "documentação:17.6(l9.6 s0.0 r8)",
+    "input:9.6(l5.9 s3.7 r0)",
+    "llm:9.5(l9.5 s0.0 r0)",
+    "tabela:4.2(l4.2 s0.0 r0)",
+    "inteligência artificial:4.0(l0.0 s0.0 r0)",
+    "lista:3.7(l3.7 s0.0 r0)",
+    "citação:3.5(l3.5 s0.0 r0)",
+    "command palette:2.6(l2.6 s0.0 r0)",
+    "tutorial:2.4(l1.3 s1.1 r0)",
+    "terminal:2.2(l0.3 s1.9 r0)",
+    "programação:2.1(l2.1 s0.0 r0)"
+   ]
+  }
+ ]
+}
