@@ -6,7 +6,7 @@
 //   no environment at all), on a free 127.0.0.1 port with a throw-away named volume.
 // - Completes /setup through the API with email + password (inside the 15-minute window), saves the
 //   public URL, gets a device token, uploads two captures, waits for the AI tags, then drives the gallery in
-//   Chromium: login (email + password), tiles, ⌘K/Ctrl+K "doce português", ZIP download. Ends with reset-password.
+//   Chromium: login (email + password), tiles, ⌘K/Ctrl+K "doce português" (grid of image cards, arrow keys), ZIP download. Ends with reset-password.
 // - Always removes the container and the volume (set E2E_KEEP=1 to leave them).
 // - Chromium: $CHROMIUM_PATH, else the newest Chromium in the Playwright cache, else playwright-core's default.
 // The first run needs internet: Meilisearch downloads its embedding model on first start.
@@ -309,7 +309,7 @@ test("search 'doce português' finds the pastel de nata (API, waits for the embe
   timings.nataRank = rank;
 });
 
-test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search, ZIP download", { timeout: 5 * 60_000 }, async () => {
+test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download", { timeout: 5 * 60_000 }, async () => {
   const executablePath = chromiumPath();
   browser = await chromium.launch({ headless: true, ...(executablePath ? { executablePath } : {}) });
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -333,6 +333,17 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search, ZIP download", { 
   await input.fill("doce português");
   const option = page.getByRole("option").filter({ hasText: "Pastel de nata" }).first();
   await option.waitFor({ state: "visible", timeout: 30_000 });
+  // Results are a grid of image cards: the card has its thumbnail, cards share rows, arrows move across.
+  assert.equal(await option.locator("img").count(), 1, "result card without its image");
+  const cards = page.getByRole("option");
+  if ((await cards.count()) >= 2) {
+    const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
+    assert.ok(a && b && Math.abs(a.y - b.y) < 2 && b.x > a.x, "first two results should sit side by side");
+    await page.keyboard.press("ArrowDown"); // into the grid
+    await page.keyboard.press("ArrowRight");
+    assert.equal(await cards.nth(1).getAttribute("aria-selected"), "true");
+    await page.keyboard.press("ArrowLeft");
+  }
   await page.screenshot({ path: join(tmp, "palette.png") });
   if (process.env.E2E_SCREENSHOT) writeFileSync(process.env.E2E_SCREENSHOT, readFileSync(join(tmp, "palette.png")));
   await page.keyboard.press("Escape");
