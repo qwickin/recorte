@@ -10,7 +10,7 @@ name: recorte
 
 services:
   app:
-    image: ${RECORTE_IMAGE:-ghcr.io/qwickin/screenshotextension:latest}
+    image: ${RECORTE_IMAGE:-ghcr.io/qwickin/recorte:latest}
     build:
       context: ..
       dockerfile: docker/Dockerfile

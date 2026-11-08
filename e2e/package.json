@@ -2,6 +2,7 @@
   "name": "@recorte/e2e",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "e2e": "node --import tsx --test --test-concurrency=1 stack.spec.ts",

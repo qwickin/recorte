@@ -2,7 +2,7 @@
 
 - Data: 2026-11-07
 - Estado: aprovado
-- Repositório: `github.com/qwickin/screenshotextension`
+- Repositório: `github.com/qwickin/recorte`
 - "Recorte" é um nome provisório.
 
 ## 1. Intenção
@@ -509,7 +509,7 @@ Esta é a leitura de "Version Control pelo Git, de forma automática". É uma es
 2. Atualizações: só o aviso de nova versão da extensão (§10). O servidor não faz pedidos ao GitHub.
 3. Execução: tudo de uma vez ("one-shot"), sem pausas para revisão intermédia.
 4. Instalação sem configuração (decisão posterior): `docker run -d -p 8080:8080 -v recorte:/data
-   ghcr.io/qwickin/screenshotextension`, abrir `http://IP:8080` e seguir o assistente. Sem `.env`: um dono,
+   ghcr.io/qwickin/recorte`, abrir `http://IP:8080` e seguir o assistente. Sem `.env`: um dono,
    Meilisearch embutido, endereço público e IA cloud guardados na
    BD e editáveis na galeria, `/setup` aberto só 15 minutos depois do arranque.
 5. Ronda 2 (2026-11-07): volta o **email + palavra-passe** (substitui o acesso só por palavra-passe), sem limites de

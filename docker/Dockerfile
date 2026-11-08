@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 # Recorte image: API + worker + SQLite, embedded Meilisearch, gallery build, extension ZIPs, SigLIP2 vision model (spec §4, §9).
-#   docker run -d -p 8080:8080 -v recorte:/data ghcr.io/qwickin/screenshotextension
+#   docker run -d -p 8080:8080 -v recorte:/data ghcr.io/qwickin/recorte
 # Build from the repo root:  docker build -f docker/Dockerfile --build-arg APP_VERSION=… --build-arg EXTENSION_VERSION=… .
 # Versions come from scripts/version.mjs (the .git folder is not in the build context).
 
