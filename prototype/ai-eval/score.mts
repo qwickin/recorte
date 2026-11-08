@@ -1,5 +1,7 @@
 // Scores results/*.json against ground-truth.json -> results/summary.md (table + per-page outputs).
 // Usage: [GT=ground-truth-holdout.json] tsx score.mts [resultsDir] [approach...]
+// Tags are compared as tag IDs: the ground truth (pt-PT names) and results written before topics-v2 (pt-PT names,
+// raw screenshot labels) are mapped through the vocabulary's ID column; IDs and unknown names pass through.
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -8,6 +10,17 @@ const dir = process.argv[2] ?? `${HERE}results`;
 const only = process.argv.slice(3);
 const gt = JSON.parse(readFileSync(`${HERE}${process.env.GT ?? "ground-truth.json"}`, "utf8")) as Record<string, string[]>;
 delete (gt as Record<string, unknown>)._;
+
+// pt-PT name -> ID (packages/ai/src/topics-vocab.ts: group|id|pt|…) and raw screenshot label -> ID (tag-labels.ts).
+const vocab = readFileSync(`${HERE}../../packages/ai/src/topics-vocab.ts`, "utf8");
+const TO_ID = new Map<string, string>();
+for (const m of vocab.matchAll(/^[a-z]+\|([^|]+)\|([^|]+)\|/gm)) TO_ID.set(m[2]!.trim(), m[1]!.trim());
+const labels = readFileSync(`${HERE}../../packages/shared/src/tag-labels.ts`, "utf8");
+const shot = labels.slice(labels.indexOf("SCREENSHOT_TAG_IDS"));
+for (const m of shot.slice(0, shot.indexOf("};")).matchAll(/^\s+"?([^":]+?)"?: "([^"]+)",$/gm)) if (!TO_ID.has(m[1]!)) TO_ID.set(m[1]!, m[2]!);
+const IDS = new Set(TO_ID.values());
+const toId = (t: string) => (IDS.has(t) ? t : TO_ID.get(t) ?? t);
+for (const id of Object.keys(gt)) gt[id] = gt[id]!.map((e) => e.split("|").map(toId).join("|"));
 
 interface Res { approach: string; threads: number; platform: string; loadMs: number; rssBaseMB: number; rssLoadedMB: number; rssPeakMB: number; perItem: { id: string; tags: string[]; ms: number }[] }
 const files = readdirSync(dir).filter((f) => f.endsWith(".json") && !f.startsWith("_"));
@@ -36,7 +49,7 @@ for (const r of results) {
   const ids = Object.keys(gt);
   for (const id of ids) {
     const it = r.perItem.find((x) => x.id === id);
-    const tags = it?.tags ?? [];
+    const tags = [...new Set((it?.tags ?? []).map(toId))];
     const m = match(tags, gt[id]!);
     tp += m.tp; np += tags.length; ng += gt[id]!.length;
     pSum += tags.length ? m.tp / tags.length : 0;

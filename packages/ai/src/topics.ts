@@ -12,6 +12,9 @@ import type { KeywordInput } from "./keywords";
  */
 
 export interface Topic {
+  /** Frozen language-neutral ID: what the tagger emits (tagItem) and items store. */
+  id: string;
+  /** pt-PT name: the internal key (parents, rules, scoring). */
   pt: string;
   group: TopicGroup;
   /** English synonyms (indexed for search). */
@@ -80,8 +83,8 @@ function parse(raw: string): Topic[] {
   const out: Topic[] = [];
   for (const line of raw.split("\n")) {
     const parts = line.split("|");
-    if (parts.length !== 4) continue;
-    const [group, pt, en, aliases] = parts.map((p) => p.trim()) as [TopicGroup, string, string, string];
+    if (parts.length !== 5) continue;
+    const [group, id, pt, en, aliases] = parts.map((p) => p.trim()) as [TopicGroup, string, string, string, string];
     const enList = en.split(",").map((s) => s.trim()).filter(Boolean);
     const ins = new Set<string>();
     const cs = new Set<string>();
@@ -92,7 +95,7 @@ function parse(raw: string): Topic[] {
       else if (a.length >= 2) ins.add(fold(a));
     }
     out.push({
-      pt, group, en: enList, searchOnly,
+      id, pt, group, en: enList, searchOnly,
       re: wrap([...ins].sort((a, b) => b.length - a.length).map(aliasPattern), "gu"),
       reCase: wrap([...cs].map(esc), "gu"),
     });
@@ -103,6 +106,8 @@ function parse(raw: string): Topic[] {
 export const TOPICS: readonly Topic[] = parse(TOPICS_RAW);
 const BY_PT = new Map(TOPICS.map((t) => [t.pt, t]));
 export const topicByName = (pt: string): Topic | undefined => BY_PT.get(pt);
+/** pt-PT name (the internal key, and what items stored before topics-v2) → tag ID. */
+export const topicId = (pt: string): string | undefined => BY_PT.get(pt)?.id;
 
 /** child -> parents (a strong child implies its parent). */
 export const TOPIC_PARENTS: ReadonlyMap<string, string[]> = new Map(

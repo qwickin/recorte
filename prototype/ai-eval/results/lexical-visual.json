@@ -3,35 +3,35 @@
  "threads": 2,
  "platform": "darwin-arm64",
  "node": "v24.22.2",
- "loadMs": 244,
- "rssBaseMB": 210,
- "rssLoadedMB": 378,
- "rssPeakMB": 580,
+ "loadMs": 355,
+ "rssBaseMB": 235,
+ "rssLoadedMB": 381,
+ "rssPeakMB": 588,
  "perItem": [
   {
    "id": "ff-surfaces",
    "tags": [
-    "documentação",
-    "sombras",
-    "componentes ui",
+    "documentation",
+    "shadows",
+    "ui components",
     "dropdown",
-    "modo escuro",
+    "dark mode",
     "dialog"
    ],
-   "ms": 498
+   "ms": 597
   },
   {
    "id": "gh-readability",
    "tags": [
-    "repositório",
-    "documentação",
+    "repository",
+    "documentation",
     "javascript",
-    "biblioteca",
+    "library",
     "github",
     "mozilla",
     "node.js"
    ],
-   "ms": 94
+   "ms": 153
   },
   {
    "id": "mdn-flexbox",
@@ -39,210 +39,210 @@
     "flexbox",
     "css",
     "layout",
-    "documentação",
+    "documentation",
     "mozilla",
-    "programação"
+    "programming"
    ],
-   "ms": 124
+   "ms": 154
   },
   {
    "id": "tailwind-docs",
    "tags": [
     "flexbox",
-    "documentação",
+    "documentation",
     "tailwind css",
     "layout",
     "css",
-    "modo escuro"
+    "dark mode"
    ],
-   "ms": 91
+   "ms": 92
   },
   {
    "id": "shadcn-combobox",
    "tags": [
-    "documentação",
+    "documentation",
     "combobox",
     "ui design",
     "react",
-    "componentes ui",
+    "ui components",
     "next.js",
     "javascript"
    ],
-   "ms": 92
+   "ms": 103
   },
   {
    "id": "motion-docs",
    "tags": [
     "react",
-    "animação",
+    "animation",
     "motion design",
-    "documentação",
-    "componentes ui",
+    "documentation",
+    "ui components",
     "ui design",
     "javascript"
    ],
-   "ms": 91
+   "ms": 127
   },
   {
    "id": "news-guardian",
    "tags": [
-    "ciência",
-    "conversa",
-    "psicologia"
+    "science",
+    "chat",
+    "psychology"
    ],
-   "ms": 100
+   "ms": 113
   },
   {
    "id": "news-publico",
    "tags": [
-    "medicina",
+    "medicine",
     "diabetes",
-    "medicamentos",
-    "saúde",
-    "notícia",
-    "artigo",
-    "obesidade"
+    "medication",
+    "health",
+    "news",
+    "article",
+    "obesity"
    ],
-   "ms": 108
+   "ms": 83
   },
   {
    "id": "recipe-allrecipes",
    "tags": [
-    "receita",
-    "bolachas",
+    "recipe",
+    "cookies",
     "chocolate",
-    "culinária",
-    "doces"
+    "cooking",
+    "sweets"
    ],
-   "ms": 87
+   "ms": 89
   },
   {
    "id": "map-osm",
    "tags": [
-    "mapa"
+    "map"
    ],
-   "ms": 73
+   "ms": 86
   },
   {
    "id": "product-ikea",
    "tags": [
-    "estante",
-    "preços",
-    "casa",
-    "mobiliário",
+    "bookcase",
+    "pricing",
+    "home",
+    "furniture",
     "design",
-    "design de interiores"
+    "interior design"
    ],
-   "ms": 99
+   "ms": 122
   },
   {
    "id": "product-apple",
    "tags": [
     "mac",
     "apple",
-    "loja",
-    "inteligência artificial",
+    "shop",
+    "ai",
     "tablet",
     "smartphone",
-    "portátil"
+    "laptop"
    ],
-   "ms": 91
+   "ms": 104
   },
   {
    "id": "design-dribbble",
    "tags": [
-    "inspiração",
+    "inspiration",
     "design",
     "dribbble",
     "landing page",
-    "inteligência artificial"
+    "ai"
    ],
-   "ms": 76
+   "ms": 136
   },
   {
    "id": "video-youtube",
    "tags": [
-    "vídeo",
-    "redes neuronais",
-    "inteligência artificial",
+    "video",
+    "neural networks",
+    "ai",
     "deep learning",
     "youtube",
-    "matemática",
+    "math",
     "portugal"
    ],
-   "ms": 87
+   "ms": 130
   },
   {
    "id": "x-post",
    "tags": [
-    "publicação",
-    "rede social",
+    "post",
+    "social media",
     "x"
-   ],
-   "ms": 71
-  },
-  {
-   "id": "wiki-nata",
-   "tags": [
-    "pastelaria",
-    "enciclopédia",
-    "portugal",
-    "doces",
-    "lisboa",
-    "religião",
-    "wikipedia"
    ],
    "ms": 100
   },
   {
+   "id": "wiki-nata",
+   "tags": [
+    "pastry",
+    "encyclopedia",
+    "portugal",
+    "sweets",
+    "lisbon",
+    "religion",
+    "wikipedia"
+   ],
+   "ms": 128
+  },
+  {
    "id": "stripe-pricing",
    "tags": [
-    "preços",
-    "pagamentos",
-    "negócios",
-    "finanças",
-    "vendas",
+    "pricing",
+    "payments",
+    "business",
+    "finance",
+    "sales",
     "api",
-    "culinária"
+    "cooking"
    ],
-   "ms": 135
+   "ms": 148
   },
   {
    "id": "arxiv-attention",
    "tags": [
-    "artigo científico",
+    "scientific paper",
     "transformers",
-    "tradução automática",
-    "ciência",
-    "inteligência artificial",
+    "machine translation",
+    "science",
+    "ai",
     "machine learning",
     "arxiv"
    ],
-   "ms": 78
+   "ms": 84
   },
   {
    "id": "hn-front",
    "tags": [
     "hacker news",
-    "lista de links",
-    "ciência",
+    "link list",
+    "science",
     "github",
-    "inteligência artificial",
+    "ai",
     "microsoft",
     "windows"
    ],
-   "ms": 86
+   "ms": 89
   },
   {
    "id": "fonts-inter",
    "tags": [
-    "tipo de letra",
+    "font",
     "google fonts",
-    "tipografia",
+    "typography",
     "design",
     "sans-serif"
    ],
-   "ms": 130
+   "ms": 92
   }
  ]
 }

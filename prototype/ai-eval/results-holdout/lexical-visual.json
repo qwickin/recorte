@@ -3,150 +3,150 @@
  "threads": 2,
  "platform": "darwin-arm64",
  "node": "v24.22.2",
- "loadMs": 215,
+ "loadMs": 199,
  "rssBaseMB": 221,
- "rssLoadedMB": 380,
- "rssPeakMB": 591,
+ "rssLoadedMB": 368,
+ "rssPeakMB": 568,
  "perItem": [
   {
    "id": "h-radix-dialog",
    "tags": [
     "dialog",
-    "documentação",
-    "componentes ui",
+    "documentation",
+    "ui components",
     "ui design",
-    "botão",
+    "button",
     "react",
     "3d"
    ],
-   "ms": 521
+   "ms": 491
   },
   {
    "id": "h-headless-combobox",
    "tags": [
     "combobox",
-    "componentes ui",
+    "ui components",
     "ui design",
-    "formulário",
+    "form",
     "dropdown",
     "3d",
     "design"
    ],
-   "ms": 76
+   "ms": 102
   },
   {
    "id": "h-mui-select",
    "tags": [
     "dropdown",
-    "componentes ui",
+    "ui components",
     "ui design",
-    "bolachas",
-    "lista",
+    "cookies",
+    "list",
     "design",
     "react"
    ],
-   "ms": 274
+   "ms": 303
   },
   {
    "id": "h-recipe-pt",
    "tags": [
-    "receita",
-    "sobremesa",
-    "gastronomia",
-    "bolachas",
-    "culinária",
-    "doces",
+    "recipe",
+    "dessert",
+    "food",
+    "cookies",
+    "cooking",
+    "sweets",
     "portugal"
    ],
-   "ms": 84
+   "ms": 80
   },
   {
    "id": "h-news-pt",
    "tags": [
-    "lisboa",
-    "segurança",
+    "lisbon",
+    "safety",
     "portugal",
     "branding",
     "google",
-    "privacidade",
-    "direito"
+    "privacy",
+    "law"
    ],
-   "ms": 73
+   "ms": 67
   },
   {
    "id": "h-gh-ripgrep",
    "tags": [
-    "repositório",
-    "documentação",
+    "repository",
+    "documentation",
     "github",
     "git",
     "windows",
     "macos",
-    "bricolage"
+    "diy"
    ],
-   "ms": 88
+   "ms": 74
   },
   {
    "id": "h-blog-jvns",
    "tags": [
-    "ciclismo",
-    "eletrónica",
-    "desporto"
+    "cycling",
+    "electronics",
+    "sports"
    ],
-   "ms": 77
+   "ms": 67
   },
   {
    "id": "h-wiki-belem",
    "tags": [
-    "enciclopédia",
-    "lisboa",
+    "encyclopedia",
+    "lisbon",
     "portugal",
     "wikipedia",
-    "história",
-    "arquitetura",
-    "guerra"
+    "history",
+    "architecture",
+    "war"
    ],
-   "ms": 105
+   "ms": 81
   },
   {
    "id": "h-commons-photo",
    "tags": [],
-   "ms": 67
+   "ms": 59
   },
   {
    "id": "h-three-demo",
    "tags": [
     "webgl",
-    "animação",
+    "animation",
     "3d",
-    "física"
+    "physics"
    ],
-   "ms": 80
+   "ms": 69
   },
   {
    "id": "h-linear-landing",
    "tags": [
-    "produto",
-    "inteligência artificial",
+    "product",
+    "ai",
     "ios",
-    "arquitetura",
-    "negócios",
-    "modo escuro"
+    "architecture",
+    "business",
+    "dark mode"
    ],
-   "ms": 74
+   "ms": 63
   },
   {
    "id": "h-python-docs",
    "tags": [
     "python",
-    "documentação",
+    "documentation",
     "llm",
-    "componentes ui",
+    "ui components",
     "input",
-    "inteligência artificial",
+    "ai",
     "command palette"
    ],
-   "ms": 91
+   "ms": 80
   }
  ]
 }

@@ -4,7 +4,7 @@ export { extractColors, colorName, COLOR_NAMES } from "./colors";
 export { extractKeywords } from "./keywords";
 export type { KeywordInput } from "./keywords";
 export { VOCAB, INFORMATIVE_VISUAL, labelSynonyms } from "./vocab";
-export { TOPICS, TOPIC_PARENTS, selectTopics, topicByName, topicSynonyms, createTopicTagger, lexicalScores, ruleTags, queryTexts, topicPassage } from "./topics";
+export { TOPICS, TOPIC_PARENTS, selectTopics, topicByName, topicId, topicSynonyms, createTopicTagger, lexicalScores, ruleTags, queryTexts, topicPassage } from "./topics";
 export type { RankedTopic, Topic, TopicInput, TopicOptions, TopicResult, TopicTagger, Embedder } from "./topics";
 export { createEmbedder, TEXT_MODEL_ID, TEXT_MODEL_FILE } from "./embed";
 export type { EmbedderOptions } from "./embed";

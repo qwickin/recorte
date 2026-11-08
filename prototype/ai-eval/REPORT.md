@@ -4,6 +4,11 @@
 context (curated pt-PT vocabulary, field weights, URL/og rules), plus the SigLIP2 screenshot model's content-type
 probabilities as extra evidence and its visual tags. No new model, so nothing extra is baked into the Docker image.
 
+**Tag IDs (topics-v2).** The tagger now emits language-neutral tag IDs (`packages/shared/src/tag-labels.ts`); its
+matching vocabulary is unchanged. `score.mts` maps the pt-PT ground truth (and results written before the change)
+to IDs through the vocabulary's ID column. Re-running `lexical-visual` after the change gives the same tags on
+every page (20/20 dev, 12/12 held-out, after mapping) and the same F1: 72% dev, 46% held-out.
+
 ## Method
 
 - **Dev set**: 20 real pages captured with the extension's own extractor (`dataset/`), with ground truth written by hand (`ground-truth.json`). The vocabulary and weights were tuned on this set.

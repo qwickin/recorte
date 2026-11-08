@@ -2,5 +2,6 @@
 // vite.config.ts aliases "@recorte/shared" here for bundling; types still come from the package itself.
 export * from "../../../../packages/shared/src/api";
 export * from "../../../../packages/shared/src/tags";
+export * from "../../../../packages/shared/src/tag-labels";
 export * from "../../../../packages/shared/src/version";
 export * from "../../../../packages/shared/src/i18n";

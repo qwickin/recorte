@@ -10,8 +10,3 @@ export function normalizeTags(a: string[]): string[] {
   }
   return out;
 }
-
-/** The AI's shown tags: the text tagger's `topics`, else (older items, or no text to go on) the screenshot tags. */
-export function aiTags(ai: { tipo: string[]; visual: string[]; topics?: string[] }): string[] {
-  return ai.topics?.length ? ai.topics : [...ai.tipo, ...ai.visual];
-}
