@@ -1,0 +1,887 @@
+[
+ {
+  "id": "h-radix-dialog",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.radix-ui.com/primitives/docs/components/dialog",
+   "site": "radix-ui.com",
+   "pageTitle": "Dialog – Radix Primitives"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Radix Homepage\nMade by WorkOS\nThemes\nPrimitives\nIcons\nColors\nDocumentation\nCase studies\nBlog\nSearch\n/\nOverview\nIntroduction\nGetting started\nAccessibility\nReleases\nGuides\nStyling\nAnimation\nComposition\nServer-side rendering\nComponents\nAccordion\nAlert Dialog\nAspect Ratio\nAvatar\nCheckbox\nCollapsible\nContext Menu\nDialog\nDropdown Menu\nForm\nPreview\nHover Card\nDialog\nA window overlaid on either the primary window or another dialog window, rendering the content underneath inert.\nEdit profile\nindex.jsx\nstyles.css\nCSS\nimport * as React from \"react\" ;\nimport { Dialog } from \"radix-ui\" ;\nimport { Cross2Icon } from \"@radix-ui/react-icons\" ;\nimport \"./styles.css\" ;\nconst DialogDemo = ( ) => (\n< Dialog.Root >\n< Dialog.Trigger asChild >\n< button className = \" Button violet \" > Edit profile </ button >\n</ Dialog.Trigger >\n< Dialog.Portal >\n< Dialog.Overlay className = \" DialogOverlay \" />\n< Dialog.Content className = \" DialogContent \" >\n< Dialog.Title className = \" DialogTitle \" > Edit profile </ Dialog.Title >\n< Dialog.Description className = \" DialogDescription \" >\nMake changes to your profile here. Click save when you&apos;re done.\n</ Dialog.Description >\n< fieldset className = \" Fieldset \" >\nExpand code\nFeatures\nSupports modal and non-modal modes.\nFocus is automatically trapped within modal.\nCan be controlled or uncontrolled.\nManages screen reader announcements with Title and Description components.\nEsc closes the component automatically.\nComponent Reference Links\nVersion: 1.2.0\nSize: 12.83 kB\nView source\nReport an issue\nARIA design pattern\nView as Markdown\nQuick nav\nAnatomy\nAPI Reference\nRoot\nTrigger\nPortal\nOverlay\nContent\nClose\nTitle\nDescription\nExamples\nClose after asynchronous form submission\nScrollable overlay\nCustom portal container\nAccessibility\nKeyboard Interactions\nCustom APIs\nAbstract the overlay and the close button",
+   "meta": {
+    "description": "A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.",
+    "og": {
+     "og:title": "Dialog – Radix Primitives",
+     "og:description": "A window overlaid on either the primary window or another dialog window, rendering the content underneath inert.",
+     "og:image": "https://www.radix-ui.com/primitives/opengraph-image.png?opengraph-image.0rn7txzeny89p.png",
+     "og:image:type": "image/png",
+     "og:image:width": "3025",
+     "og:image:height": "1700"
+    }
+   },
+   "headings": [
+    "Dialog",
+    "Features",
+    "Component Reference Links",
+    "Anatomy",
+    "API Reference",
+    "Root",
+    "Trigger",
+    "Portal",
+    "Overlay",
+    "Content",
+    "Close",
+    "Title",
+    "Description",
+    "Examples",
+    "Close after asynchronous form submission",
+    "Scrollable overlay",
+    "Custom portal container",
+    "Accessibility",
+    "Keyboard Interactions",
+    "Custom APIs",
+    "Abstract the overlay and the close button"
+   ],
+   "alts": [],
+   "page": {
+    "text": "import * as React from \"react\";\nimport { Dialog } from \"radix-ui\";\nimport { Cross2Icon } from \"@radix-ui/react-icons\";\nimport \"./styles.css\";\nconst DialogDemo = () => (\n<Dialog.Root>\n<Dialog.Trigger asChild>\n<button className=\"Button violet\">Edit profile</button>\n</Dialog.Trigger>\n<Dialog.Portal>\n<Dialog.Overlay className=\"DialogOverlay\" />\n<Dialog.Content className=\"DialogContent\">\n<Dialog.Title className=\"DialogTitle\">Edit profile</Dialog.Title>\n<Dialog.Description className=\"DialogDescription\">\nMake changes to your profile here. Click save when you&apos;re done.\n</Dialog.Description>\n<fieldset className=\"Fieldset\">\n<label className=\"Label\" htmlFor=\"name\">\nName\n</label>\n<input className=\"Input\" id=\"name\" defaultValue=\"Pedro Duarte\" />\n</fieldset>\n<fieldset className=\"Fieldset\">\n<label className=\"Label\" htmlFor=\"username\">\nUsername\n</label>\n<input className=\"Input\" id=\"username\" defaultValue=\"@peduarte\" />\n</fieldset>\n<div\nstyle={{ display: \"flex\", marginTop: 25, justifyContent: \"flex-end\" }}\n>\n<Dialog.Close asChild>\n<button className=\"Button green\">Save changes</button>\n</Dialog.Close>\n</div>\n<Dialog.Close asChild>\n<button className=\"IconButton\" aria-label=\"Close\">\n<Cross2Icon />\n</button>\n</Dialog.Close>\n</Dialog.Content>\n</Dialog.Portal>\n</Dialog.Root>\n);\nexport default DialogDemo;",
+    "nearHeadings": [
+     "Overview",
+     "Guides",
+     "Components",
+     "Dialog",
+     "Features",
+     "Component Reference Links",
+     "Quick nav"
+    ]
+   }
+  },
+  "image": "img/h-radix-dialog.webp"
+ },
+ {
+  "id": "h-headless-combobox",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://headlessui.com/react/combobox",
+   "site": "headlessui.com",
+   "pageTitle": "Combobox - Headless UI"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "v2.1\nReact\nVue\nComponents\nDropdown Menu\nDisclosure\nDialog\nPopover\nTabs\nTransition\nForms\nButton\nCheckbox\nCombobox\nFieldset\nInput\nListbox\nRadio Group\nSelect\nSwitch\nTextarea\nCombobox\nComboboxes are the foundation of accessible autocompletes and command palettes for your app, complete with robust support for keyboard navigation.\nPreview\nCode\nInstallation\nTo get started, install Headless UI via npm:\nnpm install @headlessui/react\nBasic example\nOn this page\nInstallation\nBasic example\nStyling\nUsing data attributes\nUsing render props\nExamples\nAdding a label\nAdding a description\nDisabling a combobox\nDisabling a combobox option\nAllowing custom values\nUsing with HTML forms\nUsing as uncontrolled\nPositioning the dropdown\nSetting the dropdown width\nAdding transitions\nAnimating with Framer Motion\nBinding objects as values\nBinding strings as values\nSelecting multiple values\nOpening the dropdown on focus\nRendering as different elements",
+   "meta": {
+    "og": {
+     "og:url": "https://headlessui.com/",
+     "og:type": "article",
+     "og:description": "Completely unstyled, fully accessible UI components, designed to integrate beautifully with Tailwind CSS.",
+     "og:title": "Headless UI",
+     "og:image": "/_next/static/media/social-card.46834755.jpg"
+    }
+   },
+   "headings": [
+    "Components",
+    "Forms",
+    "Combobox",
+    "Installation",
+    "Basic example",
+    "Styling",
+    "Using data attributes",
+    "Using render props",
+    "Examples",
+    "Adding a label",
+    "Adding a description",
+    "Disabling a combobox",
+    "Disabling a combobox option",
+    "Allowing custom values",
+    "Using with HTML forms",
+    "Using as uncontrolled",
+    "Positioning the dropdown",
+    "Setting the dropdown width",
+    "Adding transitions",
+    "Animating with Framer Motion",
+    "Binding objects as values",
+    "Binding strings as values",
+    "Selecting multiple values",
+    "Opening the dropdown on focus",
+    "Rendering as different elements",
+    "Rendering active option details",
+    "Virtual scrolling",
+    "Keyboard interaction",
+    "Component API",
+    "ComboboxInput",
+    "ComboboxButton",
+    "ComboboxOptions",
+    "ComboboxOption",
+    "Styled examples"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Comboboxes are the foundation of accessible autocompletes and command palettes for your app, complete with robust\nsupport for keyboard navigation.\nTo get started, install Headless UI via npm:\nnpm install @headlessui/react\nComboboxes are built using the Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, and ComboboxOption\ncomponents.\nYou are completely in charge of how you filter the results, whether it be with a fuzzy search library client-side or by\nmaking server-side requests to an API. In this example we will keep the logic simple for demo purposes.\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nHeadless UI keeps track of a lot of state about each component, like which combobox option is currently selected,\nwhether a popover is open or closed, or which item in a menu is currently focused via the keyboard.\nBut because the components are headless and completely unstyled out of the box, you can't see this information in your\nUI until you provide the styles you want for each state yourself.\nThe easiest way to style the different states of a Headless UI component is using the data-* attributes that each\ncomponent exposes.\nFor example, the ComboboxOption component exposes a data-focus attribute, which tells you if the option is currently\nfocused via the mouse or keyboard, and a data-selected attribute, which tells you if that option matches the current\nvalue of the Combobox.\n<!-- Rendered `ComboboxOptions` -->\n<div data-open>\n<div>Wade Cooper</div>\n<div data-focus data-selected>Arlene Mccoy</div>\n<div>Devon Webb</div>\n</div>\nUse the CSS attribute selector to conditionally\napply styles based on the presence of these data attributes. If you're using Tailwind CSS, the\ndata attribute modifier makes this easy:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { CheckIcon } from '@heroicons/react/20/solid'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"group flex gap-2 bg-white data-focus:bg-blue-100\">\n<CheckIcon className=\"invisible size-5 group-data-selected:visible\" />\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nSee the component API for a list of all the available data attributes.\nEach component also exposes information about its current state via\nrender props that you can use to conditionally apply different styles or\nrender different content.\nFor example, the ComboboxOption component exposes a focus state, which tells you if the option is currently focused\nvia the mouse or keyboard, and a selected state, which tells you if that option matches the current value of the\nCombobox.\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { CheckIcon } from '@heroicons/react/20/solid'\nimport clsx from 'clsx'\nimport { Fragment, useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption as={Fragment} key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{({ focus, selected }) => (\n<div className={clsx('group flex gap-2', focus && 'bg-blue-100')}>\n{selected && <CheckIcon className=\"size-5\" />}\n{person.name}\n</div>\n)}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nSee the component API for a list of all the available render props.\nWrap a Label and Combobox with the Field component to automatically associate them using a generated ID:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Field>\n<Label>Assignee:</Label>\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput displayValue={(person) => person?.name} onChange={(event) => setQuery(event.target.value)} />\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n</Field>\n)\n}\nUse the Description component within a Field to automatically associate it with a Combobox using the\naria-describedby attribute:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Description, Field, Label } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Field>\n<Label>Assignee:</Label>\n<Description>This person will have full access to this project.</Description>\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput displayValue={(person) => person?.name} onChange={(event) => setQuery(event.target.value)} />\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n</Field>\n)\n}\nAdd the disabled prop to the Field component to disable a Combobox and its associated Label and Description:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Field disabled>\n<Label>Assignee:</Label>\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput displayValue={(person) => person?.name} onChange={(event) => setQuery(event.target.value)} />\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n</Field>\n)\n}\nYou can also disable a combobox outside of a Field by adding the disabled prop directly to the Combobox itself.\nUse the disabled prop to disable a ComboboxOption and prevent it from being selected:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds', available: true },\n{ id: 2, name: 'Kenton Towne', available: true },\n{ id: 3, name: 'Therese Wunsch', available: true },\n{ id: 4, name: 'Benedict Kessler', available: false },\n{ id: 5, name: 'Katelyn Rohan', available: true },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption\nkey={person.id}\nvalue={person}\ndisabled={!person.available}\nclassName=\"data-disabled:opacity-50 data-focus:bg-blue-100\"\n>\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nYou can allow users to enter their own value that doesn't exist in the list by including a dynamic ComboboxOption\nbased on the query value.\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{query.length > 0 && (\n<ComboboxOption value={{ id: null, name: query }} className=\"data-focus:bg-blue-100\">\nCreate <span className=\"font-bold\">\"{query}\"</span>\n</ComboboxOption>\n)}\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nIf you add the name prop to your Combobox, a hidden input element will be rendered and kept in sync with the\ncombobox state.\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<form action=\"/projects/1/assignee\" method=\"post\">\n<Combobox name=\"assignee\" value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n<button>Submit</button>\n</form>\n)\n}\nThis lets you use a combobox inside a native HTML <form> and make traditional form submissions as if your combobox was\na native HTML form control.\nBasic values like strings will be rendered as a single hidden input containing that value, but complex values like\nobjects will be encoded into multiple inputs using a square bracket notation for the names:\n<!-- Rendered hidden inputs -->\n<input type=\"hidden\" name=\"assignee[id]\" value=\"1\" />\n<input type=\"hidden\" name=\"assignee[name]\" value=\"Durward Reynolds\" />\nIf you omit the value prop, Headless UI will track its state internally for you, allowing you to use it as an\nuncontrolled component.\nWhen uncontrolled, use the defaultValue prop to provide an initial value to the Combobox.\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<form action=\"/projects/1/assignee\" method=\"post\">\n<Combobox name=\"assignee\" defaultValue={people[0]} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n<button>Submit</button>\n</form>\n)\n}\nThis can simplify your code when using the combobox with HTML forms or with form APIs that\ncollect their state using FormData instead of tracking it\nusing React state.\nAny onChange prop you provide will still be called when the component's value changes in case you need to run any side\neffects, but you won't need to use it to track the component's state yourself.\nAdd the anchor prop to the ComboboxOptions to automatically position the dropdown relative to the ComboboxInput:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor=\"bottom start\" className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nUse the values top, right, bottom, or left to center the dropdown along the appropriate edge, or combine it with\nstart or end to align the dropdown to a specific corner, such as top start or bottom end.\nTo control the gap between the input and the dropdown, use the --anchor-gap CSS variable:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions\nanchor=\"bottom start\"\nclassName=\"border [--anchor-gap:4px] empty:invisible sm:[--anchor-gap:8px]\"\n>\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>\n)\n}\nAdditionally, you can use --anchor-offset to control the distance that the dropdown should be nudged from its original\nposition, and --anchor-padding to control the minimum space that should exist between the dropdown and the viewport.\nThe anchor prop also supports an object API that allows you to control the gap, offset, and padding values using\nJavaScript:\nimport { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'\nimport { useState } from 'react'\nconst people = [\n{ id: 1, name: 'Durward Reynolds' },\n{ id: 2, name: 'Kenton Towne' },\n{ id: 3, name: 'Therese Wunsch' },\n{ id: 4, name: 'Benedict Kessler' },\n{ id: 5, name: 'Katelyn Rohan' },\n]\nfunction Example() {\nconst [selectedPerson, setSelectedPerson] = useState(people[0])\nconst [query, setQuery] = useState('')\nconst filteredPeople =\nquery === ''\n? people\n: people.filter((person) => {\nreturn person.name.toLowerCase().includes(query.toLowerCase())\n})\nreturn (\n<Combobox value={selectedPerson} onChange={setSelectedPerson} onClose={() => setQuery('')}>\n<ComboboxInput\naria-label=\"Assignee\"\ndisplayValue={(person) => person?.name}\nonChange={(event) => setQuery(event.target.value)}\n/>\n<ComboboxOptions anchor={{ to: 'bottom start', gap: '4px' }} className=\"border empty:invisible\">\n{filteredPeople.map((person) => (\n<ComboboxOption key={person.id} value={person} className=\"data-focus:bg-blue-100\">\n{person.name}\n</ComboboxOption>\n))}\n</ComboboxOptions>\n</Combobox>",
+    "nearHeadings": [
+     "Components",
+     "Forms",
+     "Combobox",
+     "Installation",
+     "Basic example"
+    ]
+   }
+  },
+  "image": "img/h-headless-combobox.webp"
+ },
+ {
+  "id": "h-mui-select",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://mui.com/material-ui/react-select/",
+   "site": "mui.com",
+   "pageTitle": "React Select component - Material UI"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "🚀 Material UI and MUI X v9 are out! Check out the announcement blogpost.\nSearch…\n⌘K\n2\nMaterial UI\nv9.5.0\nGetting started\nComponents\nAll components\nInputs\nAutocomplete\nButton\nButton Group\nCheckbox\nFloating Action Button\nNumber Field\nNew\nRadio Group\nRating\nSelect\nSlider\nSwitch\nText Field\nTransfer List\nToggle Button\nData display\nAvatar\nBadge\nChip\nDivider\nIcons\nMaterial Icons\nList\nTable\nTooltip\nTypography\nFeedback\nSelect\nSelect components are used for collecting user provided information from a list of options.\nEmbedded PDF SDKs for web, server, and mobile: View, Edit, and Sign. Get a free trial\nads via Carbon\nView as Markdown\nFeedback\nBundle size\nSource\nWAI-ARIA\nMaterial Design\nFigma\nSketch\nBasic select\nMenus are positioned under their emitting elements, unless they are close to the bottom of the viewport.\nAge\nAge\nEdit in Chat\nExpand code\nEdit code\n< FormControl fullWidth > < InputLabel id = \" demo-simple-select-label \" > Age </ InputLabel > < Select labelId = \" demo-simple-select-label \" id = \" demo-simple-select \" value = { age } label = \" Age \" onChange = { handleChange } > < MenuItem value = { 10 } > Ten </ MenuItem > < MenuItem value = { 20 } > Twenty </ MenuItem > < MenuItem value = { 30 } > Thirty </ MenuItem > </ Select >\nPress Enter to start editing\nContents\nBasic select\nAdvanced features\nProps\nVariants\nLabels and helper text\nAuto width\nSmall Size\nOther props\nNative select\nTextField\nCustomization\nMultiple select\nDefault\nSelection indicators\nChip\nPlaceholder\nNative\nControlling the open state\nWith a dialog\nGrouping\nAccessibility\nAPI\nBecome a Diamond sponsor\nCookie preferences\nWe use cookies to understand site usage and improve our content. This includes third-party analytics.\nAllow analytics\nEssential only",
+   "meta": {
+    "description": "Select components are used for collecting user provided information from a list of options.",
+    "og": {
+     "og:type": "website",
+     "og:title": "React Select component - Material UI",
+     "og:url": "https://mui.com/material-ui/react-select/",
+     "og:description": "Select components are used for collecting user provided information from a list of options.",
+     "og:image": "https://mui.com/edge-functions/og-image?product=Material UI&title=React Select component&description=Select components are used for collecting user provided information from a list of options.",
+     "og:ttl": "604800"
+    }
+   },
+   "headings": [
+    "Select",
+    "Basic select",
+    "Advanced features",
+    "Props",
+    "Variants",
+    "Labels and helper text",
+    "Auto width",
+    "Small Size",
+    "Other props",
+    "Native select",
+    "TextField",
+    "Customization",
+    "Multiple select",
+    "Default",
+    "Selection indicators",
+    "Chip",
+    "Placeholder",
+    "Native",
+    "Controlling the open state",
+    "With a dialog",
+    "Grouping",
+    "Accessibility",
+    "API",
+    "Cookie preferences"
+   ],
+   "alts": [
+    "ads via Carbon",
+    "doit"
+   ],
+   "page": {
+    "text": "Select components are used for collecting user provided information from a list of options.\nView as Markdown\nFeedback\nBundle size\nSource\nWAI-ARIA\nMaterial Design\nFigma\nSketch\nBasic select\nMenus are positioned under their emitting elements, unless they are close to the bottom of the viewport.\nAge\nPress Enter to start editing\nAdvanced features\nThe Select component is meant to be interchangeable with a native <select> element.\nIf you are looking for more advanced features, like combobox, multiselect, autocomplete, async or creatable support, head to the Autocomplete component.\nIt's meant to be an improved version of the \"react-select\" and \"downshift\" packages.\nProps\nThe Select component is implemented as a custom <input> element of the InputBase.\nIt extends the text field components subcomponents, either the OutlinedInput, Input, or FilledInput, depending on the variant selected.\nIt shares the same styles and many of the same props. Refer to the respective component's API page for details.\nVariants\nAge\nAge\nAge\nLabels and helper text\nSelect always needs an accessible name. This can come from an associated visible label, such as an InputLabel linked to the Select with labelId or from adding an aria-label prop to the input element props (inputProps). If more information is needed, provide a helper text element and link it to the Select using aria-describedby.\nAge\nVisible label and helper text\nNone\naria-label and helper text\nAuto width\nAge\nSmall Size\nAge\nOther props\nAge\nDisabled\nAge\nError\nAge\nRead only\nAge\nRequired\nNative select\nAs the user experience can be improved on mobile using the native select of the platform,\nwe allow such pattern.\nAge\nPress Enter to start editing\nTextField\nThe TextField wrapper component is a complete form control including a label, input and help text.\nYou can find an example with the select mode in this section.\nCustomization\nHere are some examples of customizing the component.\nYou can learn more about this in the overrides documentation page.\nThe first step is to style the InputBase component.\nOnce it's styled, you can either use it directly as a text field or provide it to the select input prop to have a select field.\nNotice that the \"standard\" variant is easier to customize, since it does not wrap the contents in a fieldset/legend markup.\nAge\nAge\nAge\n🎨 If you are looking for inspiration, you can check MUI Treasury's customization examples.\nMultiple select\nThe Select component can handle multiple selections.\nIt's enabled with the multiple prop.\nLike with the single selection, you can pull out the new value by accessing event.target.value in the onChange callback. It's always an array.\nDefault\nName\nSelection indicators\nThis example demonstrates how icons are used to indicate the selection state of each item in the listbox.\nTag\nChip\nChip\nPlaceholder\nPlaceholder\nNative\nNative\nControlling the open state\nYou can control the open state of the select with the open prop. Alternatively, it is also possible to set the initial (uncontrolled) open state of the component with the defaultOpen prop.\nAge\nWith a dialog\nWhile it's discouraged by the Material Design guidelines, you can use a select inside a dialog.\nGrouping\nDisplay categories with the ListSubheader component or the native <optgroup> element.\nGrouping\nGrouping\nAccessibility\nTo properly label your Select input you need an extra element with an id that contains a label.\nThat id needs to match the labelId of the Select, for example:\n<InputLabel id=\"label\">Age</InputLabel>\n<Select labelId=\"label\" id=\"select\" value=\"20\">\n<MenuItem value=\"10\">Ten</MenuItem>\n<MenuItem value=\"20\">Twenty</MenuItem>\n</Select>\nAlternatively a TextField with an id and label creates the proper markup and\nids for you:\n<TextField id=\"select\" label=\"Age\" value=\"20\" select>\n<MenuItem value=\"10\">Ten</MenuItem>\n<MenuItem value=\"20\">Twenty</MenuItem>\n</TextField>\nFor a native select, you should mention a label by giving the value of the id attribute of the select element to the InputLabel's htmlFor attribute:\n<InputLabel htmlFor=\"select\">Age</InputLabel>\n<NativeSelect id=\"select\">\n<option value=\"10\">Ten</option>\n<option value=\"20\">Twenty</option>\n</NativeSelect>\nAPI\nSee the documentation below for a complete reference to all of the props and classes available to the components mentioned here.\n<NativeSelect />\n<Select />",
+    "nearHeadings": [
+     "Select",
+     "Basic select",
+     "Cookie preferences"
+    ]
+   }
+  },
+  "image": "img/h-mui-select.webp"
+ },
+ {
+  "id": "h-recipe-pt",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.pingodoce.pt/receitas/tecnicas/",
+   "site": "pingodoce.pt",
+   "pageTitle": "Técnicas de cozinha | Receitas | Pingo Doce"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Saltar para o conteúdo\nSobre nós\nAs nossas marcas\nComida Fresca\nAs nossas lojas\nSustentabilidade\nJunte-se a nós\nApoio ao cliente\nParcerias\nAPP O Meu Pingo Doce\nProdutos\nReceitas e Dicas\nFolhetos\nEncomendar Comida\nCozinha\nCasa e Família\nBem-estar\nHome\nReceitas e Dicas\nCozinha\nTécnicas\nTécnicas\nTudo o que precisa para dar os primeiros passos na cozinha, ou aperfeiçoar o que já sabe. Porque com a ajuda certa, quem sabe… sabe ainda melhor.\nTécnicas\nComo temperar cabrito para assar\nTécnicas\nComo cortar melancia\nTécnicas\nComo cozinhar espargos\nTécnicas\nComo cortar manga\nCOOKIES\nAo clicar em \"Aceitar todos os cookies\", concorda com o armazenamento de cookies no seu dispositivo para melhorar a navegação no site, analisar a utilização do site e ajudar nas nossas iniciativas de marketing. Política de COOKIES\nDefinições de cookies\nRejeitar Todos\nAceitar todos os cookies",
+   "meta": {
+    "description": "Da omelete ao tempero de borrego, aprenda a dar os primeiros passos ou a aperfeiçoar o que já sabe com as técnicas de cozinha do Pingo Doce.",
+    "og": {
+     "og:site_name": "Pingo Doce",
+     "og:locale": "pt_PT",
+     "og:type": "article",
+     "og:title": "Técnicas",
+     "og:description": "Da omelete ao tempero de borrego, aprenda a dar os primeiros passos ou a aperfeiçoar o que já sabe com as técnicas de cozinha do Pingo Doce.",
+     "og:url": "https://www.pingodoce.pt/receitas/tecnicas/",
+     "og:image": "https://cdn.pingodoce.pt/wp-content/uploads/2019/09/social_omissao.jpg",
+     "og:image:width": "1200",
+     "og:image:height": "630",
+     "og:image:type": "image/jpeg"
+    }
+   },
+   "headings": [
+    "Técnicas",
+    "Básicos de cozinha",
+    "É tão bom encontrar-nos assim.",
+    "Em qualquer lado.",
+    "COOKIES",
+    "Centro de preferências de privacidade",
+    "Gerir preferências de cookies",
+    "Lista de cookies"
+   ],
+   "alts": [
+    "Pingo Doce",
+    "como temperar cabrito para assar",
+    "como cortar melancia para servir",
+    "como cozinhar espargos",
+    "cortar manga",
+    "como fazer merengue italiano para cobertura de bolo",
+    "como fazer crepe",
+    "massa folhada receita",
+    "como descongelar carne"
+   ],
+   "page": {
+    "text": "E-mail*\nPor favor preencha o campo obrigatório.\nCódigo postal*\nPor favor preencha o campo obrigatório.\nObrigatório na subscrição da newsletter de promoções\nAutorizo o tratamento dos meus dados pessoais nos termos da Política de Proteção de Dados Pessoais.\nPor favor aceite os termos para prosseguir.\n* Campos obrigatórios",
+    "nearHeadings": [
+     "Técnicas",
+     "COOKIES"
+    ]
+   }
+  },
+  "image": "img/h-recipe-pt.webp"
+ },
+ {
+  "id": "h-news-pt",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://observador.pt/2026/11/07/presidente-da-republica-e-guterres-reuniram-se-em-belem-falamos-de-tudo-o-que-se-passa-no-mundo/",
+   "site": "observador.pt",
+   "pageTitle": "Seguro e Guterres: \"Falámos de tudo o que se passa no mundo\" – Observador"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Damos valor à sua privacidade\nNós e os nossos parceiros armazenamos e/ou acedemos a informações num dispositivo, como cookies, e processamos dados pessoais, como identificadores únicos e informações padrão enviadas por um dispositivo para publicidade e conteúdos personalizados, medição de publicidade e conteúdos, pesquisa de audiências e desenvolvimento de serviços. Com a sua permissão, nós e os nossos parceiros poderemos usar identificação e dados de geolocalização precisos através da procura de dispositivos. Poderá clicar para consentir o processamento por nossa parte e pela parte dos nossos 1753 parceiros, conforme descrito acima. Em alternativa, poderá clicar para recusar o consentimento ou para aceder a informações mais pormenorizadas e alterar as suas preferências antes de dar consentimento. Tenha em atenção que algum processamento dos seus dados pessoais poderá não exigir o seu consentimento, mas que tem o direito de se opor a esse processamento. As suas preferências aplicam-se apenas a este site e serão guardadas durante 13 meses em IABGPP_HDR_GppString cookie. Você pode alterar suas preferências ou retirar seu consentimento a qualquer momento voltando a este site e clicando no botão \"Privacidade\" na parte inferior da página. Observe também que este website/aplicação usa um ou mais serviços da Google e pode recolher e armazenar informações, incluindo, entre outras, a sua visita ou comportamento de uso. Pode clicar para conceder ou recusar o consentimento à Google e às suas tags de terceiros para usar os seus dados para os fins especificados abaixo na secção de consentimento da Google abaixo.\nMAIS OPÇÕES\nCONCORDO\nRádio\nAssinar o Observador\nOpinião\nRádio\nPodcasts\nNewsletters\nÚltimas\nJogos\nSecções\nJá somos quase 50.000. Assine e receba 1 garrafa de vinho.\nAssinar\n1252,5 kWh poupados com a\ni\nMundo /\nNações Unidas\nAtivar alertas\nPresidente da República e Guterres reuniram-se em Belém: \"Falámos de tudo o que se passa no mundo\"\nO mandato de Guterres à frente da ONU termina este ano. Seguro destaca o Pacto para o Futuro e o esforço pela igualdade de género como marcas do seu legado, após encontro entre os dois em Belém.\nAgência Lusa\nTexto\n07 nov. 2026, 21:15\n5 min\n6\n49.740 assinantes. Assine e receba 1 garrafa de vinho.",
+   "meta": {
+    "description": "O mandato de Guterres à frente da ONU termina este ano. Seguro destaca o Pacto para o Futuro e o esforço pela igualdade de género como marcas do seu legado, após encontro entre os dois em Belém.",
+    "og": {
+     "og:site_name": "Observador",
+     "og:image": "https://wm.observador.pt/wm/l/https%3A%2F%2Fbordalo.observador.pt%2Fv2%2Frs%3Afill%3A770%3A403%2Fc%3A2000%3A1122%3Anowe%3A0%3A211%2Fq%3A70%2Ff%3Awebp%2Fplain%2Fhttps%3A%2F%2Fs3.observador.pt%2Fwp-content%2Fuploads%2F2026%2F11%2F07205923%2F48087534.jpg?layer=obstop:T",
+     "og:image:width": "770",
+     "og:image:height": "403",
+     "og:image:type": "image/jpeg",
+     "og:description": "O mandato de Guterres à frente da ONU termina este ano. Seguro destaca o Pacto para o Futuro e o esforço pela igualdade de género como marcas do seu legado, após encontro entre os dois em Belém.",
+     "og:url": "https://observador.pt/2026/11/07/presidente-da-republica-e-guterres-reuniram-se-em-belem-falamos-de-tudo-o-que-se-passa-no-mundo/",
+     "og:title": "Presidente da República e Guterres reuniram-se em Belém: \"Falámos de tudo o que se passa no mundo\""
+    }
+   },
+   "headings": [
+    "Presidente da República e Guterres reuniram-se em Belém: \"Falámos de tudo o que se passa no mundo\"",
+    "As mais lidas",
+    "Jogue ao Abrapalavra",
+    "Receba os alertas do Observador",
+    "Siga-nos no Instagram",
+    "Recomendamos",
+    "Guterres: mandatos passam, mas luta pela paz continua",
+    "COP31. Cortes e financiamento climático no centro do debate",
+    "Rebeca Grynspan nova votação informal para líder da ONU",
+    "Arsenio Dominguez cumpre segundo mandato na OMI até 2031",
+    "Populares",
+    "Macau a caminho de novo mínimo histórico de nascimentos",
+    "Prédio de quatro andares desaba em São Paulo",
+    "Departamento de Justiça enfrenta série de demissões",
+    "Quem é Stephen Miller, o novo chefe de gabinete de Trump?",
+    "Para si",
+    "Últimas",
+    "Habitação pública: sem mexer um tijolo nem gastar um tostão",
+    "Direita e esquerda",
+    "Derrota do trumpismo, consequências globais",
+    "A democracia são escolhas além de diálogo"
+   ],
+   "alts": [
+    "Publisher Logo",
+    "Logótipo da Xpeng",
+    "O Presidente da República, António José Seguro (D), conversa com o secretário-geral das Nações Unidas, António Guterres (E), durante uma audiência, no Palácio Belém, em Lisboa, 07 de novembro de 2026. ANTÓNIO PEDRO SANTOS/LUSA"
+   ],
+   "page": {
+    "text": "O Presidente da República, António José Seguro, recebeu este sábado o secretário-geral das Nações Unidas, António Guterres, num encontro onde os dois políticos falaram sobre vários conflitos mundiais e o chefe de Estado destacou o legado de Guterres na ONU.\nUma nota divulgada pela Presidência da República após o encontro, que durou cerca de uma hora e meia, no Palácio de Belém, em Lisboa, adianta que na audiência “foram abordados os conflitos atuais, nomeadamente na Ucrânia, no Médio Oriente e em Gaza, a urgência climática, as ameaças híbridas, a inteligência artificial e as desigualdades globais”.\nHá ofertas Black Friday que apenas receberá por email. Já se registou? Se quer ter acesso a ofertas exclusivas Black Friday deixe-nos o seu email.Deixar email\n“Foi, ainda, analisada a exigência do novo contexto político global e a pressão que o mesmo coloca ao nível do Direito Internacional e na necessidade de reforma das instituições”, lê-se na nota.\nO Presidente da República fez ainda “questão de destacar o legado de António Guterres, desenvolvido num contexto muito adverso, incluindo a celebração de importantes acordos, como foi o caso do Pacto para o Futuro, a iniciativa interna de reforma UN80 e o esforço para assegurar a igualdade de género dentro da própria organização, a par da persistente defesa do multilateralismo e do Direito Internacional”.\nÀ saída do encontro, em curtas declarações aos jornalistas na Sala das Bicas, António Guterres, ladeado pelo Presidente da República, agradeceu-lhe “a gentileza do seu convite”.\n“Naturalmente que foi com enorme satisfação que aceitei o seu convite para vir aqui ao Palácio de Belém para trocarmos algumas impressões sobre tudo o que se passa no mundo”, afirmou.\nInterrogado sobre que matérias abordaram no encontro, António Guterres repetiu: “Falámos de tudo o que se passa no mundo”.\nEsta semana, António José Seguro esteve em Salamanca, Espanha, para assistir à cerimónia do doutoramento honoris causa de António Guterres, classificando este momento como “uma honra para Portugal”.\nNessa ocasião, Guterres, que está perto de terminar o mandato à frente da Organização das Nações Unidas (ONU), afirmou “que os mandatos passam, mas a luta pela paz, justiça e dignidade continua”, e pediu coragem face “ao ódio e à lei do mais forte”.\nO antigo primeiro-ministro português disse ter sido um privilégio “servir a ONU” durante 20 anos, como alto comissário das Nações Unidas para os Refugiados e como secretário-geral e afirmou ter conhecido “pessoas que perderam tudo menos a esperança”, em “cidades arrasadas pela guerra, campos de refugiados ou ilhas ameaçadas pelo mar”.\nGuterres considerou que no momento em que deixa a ONU, o multilateralismo enfrenta “cinco provas decisivas”: a prevenção, procura e manutenção da paz; a garantia da dignidade de todas as pessoas; a equidade; a justiça climática e o controlo e regulação da revolução tecnológica em curso, associada à inteligência artificial.\n“Cinco provas e, no fundo, uma mesma exigência: submeter a força ao direito e o poder ao bem comum”, afirmou.\nPara Guterres, a paz só é possível se o mundo “funcionar em rede, unido a um direito internacional que todos respeitem e com instituições em que todos os países tenham voz”.\nO político português é o 9.º Secretário-geral da Organização das Nações Unidas (ONU), tendo assumido a 01 de janeiro de 2017 as funções que terminam este ano.\nAntónio Manuel de Oliveira Guterres nasceu em Lisboa a 30 de abril de 1949 e tem raízes familiares na aldeia das Donas, concelho do Fundão. Foi primeiro-ministro entre 1995 e 2002 e Secretário-Geral do Partido Socialista entre 1992 e 2002.",
+    "nearHeadings": [
+     "Presidente da República e Guterres reuniram-se em Belém: \"Falámos de tudo o que se passa no mundo\""
+    ]
+   }
+  },
+  "image": "img/h-news-pt.webp"
+ },
+ {
+  "id": "h-gh-ripgrep",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "area",
+  "source": {
+   "url": "https://github.com/BurntSushi/ripgrep",
+   "site": "github.com",
+   "pageTitle": "GitHub - BurntSushi/ripgrep: ripgrep recursively searches directories for a regex pattern while respecting your gitignore · GitHub"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "ripgrep (rg)\nripgrep is a line-oriented search tool that recursively searches the current directory for a regex pattern. By default, ripgrep will respect gitignore rules and automatically skip hidden files/directories and binary files. (To disable all automatic filtering by default, use rg -uuu .) ripgrep has first class support on Windows, macOS and Linux, with binary downloads available for every release . ripgrep is similar to other popular search tools like The Silver Searcher, ack and grep.\nDual-licensed under MIT or the UNLICENSE .\nCHANGELOG\nPlease see the CHANGELOG for a release history.\nDocumentation quick links\nInstallation\nUser Guide\nFrequently Asked Questions\nRegex syntax\nConfiguration files\nShell completions\nBuilding\nTranslations\nScreenshot of search results",
+   "meta": {
+    "description": "ripgrep recursively searches directories for a regex pattern while respecting your gitignore - BurntSushi/ripgrep",
+    "og": {
+     "og:image": "https://opengraph.githubassets.com/dff4c46fbbe4cc6d46a7259dd876c4cfcefae3cb5bd255b22a048ba1d84bd8a7/BurntSushi/ripgrep",
+     "og:image:alt": "ripgrep recursively searches directories for a regex pattern while respecting your gitignore - BurntSushi/ripgrep",
+     "og:image:width": "1200",
+     "og:image:height": "600",
+     "og:site_name": "GitHub",
+     "og:type": "object",
+     "og:title": "GitHub - BurntSushi/ripgrep: ripgrep recursively searches directories for a regex pattern while respecting your gitignore",
+     "og:url": "https://github.com/BurntSushi/ripgrep",
+     "og:description": "ripgrep recursively searches directories for a regex pattern while respecting your gitignore - BurntSushi/ripgrep"
+    }
+   },
+   "headings": [
+    "Navigation Menu",
+    "Repository navigation",
+    "About",
+    "Topics",
+    "Resources",
+    "Contributing",
+    "Stars",
+    "Watchers",
+    "Forks",
+    "Latest commit",
+    "History",
+    "Folders and files",
+    "Repository files navigation",
+    "ripgrep (rg)",
+    "CHANGELOG",
+    "Documentation quick links",
+    "Screenshot of search results",
+    "Quick examples comparing tools",
+    "Why should I use ripgrep?",
+    "Why shouldn't I use ripgrep?",
+    "Is it really faster than everything else?",
+    "Feature comparison",
+    "Playground",
+    "Installation",
+    "Building",
+    "Running tests",
+    "Related tools",
+    "Vulnerability reporting",
+    "Translations",
+    "Releases75 (75)",
+    "Sponsor this project",
+    "Used by1.4K (1.4K)",
+    "Contributors450 (450)",
+    "Languages",
+    "Footer",
+    "Footer navigation"
+   ],
+   "alts": [
+    "Build status",
+    "Crates.io",
+    "Packaging status",
+    "A screenshot of a sample search with ripgrep"
+   ],
+   "page": {
+    "text": "ripgrep is a line-oriented search tool that recursively searches the current\ndirectory for a regex pattern. By default, ripgrep will respect gitignore rules\nand automatically skip hidden files/directories and binary files. (To disable\nall automatic filtering by default, use rg -uuu.) ripgrep has first class\nsupport on Windows, macOS and Linux, with binary downloads available for every\nrelease. ripgrep is similar to\nother popular search tools like The Silver Searcher, ack and grep.\nDual-licensed under MIT or the UNLICENSE.\nCHANGELOG\nPlease see the CHANGELOG for a release history.\nDocumentation quick links\nInstallation\nUser Guide\nFrequently Asked Questions\nRegex syntax\nConfiguration files\nShell completions\nBuilding\nTranslations\nScreenshot of search results\nQuick examples comparing tools\nThis example searches the entire\nLinux kernel source tree\n(after running make defconfig && make -j8) for [A-Z]+_SUSPEND, where\nall matches must be words. Timings were collected on a system with an Intel\ni9-12900K 5.2 GHz.\nPlease remember that a single benchmark is never enough! See my\nblog post on ripgrep\nfor a very detailed comparison with more benchmarks and analysis.\nTool\nCommand\nLine count\nTime\nripgrep (Unicode)\nrg -n -w '[A-Z]+_SUSPEND'\n536\n0.082s (1.00x)\nhypergrep\nhgrep -n -w '[A-Z]+_SUSPEND'\n536\n0.167s (2.04x)\ngit grep\ngit grep -P -n -w '[A-Z]+_SUSPEND'\n536\n0.273s (3.34x)\nThe Silver Searcher\nag -w '[A-Z]+_SUSPEND'\n534\n0.443s (5.43x)\nugrep\nugrep -r --ignore-files --no-hidden -I -w '[A-Z]+_SUSPEND'\n536\n0.639s (7.82x)\ngit grep\nLC_ALL=C git grep -E -n -w '[A-Z]+_SUSPEND'\n536\n0.727s (8.91x)\ngit grep (Unicode)\nLC_ALL=en_US.UTF-8 git grep -E -n -w '[A-Z]+_SUSPEND'\n536\n2.670s (32.70x)\nack\nack -w '[A-Z]+_SUSPEND'\n2677\n2.935s (35.94x)\nHere's another benchmark on the same corpus as above that disregards gitignore\nfiles and searches with a whitelist instead. The corpus is the same as in the\nprevious benchmark, and the flags passed to each command ensure that they are\ndoing equivalent work:\nTool\nCommand\nLine count\nTime\nripgrep\nrg -uuu -tc -n -w '[A-Z]+_SUSPEND'\n447\n0.063s (1.00x)\nugrep\nugrep -r -n --include='*.c' --include='*.h' -w '[A-Z]+_SUSPEND'\n447\n0.607s (9.62x)\nGNU grep\ngrep -E -r -n --include='*.c' --include='*.h' -w '[A-Z]+_SUSPEND'\n447\n0.674s (10.69x)\nNow we'll move to searching on single large file. Here is a straight-up\ncomparison between ripgrep, ugrep and GNU grep on a file cached in memory\n(~13GB, OpenSubtitles.raw.en.gz, decompressed):\nTool\nCommand\nLine count\nTime\nripgrep (Unicode)\nrg -w 'Sherlock [A-Z]\\w+'\n7882\n1.042s (1.00x)\nugrep\nugrep -w 'Sherlock [A-Z]\\w+'\n7882\n1.339s (1.28x)\nGNU grep (Unicode)\nLC_ALL=en_US.UTF-8 egrep -w 'Sherlock [A-Z]\\w+'\n7882\n6.577s (6.31x)\nIn the above benchmark, passing the -n flag (for showing line numbers)\nincreases the times to 1.664s for ripgrep and 9.484s for GNU grep. ugrep\ntimes are unaffected by the presence or absence of -n.\nBeware of performance cliffs though:\nTool\nCommand\nLine count\nTime\nripgrep (Unicode)\nrg -w '[A-Z]\\w+ Sherlock [A-Z]\\w+'\n485\n1.053s (1.00x)\nGNU grep (Unicode)\nLC_ALL=en_US.UTF-8 grep -E -w '[A-Z]\\w+ Sherlock [A-Z]\\w+'\n485\n6.234s (5.92x)\nugrep\nugrep -w '[A-Z]\\w+ Sherlock [A-Z]\\w+'\n485\n28.973s (27.51x)\nAnd performance can drop precipitously across the board when searching big\nfiles for patterns without any opportunities for literal optimizations:\nTool\nCommand\nLine count\nTime\nripgrep\nrg '[A-Za-z]{30}'\n6749\n15.569s (1.00x)\nugrep\nugrep -E '[A-Za-z]{30}'\n6749\n21.857s (1.40x)\nGNU grep\nLC_ALL=C grep -E '[A-Za-z]{30}'\n6749\n32.409s (2.08x)\nGNU grep (Unicode)\nLC_ALL=en_US.UTF-8 grep -E '[A-Za-z]{30}'\n6795\n8m30s (32.74x)\nFinally, high match counts also tend to both tank performance and smooth\nout the differences between tools (because performance is dominated by how\nquickly one can handle a match and not the algorithm used to detect the match,\ngenerally speaking):\nTool\nCommand\nLine count\nTime\nripgrep\nrg the\n83499915\n6.948s (1.00x)\nugrep\nugrep the\n83499915\n11.721s (1.69x)\nGNU grep\nLC_ALL=C grep the\n83499915\n15.217s (2.19x)\nWhy should I use ripgrep?\nIt can replace many use cases served by other search tools\nbecause it contains most of their features and is generally faster. (See\nthe FAQ for more details on whether ripgrep can truly\nreplace grep.)\nLike other tools specialized to code search, ripgrep defaults to\nrecursive search and does automatic\nfiltering. Namely, ripgrep won't search files\nignored by your .gitignore/.ignore/.rgignore files, it won't search\nhidden files and it won't search binary files. Automatic filtering can be\ndisabled with rg -uuu.\nripgrep can search specific types of files.\nFor example, rg -tpy foo limits your search to Python files and rg -Tjs foo excludes JavaScript files from your search. ripgrep can be taught about\nnew file types with custom matching rules.\nripgrep supports many features found in grep, such as showing the context\nof search results, searching multiple patterns, highlighting matches with\ncolor and full Unicode support. Unlike GNU grep, ripgrep stays fast while\nsupporting Unicode (which is always on).\nripgrep has optional support for switching its regex engine to use PCRE2.\nAmong other things, this makes it possible to use look-around and\nbackreferences in your patterns, which are not supported in ripgrep's default\nregex engine. PCRE2 support can be enabled with -P/--pcre2 (use PCRE2\nalways) or --auto-hybrid-regex (use PCRE2 only if needed). An alternative\nsyntax is provided via the --engine (default|pcre2|auto) option.\nripgrep has rudimentary support for replacements,\nwhich permit rewriting output based on what was matched.\nripgrep supports searching files in text encodings\nother than UTF-8, such as UTF-16, latin-1, GBK, EUC-JP, Shift_JIS and more.\n(Some support for automatically detecting UTF-16 is provided. Other text\nencodings must be specifically specified with the -E/--encoding flag.)\nripgrep supports searching files compressed in a common format (brotli,\nbzip2, gzip, lz4, lzma, xz, or zstandard) with the -z/--search-zip flag.\nripgrep supports\narbitrary input preprocessing filters\nwhich could be PDF text extraction, less supported decompression, decrypting,\nautomatic encoding detection and so on.\nripgrep can be configured via a\nconfiguration file.\nIn other words, use ripgrep if you like speed, filtering by default, fewer\nbugs and Unicode support.\nWhy shouldn't I use ripgrep?\nDespite initially not wanting to add every feature under the sun to ripgrep,\nover time, ripgrep has grown support for most features found in other file\nsearching tools. This includes searching for results spanning across multiple\nlines, and opt-in support for PCRE2, which provides look-around and\nbackreference support.\nAt this point, the primary reasons not to use ripgrep probably consist of one\nor more of the following:\nYou need a portable and ubiquitous tool. While ripgrep works on Windows,\nmacOS and Linux, it is not ubiquitous and it does not conform to any\nstandard such as POSIX. The best tool for this job is good old grep.\nThere still exists some other feature (or bug) not listed in this README that\nyou rely on that's in another tool that isn't in ripgrep.\nThere is a performance edge case where ripgrep doesn't do well where another\ntool does do well. (Please file a bug report!)\nripgrep isn't possible to install on your machine or isn't available for your\nplatform. (Please file a bug report!)\nIs it really faster than everything else?\nGenerally, yes. A large number of benchmarks with detailed analysis for each is\navailable on my blog.\nSummarizing, ripgrep is fast because:\nIt is built on top of\nRust's regex engine.\nRust's regex engine uses finite automata, SIMD and aggressive literal\noptimizations to make searching very fast. (PCRE2 support can be opted into\nwith the -P/--pcre2 flag.)\nRust's regex library maintains performance with full Unicode support by\nbuilding UTF-8 decoding directly into its deterministic finite automaton\nengine.\nIt supports searching with either memory maps or by searching incrementally\nwith an intermediate buffer. The former is better for single files and the\nlatter is better for large directories. ripgrep chooses the best searching\nstrategy for you automatically.\nApplies your ignore patterns in .gitignore files using a\nRegexSet.\nThat means a single file path can be matched against multiple glob patterns\nsimultaneously.\nIt uses a lock-free parallel recursive directory iterator, courtesy of\ncrossbeam and\nignore.\nFeature comparison\nAndy Lester, author of ack, has published an\nexcellent table comparing the features of ack, ag, git-grep, GNU grep and\nripgrep: https://beyondgrep.com/feature-comparison/\nNote that ripgrep has grown a few significant new features recently that\nare not yet present in Andy's table. This includes, but is not limited to,\nconfiguration files, passthru, support for searching compressed files,\nmultiline search and opt-in fancy regex support via PCRE2.\nPlayground\nIf you'd like to try ripgrep before installing, there's an unofficial\nplayground and an interactive\ntutorial.\nIf you have any questions about these, please open an issue in the tutorial\nrepo.\nInstallation\nThe binary name for ripgrep is rg.\nArchives of precompiled binaries for ripgrep are available for Windows,\nmacOS and Linux. Linux and\nWindows binaries are static executables. Users of platforms not explicitly\nmentioned below are advised to download one of these archives.\nIf you're a macOS Homebrew or a Linuxbrew user, then you can install\nripgrep from homebrew-core:\n$ brew install ripgrep\nIf you're a MacPorts user, then you can install ripgrep from the\nofficial ports:\n$ sudo port install ripgrep\nIf you're a Windows Chocolatey user, then you can install ripgrep from the\nofficial repo:\n$ choco install ripgrep\nIf you're a Windows Scoop user, then you can install ripgrep from the\nofficial bucket:\n$ scoop install ripgrep\nIf you're a Windows Winget user, then you can install ripgrep from the\nwinget-pkgs\nrepository:\n$ winget install BurntSushi.ripgrep.MSVC\nIf you're an Arch Linux user, then you can install ripgrep from the official repos:\n$ sudo pacman -S ripgrep\nIf you're a Gentoo user, you can install ripgrep from the\nofficial repo:\n$ sudo emerge sys-apps/ripgrep\nIf you're a Fedora user, you can install ripgrep from official\nrepositories.\n$ sudo dnf install ripgrep\nIf you're an openSUSE user, ripgrep is included in openSUSE Tumbleweed\nand openSUSE Leap since 15.1.\n$ sudo zypper install ripgrep\nIf you're a CentOS Stream 10 user, you can install ripgrep from the\nEPEL repository:\n$ sudo dnf config-manager --set-enabled crb\n$ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm\n$ sudo dnf install ripgrep\nIf you're a Red Hat 10 user, you can install ripgrep from the\nEPEL repository:\n$ sudo subscription-manager repos --enable codeready-builder-for-rhel-10-$(arch)-rpms\n$ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm\n$ sudo dnf install ripgrep\nIf you're a Rocky Linux 10 user, you can install ripgrep from the\nEPEL repository:\n$ sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm\n$ sudo dnf install ripgrep\nIf you're a Nix user, you can install ripgrep from\nnixpkgs:\n$ nix-env --install ripgrep\nIf you're a Flox user, you can install ripgrep as follows:\n$ flox install ripgrep\nIf you're a Guix user, you can install ripgrep from the official\npackage collection:\n$ guix install ripgrep\nIf you're a Debian user (or a user of a Debian derivative like Ubuntu),\nthen ripgrep can be installed using a binary .deb file provided in each\nripgrep release.\n$ curl -LO https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep_14.1.1-1_amd64.deb\n$ sudo dpkg -i ripgrep_14.1.1-1_amd64.deb\nIf you run Debian stable, ripgrep is officially maintained by\nDebian, although its version may\nbe older than the deb package available in the previous step.\n$ sudo apt-get install ripgrep\nIf you're an Ubuntu Cosmic (18.10) (or newer) user, ripgrep is\navailable using the same\npackaging as Debian:\n$ sudo apt-get install ripgrep\n(N.B. Various snaps for ripgrep on Ubuntu are also available, but none of them\nseem to work right and generate a number of very strange bug reports that I\ndon't know how to fix and don't have the time to fix. Therefore, it is no\nlonger a recommended installation option.)\nIf you're an ALT user, you can install ripgrep from the\nofficial repo:\n$ sudo apt-get install ripgrep\nIf you're a FreeBSD user, then you can install ripgrep from the\nofficial ports:\n$ sudo pkg install ripgrep\nIf you're an OpenBSD user, then you can install ripgrep from the\nofficial ports:\n$ doas pkg_add ripgrep\nIf you're a NetBSD user, then you can install ripgrep from\npkgsrc:\n$ sudo pkgin install ripgrep\nIf you're a Haiku x86_64 user, then you can install ripgrep from the\nofficial ports:\n$ sudo pkgman install ripgrep\nIf you're a Haiku x86_gcc2 user, then you can install ripgrep from the\nsame port as Haiku x86_64 using the x86 secondary architecture build:\n$ sudo pkgman install ripgrep_x86\nIf you're a Void Linux user, then you can install ripgrep from the\nofficial repository:\n$ sudo xbps-install -Syv ripgrep\nIf you're a Rust programmer, ripgrep can be installed with cargo.\nNote that the minimum supported version of Rust for ripgrep is 1.96.0,\nalthough ripgrep may work with older versions.\nNote that the binary may be bigger than expected because it contains debug\nsymbols. This is intentional. To remove debug symbols and therefore reduce\nthe file size, run strip on the binary.\n$ cargo install ripgrep\nAlternatively, one can use cargo binstall to install a ripgrep\nbinary directly from GitHub:\n$ cargo binstall ripgrep\nBuilding\nripgrep is written in Rust, so you'll need to grab a\nRust installation in order to compile it.\nripgrep compiles with Rust 1.96.0 (stable) or newer. In general, ripgrep tracks\nthe latest stable release of the Rust compiler.\nTo build ripgrep:\n$ git clone https://github.com/BurntSushi/ripgrep\n$ cd ripgrep\n$ cargo build --release\n$ ./target/release/rg --version\n0.1.3\nNOTE: In the past, ripgrep supported a simd-accel Cargo feature when\nusing a Rust nightly compiler. This only benefited UTF-16 transcoding.\nSince it required unstable features, this build mode was prone to breakage.\nBecause of that, support for it has been removed. If you want SIMD\noptimizations for UTF-16 transcoding, then you'll have to petition the\nencoding_rs project to use stable\nAPIs.\nFinally, optional PCRE2 support can be built with ripgrep by enabling the\npcre2 feature:\n$ cargo build --release --features 'pcre2'\nEnabling the PCRE2 feature works with a stable Rust compiler and will\nattempt to automatically find and link with your system's PCRE2 library via\npkg-config. If one doesn't exist, then ripgrep will build PCRE2 from source\nusing your system's C compiler and then statically link it into the final\nexecutable. Static linking can be forced even when there is an available PCRE2\nsystem library by either building ripgrep with the MUSL target or by setting\nPCRE2_SYS_STATIC=1.\nripgrep can be built with the MUSL target on Linux by first installing the MUSL\nlibrary on your system (consult your friendly neighborhood package manager).\nThen you just need to add MUSL support to your Rust toolchain and rebuild\nripgrep, which yields a fully static executable:\n$ rustup target add x86_64-unknown-linux-musl\n$ cargo build --release --target x86_64-unknown-linux-musl\nApplying the --features flag from above works as expected. If you want to\nbuild a static executable with MUSL and with PCRE2, then you will need to have\nmusl-gcc installed, which might be in a separate package from the actual\nMUSL library, depending on your Linux distribution.\nRunning tests\nripgrep is relatively well-tested, including both unit tests and integration\ntests. To run the full test suite, use:\n$ cargo test --all\nfrom the repository root.\nRelated tools\ndelta is a syntax highlighting\npager that supports the rg --json output format. So all you need to do to\nmake it work is rg --json pattern | delta. See delta's manual section on\ngrep for more details.\nVulnerability reporting\nFor reporting a security vulnerability, please\ncontact Andrew Gallant.\nThe contact page has my email address and PGP public key if you wish to send an\nencrypted message.\nTranslations\nThe following is a list of known translations of ripgrep's documentation. These\nare unofficially maintained and may not be up to date.\nChinese\nSpanish",
+    "nearHeadings": [
+     "ripgrep (rg)",
+     "CHANGELOG",
+     "Documentation quick links",
+     "Screenshot of search results",
+     "Languages"
+    ]
+   }
+  },
+  "image": "img/h-gh-ripgrep.webp"
+ },
+ {
+  "id": "h-blog-jvns",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://jvns.ca/blog/2026/09/27/replacing-the-old-battery-on-rechargeable-bike-lights/",
+   "site": "jvns.ca",
+   "pageTitle": "Replacing the old battery on rechargeable bike lights"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Skip to main content\nJulia Evans\nAbout\nTalks\nProjects\nMastodon\nBluesky\nGithub\nFavorites TIL Zines RSS\nReplacing the old battery on rechargeable bike lights\nSeptember 27, 2026\nHello! Recently I needed bike lights for my bike. And I remembered that I already had rechargeable bike lights that I bought ten years ago, that I hadn’t tried in a long time. I tried to recharge them, but after fully charging them, they only worked for maybe 5 minutes before they turned off again.\nI don’t know much about electronics, but I’ve been curious about whether it’s possible to fix old electronics for a long time, and this seemed like the perfect repair project because I might just need to replace the battery.\nSo I went to the local queer makerspace where I’m a member to use the soldering iron and try to do it! I don’t know much about electronics and this post does not contain any safety advice because I don’t know much about safety. I think it’s nice to do projects in a community space where you can get help.\nstep 1: cut it open\nThe bike light felt like it was made of silicone, so I cut open the silicone in a haphazard way along something that vaguely looked like a seam.\nI definitely ripped some silicone in the process and it was pretty messy but I got it open and found the circuit board.\nI don’t know the model number of the bike lights but there’s a photo of them at the end of the post.\nstep 2: remove the screws\nThere were some screws attaching things together so I removed them so I could get the circuit board out.\nMostly I tried to remove as few screws as possible because I was worried about losing them or not being able to put them back after. I probably put the screws in a bag or something.",
+   "meta": {
+    "description": "Replacing the old battery on rechargeable bike lights",
+    "og": {
+     "og:title": "Replacing the old battery on rechargeable bike lights",
+     "og:type": "website",
+     "og:url": "https://jvns.ca/blog/2026/09/27/replacing-the-old-battery-on-rechargeable-bike-lights/",
+     "og:site_name": "Julia Evans"
+    }
+   },
+   "headings": [
+    "Julia Evans",
+    "Replacing the old battery on rechargeable bike lights",
+    "step 1: cut it open",
+    "step 2: remove the screws",
+    "step 3: get the circuit board out",
+    "step 4: desolder the battery",
+    "step 5: identify the battery",
+    "step 6: buy the battery",
+    "step 7: solder the new batteries in and glue it back together",
+    "it works!"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Hello! Recently I needed bike lights for my bike. And I remembered that I\nalready had rechargeable bike lights that I bought ten years ago, that I hadn’t\ntried in a long time. I tried to recharge them, but after fully charging them,\nthey only worked for maybe 5 minutes before they turned off again.\nI don’t know much about electronics, but I’ve been curious about whether it’s\npossible to fix old electronics for a long time, and this seemed like the\nperfect repair project because I might just need to replace the battery.\nSo I went to the local queer makerspace where I’m a member to use the soldering\niron and try to do it! I don’t know much about electronics and this post does\nnot contain any safety advice because I don’t know much about safety.\nI think it’s nice to do projects in a community space where you can get help.\nstep 1: cut it open\nThe bike light felt like it was made of silicone, so I cut open the silicone in\na haphazard way along something that vaguely looked like a seam.\nI definitely ripped some silicone in the process and it was pretty messy but I\ngot it open and found the circuit board.\nI don’t know the model number of the bike lights but there’s a photo of them at\nthe end of the post.\nstep 2: remove the screws\nThere were some screws attaching things together so I removed them so I could\nget the circuit board out.\nMostly I tried to remove as few screws as possible because I was worried about\nlosing them or not being able to put them back after. I probably put the screws\nin a bag or something.\nstep 3: get the circuit board out\nI took out the circuit board. Here’s what it looked like:\nYou can see where the battery is attached, I think it’s left of RI3 and above\nQ2.\nHere’s what the battery looked like:\nstep 4: desolder the battery\nI’d never desoldered anything before, so I found\nthe iFixit guide to desoldering and read it.\nAlso I asked my friends Lee and Lauria for advice.\nHere were the steps I ended up following based on the guide & the advice I got:\nUse a desoldering pump to remove most of the solder\nOnce most of it is gone, kind of pull them apart to try to separate them\nAlso try to avoid getting the battery too hot in the process by taking\nbreaks to let it cool down. I’m not very good with a soldering iron\nso it took a while.\nThe battery has an attachment that is welded to the top.\nFor a while I thought I needed to remove this and it seemed impossible, but\nit turned out the replacement battery comes with that part so actually I was\nsupposed to leave it alone.\nstep 5: identify the battery\nIn the picture of the battery in Step 3, you can see it says something like “3”\nand “LI???77”. There’s a piece of metal that I think is welded or something to\nthe top of the battery. It seemed impossible and also maybe not smart to try to\nremove so I wasn’t sure how to find out what an “LI????77” was or how to order\nanother one.\nI’ve been trying to avoid using LLMs (though I will not get into that because\nI am exhausted by LLM discourse and I’m sure you are too), but I really had\nno idea how to figure out what the battery was so I asked an LLM. It gave the\nresponse “LIR2477”, which (when I looked it up) looked exactly the same as my\nbattery so I figured that was plausible.\nI would be interested to learn non-LLM ways to figure this out though.\nThere must be a way. Lauria showed me how to use\nDigiKey’s search which was very cool\nthough DigiKey didn’t have that part.\n(edit: someone in the replies told me that this kind of coin cell battery is\nnamed according to its dimensions, and you can use plastic calipers to measure\nthe dimensions of the battery. So I guess a non-LLM way would be to measure\nthe battery with calipers and try to match it to something on the\nList of battery sizes\nWikipedia page, though that page only mentions CR 2477 and not LIR 2477. It’s\na good example of what’s fun for me about trying to avoid LLMs, this “List of\nbattery sizes” page is super interesting and if I use an LLM I might never find\nit)\nstep 6: buy the battery\nI went to AliExpress and ordered:\n2 batteries (I had 2 bike lights and I wanted to fix them both)\nsome silicone glue to glue things back together\nI think the batteries were $3 each and the glue was $8.\nstep 7: solder the new batteries in and glue it back together\nThe parts took maybe 2 weeks to arive, and once they arrived, I went back to the\nmakerspace and:\nsoldered in the new batteries\nput the screws back in. The screws were very small and hard to hold, so at\nthis point I dropped some screws on the ground and couldn’t find them because\nthey were too small. So I just used fewer screws and hoped for the best.\nused the glue to try to put everything back together.\nMake a somewhat halfhearted attempt to clamp the parts I was gluing together\nThen after waiting some amount of time for the glue to dry I took it home and\nwaited 24 hours for the glue to cure.\nAlso I took the old batteries to somewhere nearby that accepts old batteries.\nit works!\nThe lights work! I have used them to bike at night! I still haven’t needed to\nrecharge them (and tragically I had to order a new Mini USB cable because I got\nrid of all my Mini USB cables, so I’m still waiting for that), so I still don’t\nknow for sure how long the lifetime of the new battery will be.\nHere’s what the light looks like after re-gluing.\nYou can see that I didn’t glue very carefully. It didn’t really go back\ntogether that well but I’m hoping it’ll be good enough.\nI thought it was really cool that I was able to do this with extremely minimal\nelectronics skills! It cost about $20 CAD to buy the parts, and (whether or not\nthe repair holds up, I’ll try to update this post in the future!), it was fun to\ntry to repair something and learn something new.",
+    "nearHeadings": [
+     "Julia Evans",
+     "Replacing the old battery on rechargeable bike lights",
+     "step 1: cut it open",
+     "step 2: remove the screws"
+    ]
+   }
+  },
+  "image": "img/h-blog-jvns.webp"
+ },
+ {
+  "id": "h-wiki-belem",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://pt.wikipedia.org/wiki/Torre_de_Bel%C3%A9m",
+   "site": "pt.wikipedia.org",
+   "pageTitle": "Torre de Belém – Wikipédia, a enciclopédia livre"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Ir para o conteúdo\nMenu principal\nProcurar\nDoar\nCriar conta\nIniciar sessão\nConteúdos\nocultar\nInício\nHistória\nArquitecto Francisco de Arruda\nCaracterísticas\nVer também\nReferências\nBibliografia\nLigações externas\nTorre de Belém\n55 idiomas\nArtigo\nDiscussão\nLer\nEditar\nVer histórico\nGuardar\nFerramentas\nAparência\nocultar\nTexto\nPequeno\nPadrão\nGrande\nLargura\nPadrão\nLargo\nCor (beta)\nAutomático\nClaro\nEscuro\n38° 41′ 30″ N, 9° 12′ 57″ O\nOcultar\nForam assinalados vários problemas nesta página ou se(c)ção:\nAs fontes não cobrem todo o texto .\nContém referências que necessitam de formatação.\nTorre de Belém\nInformações gerais\nNomes alternativos\nTorre de São Vicente\nEstilo dominante\nmanuelino\nArquiteto\nFrancisco de Arruda\nInício da construção\n1514\nFim da construção\n1520\nFunção inicial\nmilitar e fiscal\nProprietário atual\nEstado Português\nFunção atual\nmuseu\nVisitantes\n450 546 (2018)\nWebsite\nhttps://www.museusemonumentos.pt/pt/museus-e-monumentos/torre-de-belem\nA Torre de Belém , antigamente Torre de São Vicente a Par de Belém , oficialmente Torre de São Vicente , [ 1 ] é uma fortificação localizada na freguesia de Belém , Município e Distrito de Lisboa , em Portugal . Na margem direita do rio Tejo , onde existiu outrora a praia de Belém, era primitivamente cercada pelas águas em todo o seu perímetro. Ao longo dos séculos foi envolvida pela praia , até se incorporar hoje à terra firme. Um dos ex libris da cidade, o monumento é um ícone da arquitetura do reinado de D. Manuel I , numa síntese entre a torre de menagem de tradição medieval e o baluarte moderno, onde se dispunham peças de artilharia .\nAo longo do tempo, a torre foi perdendo a sua função de defesa da barra do Tejo e, a partir da ocupação filipina , os antigos paióis deram lugar a calabouços. Nos quatro pisos da torre, mantêm-se a Sala do Governador, a Sala dos Reis, a Sala de Audiências e, finalmente, a Capela com as suas características abóbadas quinhentistas. A Torre de São Vicente (1514) pertence a uma formação de defesa da bacia do Tejo mandada erigir por João II de Portugal , composta a sul pela torre de São Sebastião da Caparica (1481) e a oeste pela Torre de Santo António de Cascais (1488).\nO monumento destaca-se pelo nacionalismo implícito, visto que é todo rodeado por decorações do Brasão de armas de Portugal , incluindo inscrições de cruzes da Ordem de Cristo nas janelas de baluarte ; tais características remetem principalmente à arquitetura típica de uma época em que o país era uma potência global (a do início da Idade Moderna ).\nJuntamente com o Mosteiro dos Jerónimos , foi classificada em 1983 como",
+   "meta": {
+    "og": {
+     "og:image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Bel%C3%A9m_Tower_in_Lisbon%2C_Portugal.jpg/1280px-Bel%C3%A9m_Tower_in_Lisbon%2C_Portugal.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+     "og:image:width": "1200",
+     "og:image:height": "800",
+     "og:title": "Torre de Belém – Wikipédia, a enciclopédia livre",
+     "og:type": "website"
+    }
+   },
+   "headings": [
+    "Conteúdos",
+    "Torre de Belém",
+    "História",
+    "Arquitecto Francisco de Arruda",
+    "Características",
+    "Ver também",
+    "Referências",
+    "Bibliografia",
+    "Ligações externas"
+   ],
+   "alts": [
+    "Wikipédia"
+   ],
+   "page": {
+    "text": "Torre de Belém\nInformações gerais\nNomes alternativosTorre de São Vicente\nEstilo dominantemanuelino\nArquitetoFrancisco de Arruda\nInício da construção1514\nFim da construção1520\nFunção inicialmilitar e fiscal\nProprietário atualEstado Português\nFunção atualmuseu\nVisitantes450 546 (2018)\nWebsitehttps://www.museusemonumentos.pt/pt/museus-e-monumentos/torre-de-belem\nAltura35 metro\nÁrea0,09 hectare, 51,5 hectare\nPatrimónio Mundial\nCritériosC (iii) (vi)\nAno1983\nReferência263 en fr es\nPatrimónio de Portugal\nClassificação Monumento Nacional\nAno1907\nDGPC323060\nSIPA4065\nGeografia\nPaísPortugal\nCidadeLisboa\nCoordenadas38° 41′ 30″ N, 9° 12′ 57″ O\nWikimedia | © OpenStreetMap\nLocalização em mapa dinâmico\nA Torre de Belém, antigamente Torre de São Vicente a Par de Belém, oficialmente Torre de São Vicente,[1] é uma fortificação localizada na freguesia de Belém, Município e Distrito de Lisboa, em Portugal. Na margem direita do rio Tejo, onde existiu outrora a praia de Belém, era primitivamente cercada pelas águas em todo o seu perímetro. Ao longo dos séculos foi envolvida pela praia, até se incorporar hoje à terra firme. Um dos ex libris da cidade, o monumento é um ícone da arquitetura do reinado de D. Manuel I, numa síntese entre a torre de menagem de tradição medieval e o baluarte moderno, onde se dispunham peças de artilharia.\nAo longo do tempo, a torre foi perdendo a sua função de defesa da barra do Tejo e, a partir da ocupação filipina, os antigos paióis deram lugar a calabouços. Nos quatro pisos da torre, mantêm-se a Sala do Governador, a Sala dos Reis, a Sala de Audiências e, finalmente, a Capela com as suas características abóbadas quinhentistas. A Torre de São Vicente (1514) pertence a uma formação de defesa da bacia do Tejo mandada erigir por João II de Portugal, composta a sul pela torre de São Sebastião da Caparica (1481) e a oeste pela Torre de Santo António de Cascais (1488).\nO monumento destaca-se pelo nacionalismo implícito, visto que é todo rodeado por decorações do Brasão de armas de Portugal, incluindo inscrições de cruzes da Ordem de Cristo nas janelas de baluarte; tais características remetem principalmente à arquitetura típica de uma época em que o país era uma potência global (a do início da Idade Moderna).\nJuntamente com o Mosteiro dos Jerónimos, foi classificada em 1983 como Património Mundial da UNESCO e eleita como uma das Sete Maravilhas de Portugal em 2007. Em 2015 foi visitada por mais de 608 mil turistas.[2][3]Em 2022, registou 377.780 entradas, sendo um dos monumentos mais visitados do país.[4]\nEm 1495, o rei D. Manuel I torna-se uma figura importante do comércio internacional, visto que Vasco da Gama e posteriormente Álvares Cabral estabelecem rotas marítimas com a Índia, Goa e Malaca, África e Brasil, trazendo e oferecendo produtos exóticos. Essas experiências e conhecimentos levam à definição das características do estilo Manuelino, representado nos seus monumentos.[5] Portugal está associado muito especialmente ao estilo manuelino, designação adquirida pelas obras decorrentes no reinado de D. Manuel I, entre 1495 e 1521. De alguma maneira, esse estilo, segundo o autor, advém de influências do estilo Isabelino de Espanha, elaborado e ostentativo.[6] A Torre de São Vicente é um exemplo de transição entre a arquitetura da Idade Média e o Renascimento, de uma forma consonante aliada à boa maneira Manuelina, a massa de uma recuada torre quadrangular de índole medieval, com aproximadamente trinta metros de altura, num corpo avançado de \"embasamento\" e base, reforçando a horizontalidade e abraçando a forma hexagonal irregular, com quarenta metros de comprimento, orientados para sul e para o Tejo, visando desarmar com as suas baterias de fogo, colocadas no baluarte \"acasamatado\", qualquer tentativa de assalto por via marítima.[7]\nOriginalmente sob a invocação de São Vicente de Saragoça, padroeiro da cidade de Lisboa, designada no século XVI pelo nome de Baluarte de São Vicente a par de Belém e por Baluarte do Restelo, esta fortificação integrava o plano defensivo da barra do rio Tejo projetado à época de D. João II (1481-95), integrado na margem direita do rio pelo Baluarte de Cascais e, na esquerda, pelo Baluarte da Caparica.\nO cronista Garcia de Resende foi o autor do seu risco inicial, tendo registado:\n\"E assim mandou fazer então a (…) torre e baluarte de Caparica, defronte de Belém, em que estava muita e grande artilharia; e tinha ordenado de fazer uma forte fortaleza onde ora está a formosa torre de Belém, que el-Rei D. Manuel, que santa glória haja, mandou fazer; para que a fortaleza de uma parte e a torre da outra tolhessem a entrada do rio. A qual fortaleza eu por seu mandado debuxei, e com ele ordenei a sua vontade; e tinha já dada a capitania dela [a] Álvaro da Cunha, seu estribeiro-mor, e pessoa de que muito confiava; e porque el-Rei João faleceu, não houve tempo para se fazer\" (RESENDE, Garcia de. Crónica de D. João II, 1545.)\nEstátua de Nossa Senhora do Bom Sucesso na parte dianteira da Torre de Belém\nA estrutura só viria a ser iniciada em 1514, sob o reinado de Manuel I de Portugal (1495-1521), tendo como arquitecto Francisco de Arruda. Localizava-se sobre um afloramento rochoso nas águas do rio, fronteiro à antiga praia de Belém, e destinava-se a substituir a antiga nau artilhada, ancorada naquele trecho, de onde partiam as frotas para as Índias. As suas obras ficaram a cargo de Diogo Boitaca, que, à época, também dirigia as já adiantadas obras do vizinho Mosteiro dos Jerónimos.\nPresença e influência portuguesa na Índia e Himalaias durante o século 16 e 17.\nConcluída em 1520, foi seu primeiro alcaide Gaspar de Paiva, nomeado para a função no ano seguinte.\nCom a evolução dos meios de ataque e defesa, a estrutura foi, gradualmente, perdendo a sua função defensiva original. Ao longo dos séculos foi utilizada como registo aduaneiro, posto de sinalização telegráfico e farol. Os seus paióis foram utilizados como calabouços para presos políticos durante o reinado de Filipe II de Espanha (1580-1598), e, mais tarde, por João IV de Portugal (1640-1656). O Arcebispo de Braga e Primaz das Espanhas, D. Sebastião de Matos de Noronha (1586-1641), por coligação à Espanha e fazendo frente a D. João IV, foi preso e mandado recluso para a Torre de Belém.\nSofreu várias remodelações ao longo dos séculos, principalmente a do século XVIII que privilegiou as ameias, o varandim do baluarte, o nicho da Virgem, voltado para o rio, e o claustrim. A conotação da forma volumétrica da torre de pedra lioz com uma nau traduz beleza, originalidade e inovação.\nClassificada como Monumento Nacional por decreto de 10 de janeiro de 1907, é considerada como Património Mundial pela UNESCO desde 1983. Naquele mesmo ano integrou a XVII Exposição Europeia de Arte Ciência e Cultura.\nAs características arquitetónicas de Francisco de Arruda, de Diogo de Arruda e conjuntamente com as do mestre Diogo de Boytac, resultaram na inclusão das influências mediterrânicas e nórdicas do tardo-gótico no panorama arquitetónico português, sagrando-se assim como expoentes do Manuelino na arquitetura de então. O uso sistemático de volumes cilíndricos, recorrentes da retórica militar como uma configuração de iconologia arquitetónica. Encontra-se a recorrência nas suas obras através de uma decoração hiper-realista, repleta de alusões à natureza como folhas ou animais e a objetos concebidos pelo homem, assim como representações de simbologia heráldica.[8] Francisco de Arruda faz na exaltação dos elementos fundamentais do Manuelino, o gosto pelos volumes puros, bem definidos e globais em termos de desenho, e dá ênfase na arquitetura, às aplicações ornamentais, profusas de carácter popular, ao invés das eruditas, com registos imediatistas acerca da função do edifício, ou pela liberdade obtida para transpor um novo discurso icónico nas orlas das construções, tudo isto faz com que a elocução da imponência do edificado desponte e concorra para uma exposição emblemática.\nDe Francisco de Arruda desconhece-se a data do seu nascimento, sabe-se que é oriundo de uma família de arquitectos de reconhecido gabarito na época, sediada em Évora. Irmão mais novo de Diogo de Arruda e pai de Miguel de Arruda, foi arquitecto e escultor, esteve ao serviço dos Reis de Portugal, tendo sido responsável pelo traçado e construção da Torre de São Vicente.[9] É incumbido como responsável pelas obras de reabilitação e conserto das fortificações de Moura, Mourão e Portel, mas para além de reparar as muralhas, insere no castelo torres semicirculares que são já uma postura de transição do estilo neuro-balístico para a piro-balística.[10] Constrói para D. Jaime, Duque de Bragança, os Paços do Castelo de Portel, e a Capela de São João Baptista,[desambiguação necessária] esta possui na parede \"testeira\" recta, dois volumosos \"botaréus\" cilíndricos na base e octogonais daí para cima, coroados por \"pináculos\" cónicos de \"torsos\" antecedidos de uma moldura encordoada. Posteriormente continua em 1512 no Convento de Cristo em Tomar. Francisco parte com Diogo ao Norte de África, a Safim e Mazagão, em 1513, incumbidos de trabalhar na praça-forte de Azamor.[11]\nCom o falecimento de Diogo de Arruda em 1531, Francisco aproxima-se sentimentalmente e progressivamente à cultura humanista. As suas obras seguintes vão dando mostras de uma erudição renascentista, ou \"proto\" renascentista.[12] Em 1547 termina os seus dias de vida. Sem confirmação é-lhe ainda atribuída a construção da Casa dos Bicos, em Lisboa, e o Palácio da Bacalhoa, na sua fase inicial (1530) onde são evidentes duas grandes torres cilíndricas com cobertura de gomos, semelhantes às da Torre de São Vicente.[10]\nTorre de Belém vista a partir do rio Tejo\nO monumento reflete influências islâmicas e orientais, que caracterizam o estilo manuelino e marca o fim da tradição medieval das torres de menagem, ensaiando um dos primeiros baluartes para artilharia no país (ver fortalezas).\nParte da sua beleza reside na decoração exterior, adornada com cordas e nós esculpidos em pedra, galerias abertas, torres de vigia no estilo mourisco e ameias em forma de escudos decoradas com esferas armilares, a cruz da Ordem de Cristo e elementos naturalistas, como um rinoceronte, alusivos às navegações. O interior gótico, por baixo do terraço, que serviu como armaria e prisão, é muito austero.\nA sua estrutura compõe-se de dois elementos principais: a torre e o baluarte. Nos ângulos do terraço da torre e do baluarte, sobressaem guaritas cilíndricas coroadas por cúpulas de gomos,[desambiguação necessária] ricamente decorada em cantaria de pedra.\nA torre quadrangular, de tradição medieval, eleva-se em cinco pavimentos acima do baluarte, a saber:\nPrimeiro andar - Sala do Governador;\nSegundo andar - Sala dos Reis, com teto elíptico e fogão ornamentado com meias-esferas;\nTerceiro andar - Sala de Audiências;\nQuarto andar - Capela;\nQuinto andar - Terraço da torre.\nA nave do baluarte poligonal, ventilada por um claustrim, abre 16 canhoneiras para tiro rasante de artilharia. O terrapleno, guarnecido por ameias, constitui uma segunda linha de fogo, nele se localizando o santuário de Nossa Senhora do Bom Sucesso com o Menino Jesus, também conhecida como a Virgem do Restelo ou por a Virgem das Uvas.\nGaleria de imagens\nTorre de Belém, \"ex libris\" de Lisboa\nVista noturna\nCanhões na Torre\nGuaritas da Torre de Belém, encimadas por cúpulas de gomos. Lateralmente veem-se algumas ameias.\nDetalhe duma Guarita\nTuristas a aceder ao interior da Torre de Belém\nMosteiro de Santa Maria de Belém\nPastéis de Belém\nCentro Cultural de Belém\nPalácio Nacional de Belém\nReferências\n↑ Paiva, Ana Sofia (7 de maio de 2019). «Torre de Belém, símbolo arquitetónico da defesa da cidade». FCSH+Lisboa. Consultado em 9 de janeiro de 2021\n↑ «\"É possível que tenhamos de limitar o número de entradas na Torre de Belém\"»\n↑ Canelas, Lucinda. «Visitantes dos museus e palácios crescem 10%, mas Museu de Arte Antiga lidera perdas». PÚBLICO. Consultado em 4 de outubro de 2021\n↑ Sofia (2023). «Os 10 monumentos mais visitados do país». Casa Yes. Consultado em 8 de setembro de 2023\n↑ David, W. (2005). A history of western architecture (4 ed.). London. p. 206\n↑ David, W. (2005). A history of western architecture (4.ª ed.). Londres. p. 205\n↑ Garcia, J. M. (2014). A magnífica Torre de Belém. Lisboa: Verso da História, p. 40.\n↑ Garcia, J. M. (2014). A magnífica Torre de Belém. Lisboa: Verso da História.p.43\n↑ Pereira, P. (2005). Torre de Belém. London: Publicações Scala.\nIr para: 1 2 Dias, P. (2009). Arte Portuguesa: Arquitectura Manuelina (Vol. Vol. 5). Arte e Edições, Lda. p.27\n↑ Garcia, J. M. (2014). A magnífica Torre de Belém. Lisboa: Verso da História. p.25\n↑ Garcia, J. M. (2014). A magnífica Torre de Belém. Lisboa: Verso da História.p. 25\nGarcia, J. M. (2014). A magnífica Torre de Belém. Lisboa: Verso da História.\n«Torre de Belém». www.torrebelem.pt\nTorre de São Vicente / Torre de Belém na base de dados SIPA da Direção-Geral do Património Cultural\n«Instituto Português de Arqueologia». www.ipa.min-cultura.pt Arquivado em 3 de março de 2016, no Wayback Machine.\nTorre de Belém na base de dados Ulysses da Direção-Geral do Património Cultural\nTorre de Belém, a jóia ribeirinha, Património Mundial Português, Filma e Vê e RTP2, 2009\nA Torre de Belém no Google Arts & Culture\nMonastery of the Hieronymites and Tower of Belém in Lisbon. UNESCO World Heritage Centre - The List (whc.unesco.org). Em inglês ; em francês ; em espanhol.\n«A Torre de Belém em panoramas 360°»\n~",
+    "nearHeadings": [
+     "Conteúdos",
+     "Torre de Belém"
+    ]
+   }
+  },
+  "image": "img/h-wiki-belem.webp"
+ },
+ {
+  "id": "h-commons-photo",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "image",
+  "source": {
+   "url": "https://commons.wikimedia.org/wiki/Main_Page",
+   "site": "commons.wikimedia.org",
+   "pageTitle": "Wikimedia Commons"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "",
+   "meta": {
+    "og": {
+     "og:image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Aekingerzand_Nationaal_Park_Drents-Friese_Wold._11-08-2025._%28actm.%29_10.jpg/1280px-Aekingerzand_Nationaal_Park_Drents-Friese_Wold._11-08-2025._%28actm.%29_10.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail",
+     "og:image:width": "1200",
+     "og:image:height": "800",
+     "og:title": "Wikimedia Commons",
+     "og:type": "website"
+    }
+   },
+   "headings": [
+    "Language select",
+    "Main Page"
+   ],
+   "alts": [],
+   "page": {
+    "text": "From Wikimedia Commons, the free media repository\nPicture of the day\nAekingerzand Drents-Friese Wold National Park. Pinus sylvestris on the sand drift.\nMedia of the day\nDuration: 50 seconds.\nAnimation of an unfolding Dragon curve. The order is increased from 0 to 17.\nParticipating\nBrowsing?\nPlease use the search box at the top of this page or the links to the rightthe links further down. Feel free to subscribe to our syndicated feeds.\nUsing?\nTo fulfill the free license requirements, please read our Reuse guide. You can also request a file or request permission for a file already on the internet.\nIdentifying?\nHave a browse through Category:Unidentified subjects. If you find something you can identify, adjust the file's categories and depicts statements in structured data.\nCreating?\nCheck out all you need to know at our Contributing your own work guide.\nSeeking help?\nFor Commons help see: Help:Contents and Category:Commons help.\nDiscussion?\nSee the list of discussion pages.\nand more!\nTo explore more ways you can contribute to this project, check out the Community Portal.\nMonthly photo challenge\nTake some photos and upload them to meet our monthly thematic challenge, get inspiration and try new subjects! Learn more about the challenges!\nHighlights\nContent",
+    "nearHeadings": [
+     "Language select"
+    ]
+   }
+  },
+  "image": "img/h-commons-photo.webp"
+ },
+ {
+  "id": "h-three-demo",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://threejs.org/examples/#webgl_animation_keyframes",
+   "site": "threejs.org",
+   "pageTitle": "three.js examples"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "three.js\nexamples\nwebgl\nanimation / keyframes\nanimation / skinning / blending\nanimation / skinning / additive / blending",
+   "meta": {
+    "og": {
+     "og:title": "three.js examples",
+     "og:type": "website",
+     "og:url": "https://threejs.org/examples/index.html",
+     "og:image": "https://threejs.org/files/og_image.jpg"
+    }
+   },
+   "headings": [
+    "three.js",
+    "webgl",
+    "webgl / postprocessing",
+    "webgl / advanced",
+    "webgl / tsl",
+    "webgpu",
+    "webaudio",
+    "webxr",
+    "games",
+    "physics",
+    "misc",
+    "css2d",
+    "css3d",
+    "svg",
+    "tests"
+   ],
+   "alts": [],
+   "page": {
+    "text": "webgl\nanimation / keyframes\nanimation / skinning / blending\nanimation / skinning / additive / blending\nanimation / skinning / ik\nanimation / skinning / morph\nanimation / multiple\nanimation / walk\ncommunity\nbatch / lod / bvh\ncamera\ncamera / array\ncamera / logarithmicdepthbuffer\nclipping\nclipping / advanced\nclipping / intersection\nclipping / stencil\ndecals\ndepth / texture\neffects / anaglyph\neffects / ascii\neffects / parallaxbarrier\neffects / stereo\nframebuffer / texture\ngeometries\ngeometry / colors\ngeometry / colors / lookuptable\ngeometry / convex\ncommunity\ngeometry / csg\ngeometry / cube\ngeometry / extrude / shapes\ngeometry / extrude / splines\ngeometry / minecraft\ngeometry / nurbs\ngeometry / shapes\ngeometry / spline / editor\ngeometry / teapot\ngeometry / terrain\ngeometry / terrain / raycast\ngeometry / text\ngeometry / text / shapes\ngeometry / text / stroke\nhelpers\ninstancing / morph\ninstancing / dynamic\ninstancing / performance\ninstancing / raycast\ninstancing / scatter\ninteractive / buffergeometry\ninteractive / cubes\ninteractive / cubes / gpu\ninteractive / cubes / ortho\ninteractive / lines\ninteractive / points\ninteractive / raycasting / points\ninteractive / voxelpainter\nlensflares\nlightprobe\nlightprobe / cubecamera\nlightprobes\nlightprobes / complex\nlightprobes / sponza\nlights / hemisphere\nlights / physical\nlights / spotlight\nlights / spotlights\nlights / sunlight\nlights / rectarealight\nlines / colors\nlines / dashed\nlines / fat\nlines / fat / raycasting\nlines / fat / wireframe\ncommunity\nloader / 3dm\nloader / 3ds\ncommunity\nloader / 3dtiles\nloader / 3mf\nloader / 3mf / materials\nloader / amf\nloader / bvh\nloader / collada\nloader / collada / kinematics\nloader / collada / skinning\nloader / draco\nloader / fbx\nloader / fbx / nurbs\nloader / gcode\nloader / gltf\ncommunity\nloader / gltf / animation / pointer\ncommunity\nloader / gltf / progressive / lod\nloader / gltf / avif\nloader / gltf / compressed\nloader / gltf / dispersion\nloader / gltf / instancing\nloader / gltf / iridescence\nloader / gltf / sheen\nloader / gltf / transmission\nloader / gltf / variants\nloader / gltf / anisotropy\ncommunity\nloader / ifc\nloader / imagebitmap\nloader / kmz\nloader / ldraw\nloader / md2\nloader / md2 / control\nloader / mdd\nloader / nrrd\nloader / obj\nloader / pcd\nloader / pdb\nloader / ply\nloader / priority\nloader / stl\nloader / svg\nloader / texture / dds\nloader / texture / exr\nloader / texture / ultrahdr\nloader / texture / hdr\nloader / texture / ktx\nloader / texture / ktx2\ncommunity\nloader / texture / lottie\nloader / texture / pvrtc\nloader / texture / tga\nloader / texture / tiff\nloader / ttf\nloader / usdz\ncommunity\nloader / vdb\nloader / vox\nloader / vrml\nloader / xyz\nlod\nmarchingcubes\nmaterials / alphahash\nmaterials / blending\nmaterials / blending / custom\nmaterials / bumpmap\nmaterials / car\nmaterials / channels\nmaterials / cubemap\nmaterials / cubemap / dynamic\nmaterials / cubemap / refraction\nmaterials / cubemap / mipmaps\nmaterials / cubemap / render / to / mipmaps\nmaterials / displacementmap\nmaterials / envmaps\nmaterials / envmaps / exr\nmaterials / envmaps / fasthdr\nmaterials / envmaps / groundprojected\nmaterials / envmaps / hdr\nmaterials / matcap\nmaterials / normalmap\nmaterials / normalmap / object / space\nmaterials / physical / clearcoat\nmaterials / physical / transmission\nmaterials / physical / transmission / alpha\nmaterials / subsurface / scattering\nmaterials / texture / anisotropy\nmaterials / texture / canvas\nmaterials / texture / filters\nmaterials / texture / html\nmaterials / texture / manualmipmap\nmaterials / texture / partialupdate\nmaterials / texture / rotation\nmaterials / toon\nmaterials / video\nmaterials / video / webcam\nmaterials / wireframe\npmrem / cubemap\npmrem / equirectangular\npmrem / test\nmath / obb\nmath / orientation / transform\nmesh / batch\nmirror\nmodifier / curve\nmodifier / curve / instanced\nmodifier / edgesplit\nmodifier / simplifier\ncommunity\nmodifier / subdivision\nmodifier / tessellation\nmorphtargets\nmorphtargets / face\nmorphtargets / horse\nmorphtargets / sphere\ncommunity\nmorphtargets / webcam\nmultiple / elements\nmultiple / elements / text\nmultiple / scenes / comparison\nmultiple / views\npanorama / cube\npanorama / equirectangular\npoints / billboards\npoints / dynamic\npoints / sprites\npoints / waves\nportal\nrandom / uv\ncommunity\nraycaster / bvh\nraycaster / sprite\nraycaster / texture\nread / float / buffer\nrefraction\nrtt\nsculpt\nshader\nshader / lava\nshaders / ocean\nshaders / sky\nshadow / contact\nshadowmap\nshadowmap / performance\nshadowmap / pointlight\nshadowmap / viewer\nshadowmap / vsm\nshadowmesh\nsprites\ntest / memory\ntest / memory2\ntest / wide / gamut\ntonemapping\nvideo / kinect\nvideo / panorama / equirectangular\nwatch\nwebgl / postprocessing\npostprocessing\npostprocessing / 3dlut\npostprocessing / advanced\npostprocessing / afterimage\npostprocessing / backgrounds\npostprocessing / transition\npostprocessing / dof\npostprocessing / dof2\npostprocessing / fxaa\npostprocessing / glitch\ncommunity\npostprocessing / godrays\npostprocessing / gtao\npostprocessing / rgb / halftone\npostprocessing / masking\npostprocessing / ssaa\npostprocessing / outline\npostprocessing / pixel\npostprocessing / procedural\npostprocessing / sao\npostprocessing / smaa\npostprocessing / sobel\npostprocessing / ssao\npostprocessing / ssr\npostprocessing / taa\npostprocessing / unreal / bloom\npostprocessing / unreal / bloom / selective\nwebgl / advanced\nbuffergeometry\nbuffergeometry / attributes / integer\nbuffergeometry / attributes / none\nbuffergeometry / custom / attributes / particles\nbuffergeometry / drawrange\nbuffergeometry / glbufferattribute\nbuffergeometry / indexed\nbuffergeometry / instancing\nbuffergeometry / instancing / billboards\nbuffergeometry / instancing / interleaved\nbuffergeometry / lines\nbuffergeometry / lines / indexed\nbuffergeometry / points\nbuffergeometry / points / interleaved\nbuffergeometry / rawshader\nbuffergeometry / selective / draw\nbuffergeometry / uint\nclipculldistance\ncustom / attributes\ncustom / attributes / lines\ncustom / attributes / points\ncustom / attributes / points2\ncustom / attributes / points3\ngpgpu / birds\ngpgpu / birds / gltf\ngpgpu / water\ngpgpu / protoplanet\nmaterials / modified\nmultiple / rendertargets\nmultisampled / renderbuffers\nrendertarget / texture2darray\nreversed / depth / buffer\nshadowmap / csm\nshadowmap / pcss\nshadowmap / progressive\nsimple / gi\ntexture2darray\ntexture2darray / compressed\ntexture2darray / layerupdate\ntexture3d\ntexture3d / partialupdate\nubo\nubo / arrays\nvolume / cloud\nvolume / instancing\nvolume / perlin\nworker / offscreencanvas\nperformance\nwebgl / tsl\ntsl / shadowmap\ntsl / skinning\ntsl / clearcoat\ntsl / instancing\nwebgpu\nanimation / retargeting\nanimation / retargeting / readyplayer\nbackdrop\nbackdrop / area\nbackdrop / water\ncamera\ncamera / array\ncamera / logarithmicdepthbuffer\ncaustics\ncentroid / sampling\nclearcoat\nclipping\nclipping / stencil\ncolor / grading\ncompile / async\ncompute / audio\ncompute / birds\ncompute / cloth\ncompute / geometry\ncompute / particles\ncompute / particles / fluid\ncompute / particles / rain\ncompute / particles / snow\ncompute / points\ncompute / reduce\ncompute / sort / bitonic\ncompute / texture\ncompute / texture / 3d\ncompute / texture / pingpong\ncompute / water\ncubemap / adjustments\ncubemap / dynamic\ncubemap / mix\ncustom / fog\ncustom / fog / background\ncustom / fog / scattering\ndeferred\ndepth / texture\ndisplay / stereo\nequirectangular\nfog / height\nfurnace / test\ngaussian / splat\ngenerator / building\ngenerator / city\ngeometry / loft\nhdr\ninstance / mesh\ninstance / path\ninstance / points\ninstance / sprites\ninstance / uniform\ninstancing / morph\nlayers\nlensflares\nlightmap / baking\nlightprobe\nlightprobe / cubecamera\nlightprobes\nlightprobes / complex\nlightprobes / sponza\nlights / clustered\nlights / clustered / city\nlights / custom\nlights / dynamic\nlights / ies / spotlight\nlights / phong\nlights / physical\nlights / pointlights\nlights / projector\nlights / rectarealight\nlights / selective\nlights / spotlight\nlights / sunlight\nlines / fat / raycasting\nlines / fat / wireframe\nlines / fat\nloader / gltf\nloader / gltf / anisotropy\nloader / gltf / compressed\nloader / gltf / diffuse / roughness\nloader / gltf / dispersion\nloader / gltf / iridescence\nloader / gltf / sheen\nloader / gltf / transmission\nloader / jpegxl\nloader / materialx\nloader / texture / ktx2\nmaterials\nmaterials / alphahash\nmaterials / arrays\nmaterials / basic\nmaterials / cubemap / mipmaps\nmaterials / displacementmap\nmaterials / envmaps / bpcem\nmaterials / envmaps / groundprojected\nmaterials / envmaps\nmaterials / lightmap\nmaterials / matcap\nmaterials / node / instance\nmaterials / retroreflection\nmaterials / sss\nmaterials / texture / html\nmaterials / texture / manualmipmap\nmaterials / transmission\nmaterials / toon\nmaterials / video\nmaterialx / noise\nmesh / batch\nmeshlets\nmeshlets / city\nmeshlets / ibl\nmeshlets / instanced\nmeshlets / materials\nmeshlets / meshes\nmirror\nmodifier / curve\nmorphtargets\nmorphtargets / face\nmrt\nmultiple / canvas\nmultiple / elements\nmrt / mask\nmultiple / rendertargets\nmultiple / rendertargets / readback\nmultisampled / renderbuffers\nocclusion\nocean\noit\nparallax / uv\nparticles\nparticles / soft\nperformance\nperformance / renderbundle\npmrem / cubemap\npmrem / equirectangular\npmrem / scene\npmrem / test\nportal\npostprocessing / 3dlut\npostprocessing / afterimage\npostprocessing / anamorphic\npostprocessing / ao\npostprocessing / bloom\npostprocessing / bloom / emissive\npostprocessing / bloom / selective\npostprocessing / difference\npostprocessing / dof\npostprocessing / dof / basic\npostprocessing / fog\npostprocessing / fxaa\npostprocessing / godrays\npostprocessing / lensflare\npostprocessing / masking\npostprocessing / ca\npostprocessing / motion / blur\npostprocessing / outline\npostprocessing / pixel\npostprocessing / radial / blur\npostprocessing / retro\npostprocessing / smaa\npostprocessing / sobel\npostprocessing / ssaa\npostprocessing / ssgi\ncommunity\npostprocessing / ssgi / ballpool\npostprocessing / ssr\npostprocessing / ssr / denoise\npostprocessing / sss\npostprocessing / traa\npostprocessing / transition\npostprocessing\npostprocessing / direct\nprocedural / texture\nreflection\nreflection / blurred\nreflection / roughness\nrefraction\ncommunity\nrenderer / pathtracer\nrendertarget / 2d-array / 3d\nreversed / depth / buffer\nrtt\nsandbox\nsculpt\nshadertoy\nshadow / contact\nshadowmap\nshadowmap / array\nshadowmap / csm\nshadowmap / opacity\nshadowmap / pointlight\nshadowmap / progressive\nshadowmap / vsm\nskinning\nskinning / instancing\nskinning / instancing / individual\nskinning / points\nsky\nsprites\nstorage / buffer\nstruct / drawindirect\ntest / memory\ntexturegather\ntexturegrad\ntextures / 2d-array\ntextures / 2d-array / compressed\ntextures / anisotropy\ntextures / partialupdate\ntonemapping\ntsl / angular / slicing\ntsl / compute / attractors / particles\ntsl / earth\ntsl / editor\ntsl / galaxy\ntsl / graph\ntsl / halftone\ntsl / interoperability\ntsl / occlusion / dither\ntsl / procedural / terrain\ntsl / raging / sea\ntsl / transpiler\ntsl / vfx / flames\ntsl / vfx / linkedparticles\ntsl / vfx / tornado\ntsl / wood\nunwrap\nupscaling / fsr1\nupscaling / taau\nvideo / frame\nvideo / panorama\nvolume / caustics\nvolume / cloud\nvolume / fire\nvolume / lighting\nvolume / lighting / rectarea\nvolume / lighting / traa\nvolume / perlin\nvxgi\nvxgi / sponza\nwater\nxr / rollercoaster\nxr / cubes\nxr / native / layers\nxr / shadows\nwebaudio\norientation\nsandbox\ntiming\nvisualizer\nwebxr\nar / camera / access\nar / cones\nar / hittest\nar / lighting\nar / plane / detection\nvr / handinput\nvr / handinput / cubes\nvr / handinput / profiles\nvr / handinput / pointerclick\nvr / handinput / pointerdrag\nvr / handinput / pressbutton\nvr / layers\nvr / panorama\nvr / panorama / depth\nvr / rollercoaster\nvr / sandbox\nvr / teleport\nvr / video\nxr / ballshooter\nxr / controls / transform\nxr / cubes\nxr / dragging\nxr / dragging / custom / depth\nxr / haptics\nxr / marchingcubes\nxr / paint\nxr / sculpt\ngames\nfps\nphysics\ncommunity\nammo / break\ncommunity\nammo / cloth\ncommunity\nammo / instancing\ncommunity\nammo / rope\ncommunity\nammo / terrain\ncommunity\nammo / volume\ncommunity\njolt / instancing\ncommunity\nrapier / basic\ncommunity\nrapier / instancing\ncommunity\nrapier / joints\ncommunity\nrapier / character / controller\ncommunity\nrapier / vehicle / controller\nrapier / terrain\nmisc\nanimation / groups\nanimation / keys\nboxselection\ncontrols / arcball\ncontrols / drag\ncontrols / fly\ncontrols / map\ncontrols / orbit\ncontrols / pointerlock\ncontrols / trackball\ncontrols / transform\nexporter / draco\ncommunity\nexporter / gcode\nexporter / gltf\nexporter / gltf / normals\nexporter / obj\nexporter / ply\nexporter / stl\nexporter / usdz\nexporter / exr\nexporter / ktx2\ncommunity\nraycaster / helper\ncss2d\nlabel\ncss3d\nmixed\nmolecules\northographic\nperiodictable\nsandbox\nsprites\nyoutube\nsvg\nlines\nsandbox\ntests\nfurnace / test\nuv / tests",
+    "nearHeadings": [
+     "three.js",
+     "webgl"
+    ]
+   }
+  },
+  "image": "img/h-three-demo.webp"
+ },
+ {
+  "id": "h-linear-landing",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://linear.app/",
+   "site": "linear.app",
+   "pageTitle": "Linear – The system for product development"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Skip to content →\nProduct\nResources\nCustomers\nPricing\nNow\nContact\nLog in\nSign up\nThe product development\nsystem for teams and agents\nThe product development system for teams and agents\nPurpose-built for planning and building products. Designed for the AI era.\nNew\nLoops →\nLinear\nPulse\nInbox\nMy issues\nReviews\nWorkspace\nInitiatives\nProjects\nMore\nFavorites\nFaster app launch\nAgent tasks\nAgent Insights\nDRV-8852\nFaster app launch\n1 / 84\nFaster app launch\nRender UI before\nvehicle_state\nsync when minimum required state is present, instead of blocking on full refresh during iOS startup.\nActivity\nLinear created the issue via Slack on behalf of Karri\n·\n2min ago\nTriage Intelligence added the labels Performance and iOS\n·\n2min ago\nkarri\n·\n4 min ago\nRight now we show a spinner forever, which makes it look like the car disappeared...\nReviews\nRevert\nProperties\nIn Progress\nMedium\nKarri\nLinear\nCycle 144\nLabels\nPerformance\niOS",
+   "meta": {
+    "description": "Purpose-built for planning and building products with AI agents.",
+    "og": {
+     "og:title": "Linear – The system for product development",
+     "og:description": "Purpose-built for planning and building products with AI agents.",
+     "og:image": "https://linear.app/api/og/main?title=Linear&v=4"
+    }
+   },
+   "headings": [
+    "The product development system for teams and agentsThe product developmentsystem for teams and agentsThe product development system for teams and agents",
+    "Faster app launch",
+    "A new species of product tool. Purpose-built for modern teams with AI workflows at its core, Linear sets a new standard for planning and building products.",
+    "Intakeand integrations",
+    "Planningand monitoring",
+    "AI andautomations",
+    "Build, review,and ship",
+    "Changelog",
+    "Built for the future. Available today.",
+    "Product",
+    "Features",
+    "Company",
+    "Resources",
+    "Connect",
+    "Legal"
+   ],
+   "alts": [
+    "Avatar of Karri",
+    "Linear"
+   ],
+   "page": {
+    "text": "The product development system for teams and agents\nFaster app launch\nRender UI before vehicle_state sync when minimum required state is present, instead of blocking on full refresh during iOS startup.\nActivity\nLinear created the issue via Slack on behalf of Karri·2min ago\nTriage Intelligence added the labels Performance and iOS·2min ago\nLinearconnected by Jori·2 min ago\nChanged 2 filesDraft PR awaiting your review·2 min ago\nLinear moved from Todo to In Progress·just now\nReviews\nRevert\nProperties\nIn Progress\nMedium\nKarri\nLinear\nCycle 144\nLabels\nReleases\nLinear App1.6881...⋅Jun 25\nPowering the companies building the future\nA new species of product tool. Purpose-built for modern teams with AI workflows at its core, Linear sets a new standard for planning and building products.\nPurpose-built\nLinear is shaped by the practices and principles of world-class product teams.\nPowered by agents\nDesigned for workflows shared by humans and agents. From drafting PRDs to pushing PRs.\nDesigned for speed\nReduces noise and restores momentum to help teams ship with high velocity and focus.\nFig 0.1\nPurpose-built\nLinear is shaped by the practices and principles of world-class product teams.\nFig 0.2\nPowered by agents\nDesigned for workflows shared by humans and agents. From drafting PRDs to pushing PRs.\nFig 0.3\nDesigned for speed\nReduces noise and restores momentum to help teams ship with high velocity and focus.\nReduce UI flicker during autonomy…\nAdd buffering for autonomy event streams\nReduce startup delay caused by vehicle sync\nFix delayed route updates during rerouting\nRemove UI inconsistencies\nBugDesign\nTypeError: Cannot read properties\nBug\nUpgrade to Claude Opus 5.5\nAI\nOptimize load times\nPerformance\nRemove contentData from GraphQL API\n61039\nLaunch page assets\nDesign\nPrevent duplicate ride requests on poor…\nBug62048\nClean up deprecated APIs…\nAPI61002\nReduce latency in autonomy st…\n61005\nReduce ETA fluctuations durin…\n61202\nImprove fallback messaging\nUI61149\nImprove rider visibility into veh…\nAnyone else noticing the iOS app feels slow to open if you haven’t used it in a bit?\nYea, we’re still blocking initial render on a full vehicle_state sync every time…\nFeels like we could render sooner and load the rest in the background. Probably also worth tracking startup timing so we know how often this happens!\n@Linearcreate issues and assign to me\nENG-2076Reduce ETA jitter\n#55423PerformanceWorking…Oct 6\nENG-2108Handle GPS dropouts gracefully\n#55409MapsWorking…Oct 2\nENG-2143Optimize map tile loading on initial app open\nMapsOct 7\nENG-2187Prevent duplicate ride requests on poor networks\nBugWorking…Oct 5\nENG-2254Reduce unnecessary map re-rendering on home screen\nMapsOct 10\nENG-2291Clean up deprecated APIs used by the rider app\nAPIOct 9\nENG-2327Speed up CI pipelines for mobile builds\nPerformanceOct 9\nENG-2358Reduce flakiness in mobile UI tests\nReliabilityOct 4\nimport React from 'react'import { View, ActivityIndicator } from 'react-native'import { useVehicleState } from '@hooks/useVehicleState'import { Dashboard } from '@components/Dashboard'export const HomeScreen = () => { const { vehicleState, isFullySynced } = useVehicleState() if (!isFullySynced) { return <ActivityIndicator size=\"large\" /> } return ( <View> <Dashboard state={vehicleState} /> </View> )}\nimport React from 'react'import { View, ActivityIndicator } from 'react-native'import { useVehicleState, SyncStatus } from '@hooks/useVehicleState'import { Dashboard } from '@components/Dashboard'export const HomeScreen = () => { const { vehicleState, syncStatus } = useVehicleState() if (syncStatus === SyncStatus.PENDING) { return <ActivityIndicator size=\"large\" /> } return ( <View> <Dashboard state={vehicleState} syncStatus={syncStatus} /> </View> )}\nexport const CodeReview = () => { <Diff.Provider> <Slow /> <Fragmented /> <HumanOnly /> <Frictionless /> <Integrated /> <AgentReady /> </Diff.Provider>};\nChangelog",
+    "nearHeadings": [
+     "The product development system for teams and agentsThe product developmentsystem for teams and agentsThe product development system for teams and agents",
+     "Faster app launch",
+     "Activity"
+    ]
+   }
+  },
+  "image": "img/h-linear-landing.webp"
+ },
+ {
+  "id": "h-python-docs",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://docs.python.org/3/tutorial/introduction.html",
+   "site": "docs.python.org",
+   "pageTitle": "3. An Informal Introduction to Python — Python 3.15.2 documentation"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "index\nmodules |\nnext |\nprevious |\nPython » 3.15.2 documentation » The Python Tutorial » 3. An Informal Introduction to Python\n|\nTheme |\n3. An Informal Introduction to Python\nIn the following examples, input and output are distinguished by the presence or absence of prompts ( >>> and … ): to repeat the example, you must type everything after the prompt, when the prompt appears; lines that do not begin with a prompt are output from the interpreter. Note that a secondary prompt on a line by itself in an example means you must type a blank line; this is used to end a multi-line command.\nYou can use the “Copy” button (it appears in the upper-right corner when hovering over or tapping a code example), which strips prompts and omits output, to copy and paste the input lines into your interpreter.\nMany of the examples in this manual, even those entered at the interactive prompt, include comments. Comments in Python start with the hash character, # , and extend to the end of the physical line. A comment may appear at the start of a line or following whitespace or code, but not within a string literal. A hash character within a string literal is just a hash character. Since comments are to clarify code and are not interpreted by Python, they may be omitted when typing in examples.\nSome examples:\n# this is the first comment spam = 1 # and this is the second comment # ... and now a third! text = \"# This is not a comment because it's inside quotes.\"\n3.1. Using Python as a Calculator\nLet’s try some simple Python commands. Start the interpreter and wait for the primary prompt, >>> . (It shouldn’t take long.)\n3.1.1. Numbers\nThe interpreter acts as a simple calculator: you can type an expression into it and it will write the value. Expression syntax is straightforward: the operators + , - , * and / can be used to perform arithmetic; parentheses ( () ) can be used for grouping. For example:\n>>> 2 + 2\nTable of Contents\n3. An Informal Introduction to Python\n3.1. Using Python as a Calculator\n3.1.1. Numbers\n3.1.2. Text\n3.1.3. Lists\n3.2. First Steps Towards Programming\nPrevious topic\n2. Using the Python Interpreter\nNext topic\n4. More Control Flow Tools\nThis page\nReport a bug\nImprove this page\nShow source\n«",
+   "meta": {
+    "description": "In the following examples, input and output are distinguished by the presence or absence of prompts (>>> and …): to repeat the example, you must type everything after the prompt, when the ...",
+    "og": {
+     "og:title": "3. An Informal Introduction to Python",
+     "og:type": "website",
+     "og:url": "https://docs.python.org/3/tutorial/introduction.html",
+     "og:site_name": "Python documentation",
+     "og:description": "In the following examples, input and output are distinguished by the presence or absence of prompts (>>> and …): to repeat the example, you must type everything after the prompt, when the ...",
+     "og:image:width": "1146",
+     "og:image:height": "600",
+     "og:image": "https://docs.python.org/3.15/_images/social_previews/summary_tutorial_introduction_dca1cd17.png",
+     "og:image:alt": "In the following examples, input and output are distinguished by the presence or absence of prompts (>>> and …): to repeat the example, you must type everything after the prompt, when the ..."
+    }
+   },
+   "headings": [
+    "Table of Contents",
+    "This page",
+    "Navigation",
+    "3. An Informal Introduction to Python¶",
+    "3.1. Using Python as a Calculator¶",
+    "3.1.1. Numbers¶",
+    "3.1.2. Text¶",
+    "3.1.3. Lists¶",
+    "3.2. First Steps Towards Programming¶"
+   ],
+   "alts": [
+    "Python logo"
+   ],
+   "page": {
+    "text": "In the following examples, input and output are distinguished by the presence or\nabsence of prompts (>>> and …): to repeat the example, you must type\neverything after the prompt, when the prompt appears; lines that do not begin\nwith a prompt are output from the interpreter. Note that a secondary prompt on a\nline by itself in an example means you must type a blank line; this is used to\nend a multi-line command.\nYou can use the “Copy” button (it appears in the upper-right corner\nwhen hovering over or tapping a code example), which strips prompts\nand omits output, to copy and paste the input lines into your interpreter.\nMany of the examples in this manual, even those entered at the interactive\nprompt, include comments. Comments in Python start with the hash character,\n#, and extend to the end of the physical line. A comment may appear at the\nstart of a line or following whitespace or code, but not within a string\nliteral. A hash character within a string literal is just a hash character.\nSince comments are to clarify code and are not interpreted by Python, they may\nbe omitted when typing in examples.\nSome examples:\n# this is the first comment\nspam = 1 # and this is the second comment\n# ... and now a third!\ntext = \"# This is not a comment because it's inside quotes.\"\n3.1. Using Python as a Calculator¶\nLet’s try some simple Python commands. Start the interpreter and wait for the\nprimary prompt, >>>. (It shouldn’t take long.)\n3.1.1. Numbers¶\nThe interpreter acts as a simple calculator: you can type an expression into it\nand it will write the value. Expression syntax is straightforward: the\noperators +, -, * and / can be used to perform\narithmetic; parentheses (()) can be used for grouping.\nFor example:\n>>> 2 + 2\n4\n>>> 50 - 5*6\n20\n>>> (50 - 5*6) / 4\n5.0\n>>> 8 / 5 # division always returns a floating-point number\n1.6\nThe integer numbers (e.g. 2, 4, 20) have type int,\nthe ones with a fractional part (e.g. 5.0, 1.6) have type\nfloat. We will see more about numeric types later in the tutorial.\nDivision (/) always returns a float. To do floor division and\nget an integer result you can use the // operator; to calculate\nthe remainder you can use %:\n>>> 17 / 3 # classic division returns a float\n5.666666666666667\n>>>\n>>> 17 // 3 # floor division discards the fractional part\n5\n>>> 17 % 3 # the % operator returns the remainder of the division\n2\n>>> 5 * 3 + 2 # floored quotient * divisor + remainder\n17\nWith Python, it is possible to use the ** operator to calculate powers [1]:\n>>> 5 ** 2 # 5 squared\n25\n>>> 2 ** 7 # 2 to the power of 7\n128\nThe equal sign (=) is used to assign a value to a variable. Afterwards, no\nresult is displayed before the next interactive prompt:\n>>> width = 20\n>>> height = 5 * 9\n>>> width * height\n900\nIf a variable is not “defined” (assigned a value), trying to use it will\ngive you an error:\n>>> n # try to access an undefined variable\nTraceback (most recent call last):\nFile \"<stdin>\", line 1, in <module>\nNameError: name 'n' is not defined\nThere is full support for floating point; operators with mixed type operands\nconvert the integer operand to floating point:\n>>> 4 * 3.75 - 1\n14.0\nIn interactive mode, the last printed expression is assigned to the variable\n_. This means that when you are using Python as a desk calculator, it is\nsomewhat easier to continue calculations, for example:\n>>> tax = 12.5 / 100\n>>> price = 100.50\n>>> price * tax\n12.5625\n>>> price + _\n113.0625\n>>> round(_, 2)\n113.06\nThis variable should be treated as read-only by the user. Don’t explicitly\nassign a value to it — you would create an independent local variable with the\nsame name masking the built-in variable with its magic behavior.\nIn addition to int and float, Python supports other types of\nnumbers, such as Decimal and Fraction.\nPython also has built-in support for complex numbers,\nand uses the j or J suffix to indicate the imaginary part\n(e.g. 3+5j).\n3.1.2. Text¶\nPython can manipulate text (represented by type str, so-called\n“strings”) as well as numbers. This includes characters “!”, words\n“rabbit”, names “Paris”, sentences “Got your back.”, etc.\n“Yay! :)”. They can be enclosed in single quotes ('...') or double\nquotes (\"...\") with the same result [2].\n>>> 'spam eggs' # single quotes\n'spam eggs'\n>>> \"Paris rabbit got your back :)! Yay!\" # double quotes\n'Paris rabbit got your back :)! Yay!'\n>>> '1975' # digits and numerals enclosed in quotes are also strings\n'1975'\nTo quote a quote, we need to “escape” it, by preceding it with \\.\nAlternatively, we can use the other type of quotation marks:\n>>> 'doesn\\'t' # use \\' to escape the single quote...\n\"doesn't\"\n>>> \"doesn't\" # ...or use double quotes instead\n\"doesn't\"\n>>> '\"Yes,\" they said.'\n'\"Yes,\" they said.'\n>>> \"\\\"Yes,\\\" they said.\"\n'\"Yes,\" they said.'\n>>> '\"Isn\\'t,\" they said.'\n'\"Isn\\'t,\" they said.'\nIn the Python shell, the string definition and output string can look\ndifferent. The print() function produces a more readable output, by\nomitting the enclosing quotes and by printing escaped and special characters:\n>>> s = 'First line.\\nSecond line.' # \\n means newline\n>>> s # without print(), special characters are included in the string\n'First line.\\nSecond line.'\n>>> print(s) # with print(), special characters are interpreted, so \\n produces new line\nFirst line.\nSecond line.\nIf you don’t want characters prefaced by \\ to be interpreted as\nspecial characters, you can use raw strings by adding an r before\nthe first quote:\n>>> print('C:\\this\\name') # here \\t means tab, \\n means newline\nC: his\name\n>>> print(r'C:\\this\\name') # note the r before the quote\nC:\\this\\name\nThere is one subtle aspect to raw strings: a raw string may not end in\nan odd number of \\ characters; see\nthe FAQ entry for more information\nand workarounds.\nString literals can span multiple lines. One way is using triple-quotes:\n\"\"\"...\"\"\" or '''...'''. End-of-line characters are automatically\nincluded in the string, but it’s possible to prevent this by adding a \\ at\nthe end of the line. In the following example, the initial newline is not\nincluded:\n>>> print(\"\"\"\\\n... Usage: thingy [OPTIONS]\n... -h Display this usage message\n... -H hostname Hostname to connect to\n... \"\"\")\nUsage: thingy [OPTIONS]\n-h Display this usage message\n-H hostname Hostname to connect to\n>>>\nStrings can be concatenated (glued together) with the + operator, and\nrepeated with *:\n>>> # 3 times 'un', followed by 'ium'\n>>> 3 * 'un' + 'ium'\n'unununium'\nTwo or more string literals (i.e. the ones enclosed between quotes) next\nto each other are automatically concatenated.\n>>> 'Py' 'thon'\n'Python'\nThis feature is particularly useful when you want to break long strings:\n>>> text = ('Put several strings within parentheses '\n... 'to have them joined together.')\n>>> text\n'Put several strings within parentheses to have them joined together.'\nThis only works with two literals though, not with variables or expressions:\n>>> prefix = 'Py'\n>>> prefix 'thon' # can't concatenate a variable and a string literal\nFile \"<stdin>\", line 1\nprefix 'thon'\n^^^^^^\nSyntaxError: invalid syntax\n>>> ('un' * 3) 'ium'\nFile \"<stdin>\", line 1\n('un' * 3) 'ium'\n^^^^^\nSyntaxError: invalid syntax\nIf you want to concatenate variables or a variable and a literal, use +:\n>>> prefix + 'thon'\n'Python'\nStrings can be indexed (subscripted), with the first character having index 0.\nThere is no separate character type; a character is simply a string of size\none:\n>>> word = 'Python'\n>>> word[0] # character in position 0\n'P'\n>>> word[5] # character in position 5\n'n'\nIndices may also be negative numbers, to start counting from the right:\n>>> word[-1] # last character\n'n'\n>>> word[-2] # second-last character\n'o'\n>>> word[-6]\n'P'\nNote that since -0 is the same as 0, negative indices start from -1.\nIn addition to indexing, slicing is also supported. While indexing is used\nto obtain individual characters, slicing allows you to obtain a substring:\n>>> word[0:2] # characters from position 0 (included) to 2 (excluded)\n'Py'\n>>> word[2:5] # characters from position 2 (included) to 5 (excluded)\n'tho'\nSlice indices have useful defaults; an omitted first index defaults to zero, an\nomitted second index defaults to the size of the string being sliced.\n>>> word[:2] # character from the beginning to position 2 (excluded)\n'Py'\n>>> word[4:] # characters from position 4 (included) to the end\n'on'\n>>> word[-2:] # characters from the second-last (included) to the end\n'on'\nNote how the start is always included, and the end always excluded. This\nmakes sure that s[:i] + s[i:] is always equal to s:\n>>> word[:2] + word[2:]\n'Python'\n>>> word[:4] + word[4:]\n'Python'\nOne way to remember how slices work is to think of the indices as pointing\nbetween characters, with the left edge of the first character numbered 0.\nThen the right edge of the last character of a string of n characters has\nindex n, for example:\n+---+---+---+---+---+---+\n| P | y | t | h | o | n |\n+---+---+---+---+---+---+\n0 1 2 3 4 5 6\n-6 -5 -4 -3 -2 -1\nThe first row of numbers gives the position of the indices 0…6 in the string;\nthe second row gives the corresponding negative indices. The slice from i to\nj consists of all characters between the edges labeled i and j,\nrespectively.\nFor non-negative indices, the length of a slice is the difference of the\nindices, if both are within bounds. For example, the length of word[1:3] is\n2.\nAttempting to use an index that is too large will result in an error:\n>>> word[42] # the word only has 6 characters\nTraceback (most recent call last):\nFile \"<stdin>\", line 1, in <module>\nIndexError: string index out of range\nHowever, out of range slice indexes are handled gracefully when used for\nslicing:\n>>> word[4:42]\n'on'\n>>> word[42:]\n''\nPython strings cannot be changed — they are immutable.\nTherefore, assigning to an indexed position in the string results in an error:\n>>> word[0] = 'J'\nTraceback (most recent call last):\nFile \"<stdin>\", line 1, in <module>\nTypeError: 'str' object does not support item assignment\n>>> word[2:] = 'py'\nTraceback (most recent call last):\nFile \"<stdin>\", line 1, in <module>\nTypeError: 'str' object does not support item assignment\nIf you need a different string, you should create a new one:\n>>> 'J' + word[1:]\n'Jython'\n>>> word[:2] + 'py'\n'Pypy'\nThe built-in function len() returns the length of a string:\n>>> s = 'supercalifragilisticexpialidocious'\n>>> len(s)\n34\n3.1.3. Lists¶\nPython knows a number of compound data types, used to group together other\nvalues. The most versatile is the list, which can be written as a list of\ncomma-separated values (items) between square brackets. Lists might contain\nitems of different types, but usually the items all have the same type.\n>>> squares = [1, 4, 9, 16, 25]\n>>> squares\n[1, 4, 9, 16, 25]\nLike strings (and all other built-in sequence types), lists can be\nindexed and sliced:\n>>> squares[0] # indexing returns the item\n1\n>>> squares[-1]\n25\n>>> squares[-3:] # slicing returns a new list\n[9, 16, 25]\nLists also support operations like concatenation:\n>>> squares + [36, 49, 64, 81, 100]\n[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]\nUnlike strings, which are immutable, lists are a mutable\ntype, i.e. it is possible to change their content:\n>>> cubes = [1, 8, 27, 65, 125] # something's wrong here\n>>> 4 ** 3 # the cube of 4 is 64, not 65!\n64\n>>> cubes[3] = 64 # replace the wrong value\n>>> cubes\n[1, 8, 27, 64, 125]\nYou can also add new items at the end of the list, by using\nthe list.append() method (we will see more about methods later):\n>>> cubes.append(216) # add the cube of 6\n>>> cubes.append(7 ** 3) # and the cube of 7\n>>> cubes\n[1, 8, 27, 64, 125, 216, 343]\nSimple assignment in Python never copies data. When you assign a list\nto a variable, the variable refers to the existing list.\nAny changes you make to the list through one variable will be seen\nthrough all other variables that refer to it.:\n>>> rgb = [\"Red\", \"Green\", \"Blue\"]\n>>> rgba = rgb\n>>> id(rgb) == id(rgba) # they reference the same object\nTrue\n>>> rgba.append(\"Alph\")\n>>> rgb\n[\"Red\", \"Green\", \"Blue\", \"Alph\"]\nAll slice operations return a new list containing the requested elements. This\nmeans that the following slice returns a\nshallow copy of the list:\n>>> correct_rgba = rgba[:]\n>>> correct_rgba[-1] = \"Alpha\"\n>>> correct_rgba\n[\"Red\", \"Green\", \"Blue\", \"Alpha\"]\n>>> rgba\n[\"Red\", \"Green\", \"Blue\", \"Alph\"]\nAssignment to slices is also possible, and this can even change the size of the\nlist or clear it entirely:\n>>> letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g']\n>>> letters\n['a', 'b', 'c', 'd', 'e', 'f', 'g']\n>>> # replace some values\n>>> letters[2:5] = ['C', 'D', 'E']\n>>> letters\n['a', 'b', 'C', 'D', 'E', 'f', 'g']\n>>> # now remove them\n>>> letters[2:5] = []\n>>> letters\n['a', 'b', 'f', 'g']\n>>> # clear the list by replacing all the elements with an empty list\n>>> letters[:] = []\n>>> letters\n[]\nThe built-in function len() also applies to lists:\n>>> letters = ['a', 'b', 'c', 'd']\n>>> len(letters)\n4\nIt is possible to nest lists (create lists containing other lists), for\nexample:\n>>> a = ['a', 'b', 'c']\n>>> n = [1, 2, 3]\n>>> x = [a, n]\n>>> x\n[['a', 'b', 'c'], [1, 2, 3]]\n>>> x[0]\n['a', 'b', 'c']\n>>> x[0][1]\n'b'\n3.2. First Steps Towards Programming¶\nOf course, we can use Python for more complicated tasks than adding two and two\ntogether. For instance, we can write an initial sub-sequence of the\nFibonacci series\nas follows:\n>>> # Fibonacci series:\n>>> # the sum of two elements defines the next\n>>> a, b = 0, 1\n>>> while a < 10:\n... print(a)\n... a, b = b, a+b\n...\n0\n1\n1\n2\n3\n5\n8\nThis example introduces several new features.\nThe first line contains a multiple assignment: the variables a and b\nsimultaneously get the new values 0 and 1. On the last line this is used again,\ndemonstrating that the expressions on the right-hand side are all evaluated\nfirst before any of the assignments take place. The right-hand side expressions\nare evaluated from the left to the right.\nThe while loop executes as long as the condition (here: a < 10)\nremains true. In Python, like in C, any non-zero integer value is true; zero is\nfalse. The condition may also be a string or list value, in fact any sequence;\nanything with a non-zero length is true, empty sequences are false. The test\nused in the example is a simple comparison. The standard comparison operators\nare written the same as in C: < (less than), > (greater than), ==\n(equal to), <= (less than or equal to), >= (greater than or equal to)\nand != (not equal to).\nThe body of the loop is indented: indentation is Python’s way of grouping\nstatements. At the interactive prompt, you have to type a tab or space(s) for\neach indented line. In practice you will prepare more complicated input\nfor Python with a text editor; all decent text editors have an auto-indent\nfacility. When a compound statement is entered interactively, it must be\nfollowed by a blank line to indicate completion (since the parser cannot\nguess when you have typed the last line). Note that each line within a basic\nblock must be indented by the same amount.\nThe print() function writes the value of the argument(s) it is given.\nIt differs from just writing the expression you want to write (as we did\nearlier in the calculator examples) in the way it handles multiple arguments,\nfloating-point quantities, and strings. Strings are printed without quotes,\nand a space is inserted between items, so you can format things nicely, like\nthis:\n>>> i = 256*256\n>>> print('The value of i is', i)\nThe value of i is 65536\nThe keyword argument end can be used to avoid the newline after the output,\nor end the output with a different string:\n>>> a, b = 0, 1\n>>> while a < 1000:\n... print(a, end=',')\n... a, b = b, a+b\n...\n0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,\nFootnotes",
+    "nearHeadings": [
+     "3. An Informal Introduction to Python¶",
+     "3.1. Using Python as a Calculator¶",
+     "3.1.1. Numbers¶",
+     "Table of Contents",
+     "Previous topic",
+     "Next topic",
+     "This page"
+    ]
+   }
+  },
+  "image": "img/h-python-docs.webp"
+ }
+]

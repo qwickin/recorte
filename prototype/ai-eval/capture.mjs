@@ -6,7 +6,7 @@ import { build } from "esbuild";
 import { chromium } from "playwright-core";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { PAGES } from "./pages.mjs";
+const { PAGES } = await import(process.env.PAGES ?? "./pages.mjs");
 
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const OUT = process.argv[2] ?? `${HERE}.raw/`;
@@ -89,9 +89,13 @@ for (const site of PAGES) {
       await page.screenshot({ path, fullPage: true, clip: { x: box.x, y: box.y + sy, width: box.width, height: h } });
       rect = { x: box.x, y: box.y, width: box.width, height: Math.min(h, 900 - Math.max(0, box.y)) };
     }
+    // "image" captures send the element's alt + caption (figcaption) as the selection, like the extension.
+    const image = site.kind === "image"
+      ? await page.evaluate((sel) => { const im = document.querySelector(sel); return { alt: im?.getAttribute("alt") ?? "", caption: im?.closest("figure")?.querySelector("figcaption")?.textContent ?? "" }; }, site.selector)
+      : undefined;
     const text = await page.evaluate(
-      ({ kind, rect }) => window.__recorteExtract.extractText(document, { kind, rect }),
-      { kind: site.kind, rect },
+      ({ kind, rect, image }) => window.__recorteExtract.extractText(document, { kind, rect, image }),
+      { kind: site.kind, rect, image },
     );
     results.push({ id: site.id, url: page.url(), kind: site.kind, pageTitle: await page.title(), text });
     console.log("ok", site.id, `sel=${text.selection.length} page=${text.page?.text.length ?? 0} h=${text.headings.length}`);

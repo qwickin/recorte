@@ -12,12 +12,12 @@ import { mergeLink } from "../../apps/server/src/pipeline.ts";
 const sharp = createRequire(new URL("../../packages/ai/package.json", import.meta.url))("sharp") as typeof import("sharp");
 const HERE = fileURLToPath(new URL(".", import.meta.url));
 const raw = process.argv[2]!;
-const OUT = `${HERE}dataset/`;
+const OUT = `${HERE}${process.argv[3] ?? "dataset"}/`;
 mkdirSync(`${OUT}img`, { recursive: true });
 
 interface Raw { id: string; url: string; kind: Item["kind"]; pageTitle?: string; text?: Item["text"] }
 const rows = JSON.parse(readFileSync(`${raw}/raw.json`, "utf8")) as Raw[];
-const { PAGES } = await import("./pages.mjs");
+const { PAGES } = await import(process.env.PAGES ?? "./pages.mjs");
 const order = new Map((PAGES as { id: string }[]).map((p, i) => [p.id, i]));
 rows.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
 

@@ -1,0 +1,15 @@
+{
+  "_": "Held-out set: written after the tagger was frozen (203ff9f) and before running any approach on these pages. Same rules as ground-truth.json.",
+  "h-radix-dialog": ["componentes ui", "dialog", "react", "documentação", "acessibilidade", "modo escuro"],
+  "h-headless-combobox": ["componentes ui", "combobox|dropdown", "react", "documentação", "acessibilidade"],
+  "h-mui-select": ["componentes ui", "dropdown|combobox", "react", "documentação", "design system|ui design", "formulário"],
+  "h-recipe-pt": ["culinária|gastronomia", "receita", "tutorial"],
+  "h-news-pt": ["notícia|artigo", "política", "portugal"],
+  "h-gh-ripgrep": ["repositório", "github", "rust", "open source", "cli|terminal", "código"],
+  "h-blog-jvns": ["blogue|artigo", "eletrónica", "ciclismo", "bricolage", "tutorial"],
+  "h-wiki-belem": ["enciclopédia|wikipedia", "lisboa", "portugal", "história", "arquitetura", "cultura|turismo"],
+  "h-commons-photo": ["fotografia", "natureza", "plantas"],
+  "h-three-demo": ["3d", "webgl", "animação", "javascript"],
+  "h-linear-landing": ["landing page", "saas|software", "produtividade", "inteligência artificial", "modo escuro"],
+  "h-python-docs": ["documentação", "python", "tutorial", "programação", "código"]
+}
