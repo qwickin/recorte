@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Recorte: find what you saw on the web</title>
+  <meta name="description" content="Recorte saves screenshots and links from the web to your own server, tags them with local AI, and finds them again by what you remember. Self-hosted, open source, one Docker container.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#000000">
+  <link rel="canonical" href="https://qwickin.github.io/recorte/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Recorte">
+  <meta property="og:title" content="Recorte: find what you saw on the web">
+  <meta property="og:description" content="Screenshots and links, saved to your own server, tagged by local AI, searchable by what you remember.">
+  <meta property="og:url" content="https://qwickin.github.io/recorte/">
+  <meta property="og:image" content="https://qwickin.github.io/recorte/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Recorte: a black, minimal gallery of web captures with a cloud of tags.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@qwickin">
+  <meta name="twitter:creator" content="@qwickin">
+  <meta name="twitter:title" content="Recorte: find what you saw on the web">
+  <meta name="twitter:description" content="Screenshots and links, saved to your own server, tagged by local AI, searchable by what you remember.">
+  <meta name="twitter:image" content="https://qwickin.github.io/recorte/assets/og.jpg">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preload" href="fonts/albert-sans-latin-200-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/albert-sans-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // The hero's crop marks start out of frame and settle on the headline once the page is up.
+    // Kept inline so the headline never stays hidden if main.js fails to load.
+    document.documentElement.classList.add("js");
+    document.addEventListener("DOMContentLoaded", function () {
+      var f = document.querySelector("[data-frame]");
+      if (f) requestAnimationFrame(function () { requestAnimationFrame(function () { f.classList.add("is-set"); }); });
+    });
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <a class="brand" href="./" aria-label="Recorte home">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v15h15M2 7h15v15"/></svg>
+      <span>Recorte</span>
+    </a>
+    <nav class="top-links" aria-label="Primary">
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/qwickin/recorte">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="frame" data-frame>
+        <span class="corner tl" aria-hidden="true"></span>
+        <span class="corner tr" aria-hidden="true"></span>
+        <span class="corner bl" aria-hidden="true"></span>
+        <span class="corner br" aria-hidden="true"></span>
+        <h1 id="hero-title">Find what you saw.</h1>
+      </div>
+      <p class="lede">Recorte saves screenshots and links from the web to your own server, tags them with local AI, and finds them again by what you remember.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#install">Quick start</a>
+        <a class="btn" href="https://github.com/qwickin/recorte">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <p class="fineprint">Free and open source. MIT licensed. Runs in one Docker container.</p>
+    </section>
+
+    <figure class="showcase">
+      <img src="assets/gallery.webp" width="1440" height="900" alt="The Recorte gallery: a scrolling cloud of tags above a masonry grid of captured web pages, with a floating filter bar at the bottom." fetchpriority="high">
+    </figure>
+
+    <section class="problem" aria-labelledby="problem-title">
+      <h2 id="problem-title">You screenshot things to remember them. Then you never find them again.</h2>
+      <div class="problem-body">
+        <p>They pile up as <span class="filename">Screenshot 2026-11-08 at 14.32.png</span>, cut off from the page they came from. Bookmarks forget what the page looked like. Read-later apps keep your history on someone else’s server.</p>
+        <p>Recorte keeps each capture with its address and the text of the page, tags it on your own machine, and puts it all in one place you can search. Type “that recipe for Portuguese custard tarts” and the capture comes back, even if the page was in another language.</p>
+      </div>
+    </section>
+
+    <section class="features" id="features" aria-labelledby="features-title">
+      <h2 id="features-title" class="section-title">What it does</h2>
+      <div class="bento">
+        <article class="card c-search">
+          <div class="card-text">
+            <h3>Search by what you remember</h3>
+            <p>Press ⌘K or Ctrl+K and describe it. Full-text and semantic search work together, so a vague memory is enough, and the results come back as pictures.</p>
+          </div>
+          <img class="shot" src="assets/search.webp" width="922" height="674" loading="lazy" alt="The search palette showing a grid of image results for a query.">
+        </article>
+
+        <article class="card c-keys">
+          <h3>Capture in one keystroke</h3>
+          <ul class="keys" aria-label="Keyboard shortcuts on macOS">
+            <li><span class="kbd">⌃⇧S</span> an area</li>
+            <li><span class="kbd">⌃⇧V</span> the visible part</li>
+            <li><span class="kbd">⌃⇧F</span> the full page</li>
+          </ul>
+          <p>Alt+Shift on Windows and Linux. Add a title, note or tags before it saves.</p>
+        </article>
+
+        <article class="card c-ai">
+          <h3>Tagged on your machine</h3>
+          <p>A text tagger reads the whole page and SigLIP2 looks at the image, both on the CPU. No GPU, no API key. A cloud model is optional.</p>
+          <div class="marquee" aria-hidden="true">
+            <div class="marquee-row">
+              <span>dark mode</span><span>recipe</span><span class="big">react</span><span>map</span><span>research paper</span><span>gradient</span><span class="big">typography</span><span>documentation</span><span>lisbon</span><span>css</span>
+              <span>dark mode</span><span>recipe</span><span class="big">react</span><span>map</span><span>research paper</span><span>gradient</span><span class="big">typography</span><span>documentation</span><span>lisbon</span><span>css</span>
+            </div>
+            <div class="marquee-row reverse">
+              <span>javascript</span><span class="big">pastry</span><span>dashboard</span><span>photography</span><span>open source</span><span class="big">webgl</span><span>pricing page</span><span>news</span><span>design system</span>
+              <span>javascript</span><span class="big">pastry</span><span>dashboard</span><span>photography</span><span>open source</span><span class="big">webgl</span><span>pricing page</span><span>news</span><span>design system</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card c-detail">
+          <div class="card-text">
+            <h3>Every detail, up close</h3>
+            <p>Zoom into the full-resolution capture, edit tags and notes, and jump back to the original page.</p>
+          </div>
+          <img class="shot" src="assets/detail.webp" width="1184" height="778" loading="lazy" alt="A capture open in the detail view, with page address, tags, a note field and related captures beside it.">
+        </article>
+
+        <article class="card c-phone">
+          <div class="card-text">
+            <h3>In your pocket</h3>
+            <p>Made for phones too. Install the gallery as an app.</p>
+          </div>
+          <img class="shot phone" src="assets/phone.webp" width="600" height="1298" loading="lazy" alt="The gallery on a phone: tag cloud, two-column grid and the filter bar.">
+        </article>
+
+        <article class="card c-dock">
+          <div class="card-text">
+            <h3>Filter from the Dock</h3>
+            <p>Narrow down by site, type, color, date or category. Click any tag in the cloud to filter by it.</p>
+          </div>
+          <img class="shot" src="assets/filters.webp" width="560" height="330" loading="lazy" alt="The floating filter bar with its color filter open.">
+        </article>
+
+        <article class="card c-data">
+          <h3>Your disk, your files</h3>
+          <pre class="tree" aria-label="Data folder layout"><code>/data
+├─ items/…/<b>meta.json</b>
+│          original.webp
+├─ recorte.db
+└─ meili/</code></pre>
+          <p>One plain <code>meta.json</code> per capture, plus SQLite. Export everything as a ZIP whenever you like.</p>
+        </article>
+
+        <article class="card c-links">
+          <div class="card-text">
+            <h3>Links and posts, too</h3>
+            <p>Right-click to save a link, a page or an image. Your server fetches the title, description and preview, and posts from X keep their embedded video.</p>
+          </div>
+          <div class="linktile" aria-hidden="true">
+            <span class="pill"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>link</span>
+            <span class="site">github.com</span>
+            <span class="title">qwickin/recorte: find what you saw on the web</span>
+          </div>
+        </article>
+
+        <article class="card c-lang">
+          <h3>Speaks your language</h3>
+          <p class="langs"><span lang="en">English</span> <span lang="pt-BR">Português</span> <span lang="es">Español</span> <span lang="fr">Français</span> <span lang="it">Italiano</span></p>
+          <p>The gallery and the extension follow your browser. Tags show up in your language, and search finds them in any of the five.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="how" aria-labelledby="how-title">
+      <h2 id="how-title" class="section-title">How it works</h2>
+      <ol class="steps">
+        <li>
+          <h3>Run the server</h3>
+          <p>One <code>docker run</code> on your home server, NAS or VPS. The API, the gallery, the AI models and the search engine all live in a single container.</p>
+        </li>
+        <li>
+          <h3>Create your account</h3>
+          <p>Open the server’s address in a browser. A three-step wizard sets up your email and password, the public address, and optional cloud AI.</p>
+        </li>
+        <li>
+          <h3>Add the extension</h3>
+          <p>Download it for Chrome or Firefox from the gallery, sign in once, and start capturing. Each capture arrives with its page text and tags.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="install" id="install" aria-labelledby="install-title">
+      <h2 id="install-title" class="section-title">Quick start</h2>
+      <p class="install-lede">You need Docker on amd64 or arm64 and 2&nbsp;GB of RAM (4&nbsp;GB recommended).</p>
+      <div class="code">
+        <pre><code id="cmd">docker run -d --name recorte \
+  --restart unless-stopped \
+  -p 8080:8080 -v recorte:/data \
+  ghcr.io/qwickin/recorte</code></pre>
+        <button class="copy" type="button" data-copy="cmd" aria-label="Copy command">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+          <span data-label>Copy</span>
+        </button>
+      </div>
+      <p class="install-next">Then open <code>http://&lt;server-ip&gt;:8080</code> within 15 minutes and follow the wizard. HTTPS with your own domain, backups and updates are covered in the <a href="https://github.com/qwickin/recorte#readme">README</a>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-brand">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v15h15M2 7h15v15"/></svg>
+      <span>Recorte</span>
+    </div>
+    <nav class="foot-links" aria-label="Elsewhere">
+      <a href="https://github.com/qwickin/recorte">GitHub</a>
+      <a href="https://x.com/qwickin">X @qwickin</a>
+      <a href="https://github.com/qwickin/recorte/blob/main/LICENSE">MIT License</a>
+    </nav>
+    <p class="foot-note">© 2026 qwickin. Your captures never leave your server unless you turn on cloud AI.</p>
+  </footer>
+
+  <script src="main.js" defer></script>
+</body>
+</html>
