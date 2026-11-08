@@ -1,0 +1,1567 @@
+[
+ {
+  "id": "ff-surfaces",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "area",
+  "source": {
+   "url": "https://www.fluidfunctionalism.com/docs/surfaces",
+   "site": "fluidfunctionalism.com",
+   "pageTitle": "Surfaces · Fluid Functionalism"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Preview\nCode\nInspect\nM\nInvite to your workspace\nEmail\nSelect role\nMember\nWorkspace owner\nCan change workspace settings and invite new members\nMember\nCan't change workspace settings or invite new members\nRestricted member\nCan only see and edit content they created\nCancel\nSend invites\nDialog\n#333333\nRole dropdown\n#414141",
+   "meta": {
+    "description": "Eight-level surface and shadow ladder for elevation in light and dark mode.",
+    "og": {
+     "og:title": "Surfaces · Fluid Functionalism",
+     "og:description": "Eight-level surface and shadow ladder for elevation in light and dark mode.",
+     "og:url": "https://www.fluidfunctionalism.com/docs/surfaces",
+     "og:image": "https://www.fluidfunctionalism.com/metadata/og.png",
+     "og:image:width": "2400",
+     "og:image:height": "1260",
+     "og:video": "https://www.fluidfunctionalism.com/metadata/og.mp4",
+     "og:video:secure_url": "https://www.fluidfunctionalism.com/metadata/og.mp4",
+     "og:video:width": "1200",
+     "og:video:height": "630",
+     "og:video:type": "video/mp4"
+    }
+   },
+   "headings": [
+    "Surfaces",
+    "Installation",
+    "The problem",
+    "The solution",
+    "Tokens",
+    "Substrate",
+    "Elevated",
+    "Move through levels",
+    "Examples",
+    "Invite dialog",
+    "Color picker",
+    "Make them yours"
+   ],
+   "alts": [],
+   "page": {
+    "text": "In light mode, we use shadow behind white surfaces to signify elevation. In dark mode, we use progressively lighter backgrounds instead.\nBut traditional components have a fixed background — a dropdown often ends up the same color as the dialog it sits in. That makes your interface look like this:",
+    "nearHeadings": [
+     "Make them yours"
+    ]
+   }
+  },
+  "image": "img/ff-surfaces.webp"
+ },
+ {
+  "id": "gh-readability",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "area",
+  "source": {
+   "url": "https://github.com/mozilla/readability",
+   "site": "github.com",
+   "pageTitle": "GitHub - mozilla/readability: A standalone version of the readability lib · GitHub"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Readability.js\nA standalone version of the readability library used for Firefox Reader View .\nInstallation\nReadability is available on npm:\nnpm install @mozilla/readability\nYou can then require() it, or for web-based projects, load the Readability.js script from your webpage.\nBasic usage\nTo parse a document, you must create a new Readability object from a DOM document object, and then call the parse() method. Here's an example:\nvar article = new Readability ( document ) . parse ( ) ;\nIf you use Readability in a web browser, you will likely be able to use a document reference from elsewhere (e.g. fetched via XMLHttpRequest, in a same-origin <iframe> you have access to, etc.). In Node.js, you can use an external DOM library .\nAPI Reference\nnew Readability(document, options)\nThe options object accepts a number of properties, all optional:\ndebug (boolean, default false ): whether to enable logging.\nmaxElemsToParse (number, default 0 i.e. no limit): the maximum number of elements to parse.\nnbTopCandidates (number, default 5 ): the number of top candidates to consider when analysing how tight the competition is among candidates.\ncharThreshold (number, default 500 ): the number of characters an article must have in order to return a result.\nclassesToPreserve (array): a set of classes to preserve on HTML elements when the keepClasses options is set to false .",
+   "meta": {
+    "description": "A standalone version of the readability lib. Contribute to mozilla/readability development by creating an account on GitHub.",
+    "og": {
+     "og:image": "https://opengraph.githubassets.com/2570d794e3ca9cc454e8b177c04f1859629553dd2348038b78a29f78e138bbed/mozilla/readability",
+     "og:image:alt": "A standalone version of the readability lib. Contribute to mozilla/readability development by creating an account on GitHub.",
+     "og:image:width": "1200",
+     "og:image:height": "600",
+     "og:site_name": "GitHub",
+     "og:type": "object",
+     "og:title": "GitHub - mozilla/readability: A standalone version of the readability lib",
+     "og:url": "https://github.com/mozilla/readability",
+     "og:description": "A standalone version of the readability lib. Contribute to mozilla/readability development by creating an account on GitHub."
+    }
+   },
+   "headings": [
+    "Navigation Menu",
+    "Repository navigation",
+    "About",
+    "Resources",
+    "Code of conduct",
+    "Contributing",
+    "Security policy",
+    "Stars",
+    "Watchers",
+    "Forks",
+    "Latest commit",
+    "History",
+    "Folders and files",
+    "Repository files navigation",
+    "Readability.js",
+    "Installation",
+    "Basic usage",
+    "API Reference",
+    "new Readability(document, options)",
+    "parse()",
+    "isProbablyReaderable(document, options)",
+    "Node.js usage",
+    "Security",
+    "License",
+    "Releases",
+    "Used by14K (14K)",
+    "Contributors90 (90)",
+    "Languages",
+    "Footer",
+    "Footer navigation"
+   ],
+   "alts": [],
+   "page": {
+    "text": "A standalone version of the readability library used for Firefox Reader View.\nInstallation\nReadability is available on npm:\nnpm install @mozilla/readability\nYou can then require() it, or for web-based projects, load the Readability.js script from your webpage.\nBasic usage\nTo parse a document, you must create a new Readability object from a DOM document object, and then call the parse() method. Here's an example:\nvar article = new Readability(document).parse();\nIf you use Readability in a web browser, you will likely be able to use a document reference from elsewhere (e.g. fetched via XMLHttpRequest, in a same-origin <iframe> you have access to, etc.). In Node.js, you can use an external DOM library.\nAPI Reference\nnew Readability(document, options)\nThe options object accepts a number of properties, all optional:\ndebug (boolean, default false): whether to enable logging.\nmaxElemsToParse (number, default 0 i.e. no limit): the maximum number of elements to parse.\nnbTopCandidates (number, default 5): the number of top candidates to consider when analysing how tight the competition is among candidates.\ncharThreshold (number, default 500): the number of characters an article must have in order to return a result.\nclassesToPreserve (array): a set of classes to preserve on HTML elements when the keepClasses options is set to false.\nkeepClasses (boolean, default false): whether to preserve all classes on HTML elements. When set to false only classes specified in the classesToPreserve array are kept.\ndisableJSONLD (boolean, default false): when extracting page metadata, Readability gives precedence to Schema.org fields specified in the JSON-LD format. Set this option to true to skip JSON-LD parsing.\nserializer (function, default el => el.innerHTML) controls how the content property returned by the parse() method is produced from the root DOM element. It may be useful to specify the serializer as the identity function (el => el) to obtain a DOM element instead of a string for content if you plan to process it further.\nallowedVideoRegex (RegExp, default undefined ): a regular expression that matches video URLs that should be allowed to be included in the article content. If undefined, the default regex is applied.\nlinkDensityModifier (number, default 0): a number that is added to the base link density threshold during the shadiness checks. This can be used to penalize nodes with a high link density or vice versa.\nparse()\nReturns an object containing the following properties:\ntitle: article title;\ncontent: HTML string of processed article content;\ntextContent: text content of the article, with all the HTML tags removed;\nlength: length of an article, in characters;\nexcerpt: article description, or short excerpt from the content;\nbyline: author metadata;\ndir: content direction;\nsiteName: name of the site;\nlang: content language;\npublishedTime: published time;\nThe parse() method works by modifying the DOM. This removes some elements in the web page, which may be undesirable. You can avoid this by passing the clone of the document object to the Readability constructor:\nvar documentClone = document.cloneNode(true);\nvar article = new Readability(documentClone).parse();\nisProbablyReaderable(document, options)\nA quick-and-dirty way of figuring out if it's plausible that the contents of a given document are suitable for processing with Readability. It is likely to produce both false positives and false negatives. The reason it exists is to avoid bogging down a time-sensitive process (like loading and showing the user a webpage) with the complex logic in the core of Readability. Improvements to its logic (while not deteriorating its performance) are very welcome.\nThe options object accepts a number of properties, all optional:\nminContentLength (number, default 140): the minimum node content length used to decide if the document is readerable;\nminScore (number, default 20): the minimum cumulated 'score' used to determine if the document is readerable;\nvisibilityChecker (function, default isNodeVisible): the function used to determine if a node is visible;\nThe function returns a boolean corresponding to whether or not we suspect Readability.parse() will succeed at returning an article object. Here's an example:\n/*\nOnly instantiate Readability if we suspect\nthe `parse()` method will produce a meaningful result.\n*/\nif (isProbablyReaderable(document)) {\nlet article = new Readability(document).parse();\n}\nNode.js usage\nSince Node.js does not come with its own DOM implementation, we rely on external libraries like jsdom. Here's an example using jsdom to obtain a DOM document object:\nvar { Readability } = require('@mozilla/readability');\nvar { JSDOM } = require('jsdom');\nvar doc = new JSDOM(\"<body>Look at this cat: <img src='./cat.jpg'></body>\", {\nurl: \"https://www.example.com/the-page-i-got-the-source-from\"\n});\nlet reader = new Readability(doc.window.document);\nlet article = reader.parse();\nRemember to pass the page's URI as the url option in the JSDOM constructor (as shown in the example above), so that Readability can convert relative URLs for images, hyperlinks, etc. to their absolute counterparts.\njsdom has the ability to run the scripts included in the HTML and fetch remote resources. For security reasons these are disabled by default, and we strongly recommend you keep them that way.\nSecurity\nIf you're going to use Readability with untrusted input (whether in HTML or DOM form), we strongly recommend you use a sanitizer library like DOMPurify to avoid script injection when you use\nthe output of Readability. We would also recommend using CSP to add further defense-in-depth\nrestrictions to what you allow the resulting content to do. The Firefox integration of\nreader mode uses both of these techniques itself. Sanitizing unsafe content out of the input is explicitly not something we aim to do as part of Readability itself - there are other good sanitizer libraries out there, use them!\nContributing\nPlease see our Contributing document.\nLicense\nCopyright (c) 2010 Arc90 Inc\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\nhttp://www.apache.org/licenses/LICENSE-2.0\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.",
+    "nearHeadings": [
+     "Readability.js",
+     "Installation",
+     "Basic usage",
+     "API Reference",
+     "new Readability(document, options)",
+     "Languages"
+    ]
+   }
+  },
+  "image": "img/gh-readability.webp"
+ },
+ {
+  "id": "mdn-flexbox",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Flexible_box_layout/Basic_concepts",
+   "site": "developer.mozilla.org",
+   "pageTitle": "Basic concepts of flexbox - CSS | MDN"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "HTML\nCSS\nJavaScript\nWeb APIs\nAll\nLearn\nTools\nAbout\nBlog\nWeb\nCSS\nGuides\nFlexible box layout\nBasic concepts\nBasic concepts of flexbox\nThe flexible box layout module (usually referred to as flexbox) is a one-dimensional layout model for distributing space between items and includes numerous alignment capabilities. This article gives an outline of the main features of flexbox, which we will explore in more detail in the rest of these guides.\nWhen we describe flexbox as being one-dimensional we are describing the fact that flexbox deals with layout in one dimension at a time — either as a row or as a column. This can be contrasted with the two-dimensional model of CSS Grid Layout , which controls columns and rows together.\nIn this article\nThe two axes of flexbox\nStart and end lines\nThe flex container\nMulti-line flex containers with flex-wrap\nThe flex-flow shorthand\nProperties applied to flex items\nAlignment, justification and distribution of free space between items\nNext steps\nThe two axes of flexbox\nWhen working with flexbox you need to think in terms of two axes — the main axis and the cross axis . The main axis is defined by the flex-direction property, and the cross axis runs perpendicular to it. Everything we do with flexbox refers back to these axes, so it is worth understanding how they work from the outset.\nThe main axis\nThe main axis is defined by flex-direction , which has four possible values:\nrow\nrow-reverse\ncolumn\ncolumn-reverse\nShould you choose row or row-reverse , your main axis will run along the row in the inline direction .\nCascading and inheritance\nColor adjustment\nColors\nCompositing and blending\nConditional rules\nContainment\nCounter styles\nCSSOM view\nCustom functions and mixins\nCustom highlight API\nCustom properties for cascading variables\nDisplay\nEasing functions\nEnvironment variables\nFilter effects\nFlexible box layout\nFont loading\nFonts\nFragmentation\nGaps\nGenerated content\nGrid layout\nImages\nInline layout\nIn multi-column layout\nInheritance\nSpecificity\nProperty value processing\nShorthand properties\nCascading variables\nUsing custom properties\nColors\nApplying color\nColor values\nUsing relative colors\nUsing color wisely\nAccessibility: Colors and luminance\nAccessibility: Color contrast\nColumns\nBasic concepts\nStyling columns\nUsing multi-column layouts\nSpanning and balancing columns\nHandling overflow\nHandling content breaks\nConditional rules\nUsing feature queries\nUsing container scroll-state queries\nContainment\nContainer queries\nUsing containment\nUsing container size and style queries\nCounters\nUsing counters\nCSSOM view\nCoordinate systems (API)\nViewport concepts\nCustom functions and mixins\nUsing CSS custom functions\nDisplay\nBlock and inline layout\nFlow layout\nFlow layout and overflow\nFlow layout and writing modes\nIn flow and out of flow\nLayout and the containing block\nFormatting contexts\nBlock formatting context\nInline formatting context\nUsing multi-keyword syntax\nVisual formatting model\nEnvironment variables\nUsing environment variables\nFilter effects\nUsing filter effects\nFlexbox\nBasic concepts\nFlexbox and other layouts\nAligning flex items\nOrdering flex items\nControlling flex item ratios\nWrapping flex items\nTypical use cases\nFonts\nOpenType features\nVariable fonts\nWOFF\nGrid\nBasic concepts\nGrid and other layouts\nUsing line-based placement\nGrid template areas\nUsing named grid lines\nImages\nUsing gradients\nUsing object-view-box\nStyling replaced elements\nImplementing image sprites\nLists\nIndenting lists\nLogical properties\nBasic concepts\nFor floating and positioning\nMasking\nIntroduction\nMedia queries",
+   "meta": {
+    "description": "The flexible box layout module (usually referred to as flexbox) is a one-dimensional layout model for distributing space between items and includes numerous alignment capabilities. This article gives an outline of the main features of flexbox, which we will explore in more detail in the rest of these guides."
+   },
+   "headings": [
+    "Basic concepts of flexbox",
+    "In this article",
+    "The two axes of flexbox",
+    "The main axis",
+    "The cross axis",
+    "Start and end lines",
+    "The flex container",
+    "Initial values",
+    "Changing flex-direction",
+    "Multi-line flex containers with flex-wrap",
+    "The flex-flow shorthand",
+    "Properties applied to flex items",
+    "The flex-basis property",
+    "The flex-grow property",
+    "The flex-shrink property",
+    "Shorthand values for the flex properties",
+    "Alignment, justification and distribution of free space between items",
+    "align-items",
+    "justify-content",
+    "justify-items",
+    "place-items and place-content",
+    "Next steps",
+    "Help improve MDN"
+   ],
+   "alts": [],
+   "page": {
+    "text": "The two axes of flexbox\nWhen working with flexbox you need to think in terms of two axes — the main axis and the cross axis. The main axis is defined by the flex-direction property, and the cross axis runs perpendicular to it. Everything we do with flexbox refers back to these axes, so it is worth understanding how they work from the outset.\nThe main axis\nThe main axis is defined by flex-direction, which has four possible values:\nrow\nrow-reverse\ncolumn\ncolumn-reverse\nShould you choose row or row-reverse, your main axis will run along the row in the inline direction.\nChoose column or column-reverse and your main axis will run in the block direction, from the top of the page to the bottom.\nThe cross axis\nThe cross axis runs perpendicular to the main axis. Therefore, if your flex-direction (main axis) is set to row or row-reverse the cross axis runs down the columns.\nIf your main axis is column or column-reverse then the cross axis runs along the rows.\nStart and end lines\nAnother vital area of understanding is how flexbox makes no assumption about the writing mode of the document. Flexbox doesn't just assume that all lines of text start at the top left of a document and run towards the right-hand side, with new lines appearing one under the other. Rather, it supports all writing modes, like other logical properties and values.\nYou can read more about the relationship between flexbox and writing modes in a later article; however, the following description should help explain why we do not talk about left and right and top and bottom when we describe the direction that our flex items flow in.\nIf the flex-direction is row and I am working in English, then the start edge of the main axis will be on the left, the end edge on the right.\nIf I were to work in Arabic, then the start edge of my main axis would be on the right and the end edge on the left.\nIn both cases the start edge of the cross-axis is at the top of the flex container and the end edge at the bottom, as both languages have a horizontal writing mode.\nAfter a while, thinking about start and end rather than left and right becomes natural, and will be useful to you when dealing with other layout methods such as CSS Grid Layout which follow the same patterns.\nThe flex container\nAn area of a document that is laid out using flexbox is called a flex container. To create a flex container, set the area's display property to flex. When we do this, the direct children of that container become flex items. You can explicitly control whether the container itself is displayed inline or in block formatting context using inline flex or inline-flex for inline flex containers or block flex or flex for block level flex containers.\nInitial values\nAs with all properties in CSS, some initial values are defined, so the contents of a new flex container will behave in the following way:\nItems display in a row (the flex-direction property's default value is row).\nThe items start from the start edge of the main axis.\nThe items do not stretch on the main dimension but can shrink (a flex-item's flex-grow property's default value is 0 and its flex-shrink property's default value is 1).\nThe items will stretch to fill the size of the cross-axis (the align-items property's default value is stretch).\nThe flex-item's flex-basis property's default value is auto. This means that, in each case, it will be equal to the flex item width in horizontal writing mode, and the flex item height in vertical writing mode. If the corresponding width/height is also set to auto, the flex-basis content value is used instead.\nAll the items will be in a single row (the flex-wrap property's default value is nowrap), overflowing their container if their combined width/height exceeds the containing element width/height.\nThe result of this is that your items will all line up in a row, using the size of the content as their size in the main axis. If there are more items than can fit in the container, they will not wrap but will instead overflow. If some items are taller than others, all items will stretch along the full length of the cross-axis.\nYou can see in the live sample below how this looks. Click \"Play\" to open the example in the MDN Playground and edit the items or add new items to try out the initial behavior of flexbox:\nChanging flex-direction\nAdding the flex-direction property to the flex container allows us to change the direction in which our flex items display. Setting flex-direction: row-reverse will keep the items displaying along the row, however the start and end lines are switched.\nIf we change flex-direction to column the main axis switches and our items now display in a column. Set column-reverse and the start and end lines are again switched.\nThe live sample below has flex-direction set to row-reverse. Try the other values — row, column and column-reverse — to see what happens to the content.\nMulti-line flex containers with flex-wrap\nWhile flexbox is a one dimensional model, it is possible to make flex items wrap across multiple lines. If you do this, you should consider each line as a new flex container. Any space distribution will happen across each line, without reference to the previous or subsequent lines.\nTo cause wrapping behavior add the property flex-wrap with a value of wrap. Now, if your items are too large to all display in one line, they will wrap onto another line. The live sample below contains items that have been given a width. The total width of the items is too wide for the flex container. As flex-wrap is set to wrap, the items wrap across multiple lines. If you set it to nowrap, which is the initial value, they will shrink to fit the container. They shrink because they are using initial flexbox values, including flex-shrink: 1, that allows items to shrink. Using nowrap would cause an overflow if the items were not able to shrink, or could not shrink small enough to fit.\nFind out more about wrapping flex items in the guide Mastering wrapping of flex items.\nThe flex-flow shorthand\nYou can combine the two properties flex-direction and flex-wrap into the flex-flow shorthand.\nIn the live sample below, try changing the first value to one of the allowable values for flex-direction - row, row-reverse, column or column-reverse, and also change the second to wrap and nowrap.\nProperties applied to flex items\nTo control the inline-size of each flex item, we target them directly via three properties:\nflex-grow\nflex-shrink\nflex-basis\nWe will take a brief look at these properties below, but if you want more comprehensive information, take a look at the Controlling ratios of flex items on the main axis guide.\nBefore we can make sense of these properties we need to consider the concept of available space. What we are doing when we change the value of these flex properties is to change the way that available space is distributed among our items. This concept of available space is also important when we come to look at aligning items.\nIf we have three 100 pixel-wide items in a container which is 500 pixels wide, then the space we need to lay out our items is 300 pixels. This leaves 200 pixels of available space. If we don't change the initial values then flexbox will put that space after the last item.\nIf we instead would like the items to grow and fill the space, then we need to have a method of distributing the leftover space between the items. The flex properties that we apply to the items themselves, enable dictating how that available space should be distributed among the sibling flex items.\nThe flex-basis property\nThe flex-basis is what defines the size of that item in terms of the space it leaves as available space. The initial value of this property is auto — in this case the browser looks to see if the item has a size. In the example above, all of the items have a width of 100 pixels. This is used as the flex-basis.\nIf the items don't have a size then the content's size is used as the flex-basis. This is why when we just declare display: flex on the parent to create flex items, the items all move into a row and take only as much space as they need to display their contents.\nThe flex-grow property\nWith the flex-grow property set to a positive integer, if there is available space, the flex item can grow along the main axis from its flex-basis. Whether the item stretches to take up all the available space on that axis, or just a portion of the available space depends on if the other items are allowed to grow too and the value of their flex-grow properties.\nEach item with a positive value consumes a portion of any available space based on their flex-grow value. If we gave all of our items in the example above a flex-grow value of 1 then the available space in the flex container would be equally shared between our items and they would stretch to fill the container on the main axis. If we give our first item a flex-grow value of 2, and the other items a value of 1 each, there are a total of 4 parts; 2 parts of the available space will be given to the first item (100px out of 200px in the case of the example above) and 1 part each the other two (50px each out of the 200px total).\nThe flex-shrink property\nWhere the flex-grow property deals with adding space in the main axis, the flex-shrink property controls how it is taken away. If we do not have enough space in the container to lay out our items, and flex-shrink is set to a positive integer, then the item can become smaller than the flex-basis. As with flex-grow, different values can be assigned in order to cause one item to shrink faster than others — an item with a higher value set for flex-shrink will shrink faster than its siblings that have lower values.\nAn item can shrink down to its min-content size. This minimum size is taken into account while working out the actual amount of shrinkage that will happen, which means that flex-shrink has the potential to appear less consistent than flex-grow in behavior. We'll therefore take a more detailed look at how this algorithm works in the article Controlling ratios of items along the main axis.\nNote:\nThese values for flex-grow and flex-shrink are proportions. Typically if we had all of our items set to flex: 1 1 200px and then wanted one item to grow at twice the rate, we would set that item to flex: 2 1 200px. However you could also use flex: 10 1 200px and flex: 20 1 200px if you wanted.\nShorthand values for the flex properties\nYou will very rarely see the flex-grow, flex-shrink, and flex-basis properties used individually; instead they are combined into the flex shorthand. The flex shorthand allows you to set the three values in this order — flex-grow, flex-shrink, flex-basis.\nThe live sample below allows you to test out the different values of the flex shorthand; remember that the first value is flex-grow. Giving this a positive value means the item can grow. The second is flex-shrink — with a positive value the items can shrink, but only if their total values overflow the main axis. The final value is flex-basis; this is the value the items are using as their base value to grow and shrink from.\nThere are also some predefined shorthand values which cover most of the use cases. You will often see these used in tutorials, and in many cases these are all you will need to use. The predefined values are as follows:\nflex: initial\nflex: auto\nflex: none\nflex: <positive-number>\nThe initial value is a CSS-wide keyword that represents the initial value for a property. Setting flex: initial resets the item to the initial values of the three longhand properties, which is the same as flex: 0 1 auto. The initial value of flex-grow is 0, so items will not grow larger than their flex-basis size. The initial value of flex-shrink is 1, so items can shrink if they need to rather than overflowing. The initial value of flex-basis is auto. Items will either use any size set on the item in the main dimension, or they will get their size from the content size.\nUsing flex: auto is the same as using flex: 1 1 auto; this is similar to flex: initial, except that the items can grow and fill the container as well as shrink if needed.\nUsing flex: none will create fully inflexible flex items. It is as if you wrote flex: 0 0 auto. The items cannot grow or shrink and will be laid out using flexbox with a flex-basis of auto.\nThe shorthand you often see in tutorials is flex: 1 or flex: 2 and so on. This is the same as writing flex: 1 1 0 or flex: 2 1 0 and so on, respectively. The items get minimum size due to flex-basis: 0 and then proportionally grow to fill the available space. In this case, the flex-shrink value of 1 is redundant because the items start with minimum size — they're not given any size that could cause them to overflow the flex container.\nTry these shorthand values in the live sample below.\nAlignment, justification and distribution of free space between items\nA key feature of flexbox is the ability to align and justify items on the main- and cross-axes, and to distribute space between flex items. Note that these properties are set on the flex container, not on the items themselves.\nalign-items\nThe align-items property aligns all the flex items on the cross axis.\nThe initial value for this property is stretch and is why flex items stretch to the height of the flex container by default (or the width if flex-direction is set to column or column-reverse). This height may come from the tallest item in the container or the size set on the flex container itself.\nYou could instead set align-items to flex-start, or simply start, in order to make the items line up at the start of the flex container, flex-end, or just end, to align them to the end, or center to align them in the center. Try this in the live sample — I have given the flex container a height in order that you can see how the items can be moved around inside the container. See what happens if you set the value of align-items to:\nstretch\nflex-start\nflex-end\nstart\nend\ncenter\nbaseline\nlast baseline\nThe align-items is set on the flex container and impacts all the flex items. If you want to align a flex item differently from others, you can set the align-self on the flex item.\njustify-content\nThe justify-content property is used to align the items on the main axis, the direction in which flex-direction has set the flow. The initial value is flex-start which will line the items up at the start edge of the container, but you could also set the value to flex-end to line them up at the end, or center to line them up in the center.\nYou can also use the value space-between to take all the spare space after the items have been laid out, and share it out evenly between the items so there will be an equal amount of space between each item. To cause an equal amount of space on the right and left (or top and bottom for columns) of each item use the value space-around. With space-around, items have a half-size space on either end. Or, to cause items to have equal space around them use the value space-evenly. With space-evenly, items have a full-size space on either end.\nTry the following values of justify-content in the live sample:\nstart\nend\nleft\nright\nnormal\nflex-start\nflex-end\ncenter\nspace-around\nspace-between\nspace-evenly\nstretch\nThe article Aligning items in a flex container explores these properties in more depth, in order to have a better understanding of how they work. These basic examples, however, are useful in the majority of use cases.\njustify-items\nThe justify-items property is ignored in flexbox layouts.\nplace-items and place-content\nThe place-items property is a shorthand property for align-items and justify-items. If set on a flex container, it will set the alignment but not the justification, as justify-items is ignored in flexbox.\nThere is another shorthand property, place-content, that defines the align-content and justify-content properties. The align-content property only affects flex containers that wrap, and is discussed in Aligning items in a flex container.\nNext steps\nAfter reading this article you should have an understanding of the basic features of flexbox. In the next article, we will look at how this specification relates to other parts of CSS.",
+    "nearHeadings": [
+     "Basic concepts of flexbox",
+     "In this article",
+     "The two axes of flexbox",
+     "The main axis"
+    ]
+   }
+  },
+  "image": "img/mdn-flexbox.webp"
+ },
+ {
+  "id": "tailwind-docs",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://tailwindcss.com/docs/flex-direction",
+   "site": "tailwindcss.com",
+   "pageTitle": "flex-direction - Flexbox & Grid - Tailwind CSS"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "v 4.3\n⌘K\nDocs\nPlay\nBlog\nShowcase\nPartners\nPlus\nbox-sizing\ndisplay\nfloat\nclear\nisolation\nobject-fit\nobject-position\noverflow\noverscroll-behavior\nposition\ntop / right / bottom / left\nvisibility\nz-index\nFlexbox & Grid\nflex-basis\nflex-direction\nflex-wrap\nflex\nflex-grow\nflex-shrink\norder\ngrid-template-columns\ngrid-column\ngrid-template-rows\ngrid-row\ngrid-auto-flow\ngrid-auto-columns\ngrid-auto-rows\ngap\njustify-content\nFlexbox & Grid\nflex-direction\nUtilities for controlling the direction of flex items.\nClass\nStyles\nflex-row\nflex-direction: row;\nflex-row-reverse\nflex-direction: row-reverse;\nflex-col\nflex-direction: column;\nflex-col-reverse\nflex-direction: column-reverse;\nExamples\nRow\nUse flex-row to position flex items horizontally in the same direction as text:\n01\n02\n03\n< div class = \"flex flex-row ...\" >\n< div > 01 </ div >\n< div > 02 </ div >\n< div > 03 </ div >\n</ div >\nOn this page\nQuick reference\nExamples\nRow\nRow reversed\nColumn\nColumn reversed\nResponsive design\nFrom the creators of Tailwind CSS\nMake your ideas look awesome, without relying on a designer.\n“This is the survival kit I wish I had when I started building apps.”\nDerrick Reimer, SavvyCal",
+   "meta": {
+    "description": "Utilities for controlling the direction of flex items.",
+    "og": {
+     "og:title": "flex-direction - Flexbox & Grid",
+     "og:description": "Utilities for controlling the direction of flex items.",
+     "og:url": "https://tailwindcss.com/docs/flex-direction",
+     "og:image": "https://tailwindcss.com/api/og?path=/docs/flex-direction",
+     "og:type": "article"
+    }
+   },
+   "headings": [
+    "Getting started",
+    "Core concepts",
+    "Base styles",
+    "Layout",
+    "Flexbox & Grid",
+    "Spacing",
+    "Sizing",
+    "Typography",
+    "Backgrounds",
+    "Borders",
+    "Effects",
+    "Filters",
+    "Tables",
+    "Transitions & Animation",
+    "Transforms",
+    "Interactivity",
+    "SVG",
+    "Accessibility",
+    "flex-direction",
+    "Examples",
+    "Row",
+    "Row reversed",
+    "Column",
+    "Column reversed",
+    "Responsive design",
+    "On this page",
+    "Tailwind CSS",
+    "Resources",
+    "Community"
+   ],
+   "alts": [
+    "Refactoring UI"
+   ],
+   "page": {
+    "text": "Utilities for controlling the direction of flex items.\nClassStyles\nflex-row\nflex-direction: row;\nflex-row-reverse\nflex-direction: row-reverse;\nflex-col\nflex-direction: column;\nflex-col-reverse\nflex-direction: column-reverse;\nExamples\nRow\nUse flex-row to position flex items horizontally in the same direction as text:\n01\n02\n03\n<div class=\"flex flex-row ...\"> <div>01</div> <div>02</div> <div>03</div></div>\nRow reversed\nUse flex-row-reverse to position flex items horizontally in the opposite direction:\n01\n02\n03\n<div class=\"flex flex-row-reverse ...\"> <div>01</div> <div>02</div> <div>03</div></div>\nColumn\nUse flex-col to position flex items vertically:\n01\n02\n03\n<div class=\"flex flex-col ...\"> <div>01</div> <div>02</div> <div>03</div></div>\nColumn reversed\nUse flex-col-reverse to position flex items vertically in the opposite direction:\n01\n02\n03\n<div class=\"flex flex-col-reverse ...\"> <div>01</div> <div>02</div> <div>03</div></div>\nResponsive design\nPrefix a flex-direction utility with a breakpoint variant like md: to only apply the utility at medium screen sizes and above:\n<div class=\"flex flex-col md:flex-row ...\"> <!-- ... --></div>\nLearn more about using variants in the variants documentation.",
+    "nearHeadings": [
+     "Flexbox & Grid",
+     "flex-direction",
+     "Examples",
+     "Row",
+     "On this page",
+     "Layout"
+    ]
+   }
+  },
+  "image": "img/tailwind-docs.webp"
+ },
+ {
+  "id": "shadcn-combobox",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://ui.shadcn.com/docs/components/base/combobox",
+   "site": "ui.shadcn.com",
+   "pageTitle": "Combobox - shadcn/ui"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Home\nDocs\nComponents\nBlocks\nCharts\nDirectory\nTypeset\nCreate\nSearch documentation...\n128k\nToggle theme\nNew\nAspect Ratio\nAttachment\nAvatar\nBadge\nBreadcrumb\nBubble\nButton\nButton Group\nCalendar\nCard\nCarousel\nChart\nCheckbox\nCode Block\nCollapsible\nCombobox\nCommand\nContext Menu\nData Table\nDate Picker\nDialog\nDirection\nDrawer\nDropdown Menu\nEmpty\nField\nHover Card\nInput\nInput Group\nInput OTP\nItem\nKbd\nCombobox\nCopy Page\nPrevious\nNext\nAutocomplete input with a list of suggestions.\nBase UI\nReact Aria\nRadix UI\n\"use client\"\nimport {\nView Code\nInstallation #\nCommand\nManual\npnpm\nnpm\nyarn\nbun\npnpm dlx shadcn@latest add combobox\nCopy\nUsage #\nOn This Page\nInstallation\nUsage\nComposition\nSimple\nWith chips\nWith groups and collection\nCustom Items\nMultiple Selection\nBasic\nMultiple\nClear Button\nGroups\nCustom Items\nInvalid\nDisabled\nAuto Highlight\nPopup\nInput Group\nRTL\nAPI Reference\nDeploy your shadcn/ui app on Vercel\nTrusted by OpenAI, Sonos, Adobe, and more.\nVercel provides tools and infrastructure to deploy apps and features at scale.\nDeploy Now\nDeploy to Vercel",
+   "meta": {
+    "description": "Autocomplete input with a list of suggestions.",
+    "og": {
+     "og:title": "Combobox",
+     "og:description": "Autocomplete input with a list of suggestions.",
+     "og:url": "https://ui.shadcn.com/docs/components/base/combobox",
+     "og:image": "https://ui.shadcn.com/og?title=Combobox&description=Autocomplete%20input%20with%20a%20list%20of%20suggestions.",
+     "og:type": "article"
+    }
+   },
+   "headings": [
+    "Combobox",
+    "Installation#",
+    "Usage#",
+    "Composition#",
+    "Simple#",
+    "With chips#",
+    "With groups and collection#",
+    "Custom Items#",
+    "Multiple Selection#",
+    "Basic#",
+    "Multiple#",
+    "Clear Button#",
+    "Groups#",
+    "Invalid#",
+    "Disabled#",
+    "Auto Highlight#",
+    "Popup#",
+    "Input Group#",
+    "RTL#",
+    "API Reference#"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Introduction\nComponents\nAI Elements\nInstallation\nTheming\nCLI\nTypeset\nSkills\nRegistry\nChangelog\nAccordion\nAlert\nAlert Dialog\nAspect Ratio\nAttachment\nAvatar\nBadge\nBreadcrumb\nBubble\nButton\nButton Group\nCalendar\nCard\nCarousel\nChart\nCheckbox\nCode Block\nCollapsible\nCombobox\nCommand\nContext Menu\nData Table\nDate Picker\nDialog\nDirection\nDrawer\nDropdown Menu\nEmpty\nField\nHover Card\nInput\nInput Group\nInput OTP\nItem\nKbd\nLabel\nMarker\nMenubar\nMessage\nMessage Scroller\nNative Select\nNavigation Menu\nPagination\nPopover\nProgress\nQuestionnaire\nRadio Group\nResizable\nScroll Area\nSelect\nSeparator\nSheet\nSidebar\nSkeleton\nSlider\nSpinner\nSwitch\nTable\nTabs\nTextarea\nToast\nToggle\nToggle Group\nTooltip\nTrace\nTypography\nIntroduction\nChain of Thought\nChat\nCheckpoint\nConfirmation\nContext\nFile Tree\nInline Citation\nMessage\nModel Selector\nPlan\nPrompt Input\nQueue\nReasoning\nSources\nStack Trace\nSubagent\nSuggestion\nTask\nTerminal\nTest Results\nTool\nInstallation\ncomponents.json\nPackage Imports\nTheming\nTypeset\nDark Mode\nCLI\nMonorepo\nSkills\nJavaScript\nFigma\nllms.txt\nLegacy Docs\nMessage Scroller\nQuestionnaire\nAI SDK\nTanStack AI\nReact Hook Form\nTanStack Form\nFormisch\nscroll-fade\nshimmer\nIntroduction\nGetting Started\nGitHub Registries\nRegistry Directory\nRegistry Health\nExamples\nNamespaces\nAuthentication\nDynamic Search\nMCP Server\nOpen in v0\nFAQ\nAPI Reference\nregistry.json\nregistry-item.json\nAutocomplete input with a list of suggestions.\n\"use client\"\nimport {\nInstallation#\npnpm dlx shadcn@latest add combobox\nUsage#\nimport {\nCombobox,\nComboboxContent,\nComboboxEmpty,\nComboboxInput,\nComboboxItem,\nComboboxList,\n} from \"@/components/ui/combobox\"\nconst frameworks = [\"Next.js\", \"SvelteKit\", \"Nuxt.js\", \"Remix\", \"Astro\"]\nexport function ExampleCombobox() {\nreturn (\n<Combobox items={frameworks}>\n<ComboboxInput placeholder=\"Select a framework\" />\n<ComboboxContent>\n<ComboboxEmpty>No items found.</ComboboxEmpty>\n<ComboboxList>\n{(item) => (\n<ComboboxItem key={item} value={item}>\n{item}\n</ComboboxItem>\n)}\n</ComboboxList>\n</ComboboxContent>\n</Combobox>\n)\n}\nComposition#\nSimple#\nA single-line input and a flat list (see Basic).\nCombobox\n├── ComboboxInput\n└── ComboboxContent\n├── ComboboxEmpty\n└── ComboboxList\n├── ComboboxItem\n└── ComboboxItem\nWith chips#\nMulti-select with multiple, chips, and a chips input (see Multiple).\nCombobox\n├── ComboboxChips\n│ ├── ComboboxValue\n│ │ └── ComboboxChip\n│ └── ComboboxChipsInput\n└── ComboboxContent\n├── ComboboxEmpty\n└── ComboboxList\n├── ComboboxItem\n└── ComboboxItem\nWith groups and collection#\nNested items per group using ComboboxCollection inside each ComboboxGroup, with a separator between groups (see Groups).\nCombobox\n├── ComboboxInput\n└── ComboboxContent\n├── ComboboxEmpty\n└── ComboboxList\n├── ComboboxGroup\n│ ├── ComboboxLabel\n│ └── ComboboxCollection\n│ ├── ComboboxItem\n│ └── ComboboxItem\n├── ComboboxSeparator\n└── ComboboxGroup\n├── ComboboxLabel\n└── ComboboxCollection\n├── ComboboxItem\n└── ComboboxItem\nCustom Items#\nUse itemToStringValue when your items are objects.\nimport * as React from \"react\"\nimport {\nCombobox,\nComboboxContent,\nComboboxEmpty,\nComboboxInput,\nComboboxItem,\nComboboxList,\n} from \"@/components/ui/combobox\"\ntype Framework = {\nlabel: string\nvalue: string\n}\nconst frameworks: Framework[] = [\n{ label: \"Next.js\", value: \"next\" },\n{ label: \"SvelteKit\", value: \"sveltekit\" },\n{ label: \"Nuxt\", value: \"nuxt\" },\n]\nexport function ExampleComboboxCustomItems() {\nreturn (\n<Combobox\nitems={frameworks}\nitemToStringValue={(framework) => framework.label}\n>\n<ComboboxInput placeholder=\"Select a framework\" />\n<ComboboxContent>\n<ComboboxEmpty>No items found.</ComboboxEmpty>\n<ComboboxList>\n{(framework) => (\n<ComboboxItem key={framework.value} value={framework}>\n{framework.label}\n</ComboboxItem>\n)}\n</ComboboxList>\n</ComboboxContent>\n</Combobox>\n)\n}\nMultiple Selection#\nUse multiple with chips for multi-select behavior.\nimport * as React from \"react\"\nimport {\nCombobox,\nComboboxChip,\nComboboxChips,\nComboboxChipsInput,\nComboboxContent,\nComboboxEmpty,\nComboboxInput,\nComboboxItem,\nComboboxList,\nComboboxValue,\n} from \"@/components/ui/combobox\"\nconst frameworks = [\"Next.js\", \"SvelteKit\", \"Nuxt.js\", \"Remix\", \"Astro\"]\nexport function ExampleComboboxMultiple() {\nconst [value, setValue] = React.useState<string[]>([])\nreturn (\n<Combobox\nitems={frameworks}\nmultiple\nvalue={value}\nonValueChange={setValue}\n>\n<ComboboxChips>\n<ComboboxValue>\n{value.map((item) => (\n<ComboboxChip key={item}>{item}</ComboboxChip>\n))}\n</ComboboxValue>\n<ComboboxChipsInput placeholder=\"Add framework\" />\n</ComboboxChips>\n<ComboboxContent>\n<ComboboxEmpty>No items found.</ComboboxEmpty>\n<ComboboxList>\n{(item) => (\n<ComboboxItem key={item} value={item}>\n{item}\n</ComboboxItem>\n)}\n</ComboboxList>\n</ComboboxContent>\n</Combobox>\n)\n}\nBasic#\nA simple combobox with a list of frameworks.\n\"use client\"\nimport {\nMultiple#\nA combobox with multiple selection using multiple and ComboboxChips.\n\"use client\"\nimport * as React from \"react\"\nClear Button#\nUse the showClear prop to show a clear button.\n\"use client\"\nimport {\nGroups#\nUse ComboboxGroup and ComboboxSeparator to group items.\n\"use client\"\nimport {\nCustom Items#\nYou can render a custom component inside ComboboxItem.\n\"use client\"\nimport {\nInvalid#\nUse the aria-invalid prop to make the combobox invalid.\n\"use client\"\nimport {\nDisabled#\nUse the disabled prop to disable the combobox.\n\"use client\"\nimport {\nAuto Highlight#\nUse the autoHighlight prop to automatically highlight the first item on filter.\n\"use client\"\nimport {\nPopup#\nYou can trigger the combobox from a button or any other component by using the render prop. Move the ComboboxInput inside the ComboboxContent.\n\"use client\"\nimport { Button } from \"@/components/ui/button\"\nInput Group#\nYou can add an addon to the combobox by using the InputGroupAddon component inside the ComboboxInput.\n\"use client\"\nimport { GlobeIcon } from \"lucide-react\"\nRTL#\nTo enable RTL support in shadcn/ui, see the RTL configuration guide.\n\"use client\"\nimport * as React from \"react\"\nAPI Reference#\nSee the Base UI documentation for more information.",
+    "keywords": [
+     "Next.js",
+     "React",
+     "Tailwind CSS",
+     "Components",
+     "shadcn"
+    ],
+    "nearHeadings": [
+     "Combobox",
+     "Installation#",
+     "Usage#"
+    ]
+   }
+  },
+  "image": "img/shadcn-combobox.webp"
+ },
+ {
+  "id": "motion-docs",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://motion.dev/docs/react-animation",
+   "site": "motion.dev",
+   "pageTitle": "React Animation | Keyframes, Transitions & Gestures | Motion for React"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Skip to article\nDocs\nDocs\nExamples\nExamples\nAI Kit\nAI Kit\nMotion+\nMotion+\nMotion\nReact\nJS\nVue\nAI\nAnimations\nOverview\nLayout\nScroll\nSVG\nTransitions\nGestures\nOverview\nDrag\nHover\nComponents\n<motion>\n<AnimateActivity>\n<AnimatePresence>\n<AnimateSuspense>\n<AnimateView>\n<LayoutGroup>\n<LazyMotion>\n<MotionConfig>\n<Reorder>\nMotion UI\nInstall Motion UI\n<AnimateNumber>\n<Carousel>\n<Cursor>\n<Gallery>\nDocs / React\nReact animation\nAn overview of animating React with motion components, variants, gestures, and keyframes.\nCopy page\nOn this page\nWhat you'll learn\nAnimate with <motion />\nAnimatable values\nTransitions\nEnter animations\nExit animations\nKeyframes\nMotion along a path\nGesture animations\nVariants\nAnimation controls\nAnimate content\nNext\nMotion for React is a simple yet powerful animation library.\nWhether you're building hover effects, scroll-triggered animations, or complex animation sequences, this guide will provide an overview of all the ways you can animate in React with Motion.\nWhat you'll learn\nHow to create your first animation with the <motion.div /> component.\nWhich values and elements you can animate.\nHow to customise your animations with transition options.\nHow to animate elements as they enter and exit the DOM.\nHow to orchestrate animations with variants.",
+   "meta": {
+    "description": "Create React animation with Motion components. Learn variants, gestures, and keyframes.",
+    "og": {
+     "og:url": "https://motion.dev/docs/react-animation",
+     "og:site_name": "Motion",
+     "og:title": "React Animation | Keyframes, Transitions & Gestures | Motion for React",
+     "og:description": "Create React animation with Motion components. Learn variants, gestures, and keyframes.",
+     "og:type": "article",
+     "og:image": "https://images.motion.dev/og/fresh/v1/site/docs-react-animation-12wxeteb2kss1.png",
+     "og:image:width": "1200",
+     "og:image:height": "630",
+     "og:image:alt": "React Animation | Keyframes, Transitions & Gestures, Motion React docs"
+    }
+   },
+   "headings": [
+    "React animation",
+    "What you'll learn",
+    "Animate with <motion />",
+    "Enter animations",
+    "Animatable values",
+    "Transforms",
+    "Supported value types",
+    "Value type conversion",
+    "Transform origin",
+    "CSS variables",
+    "CSS variables as animation targets",
+    "Transitions",
+    "Exit animations",
+    "Keyframes",
+    "Wildcard keyframes",
+    "Keyframe timing",
+    "Motion along a path",
+    "Gesture animations",
+    "Variants",
+    "Propagation",
+    "Orchestration",
+    "Dynamic variants",
+    "Animation controls",
+    "Animate content",
+    "Next",
+    "Animate faster with Motion+.",
+    "Related docs",
+    "Related examples",
+    "Motion is supported by",
+    "Sponsors",
+    "Newsletter"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Motion for React is a simple yet powerful animation library.\nWhether you're building hover effects, scroll-triggered animations, or complex animation sequences, this guide will provide an overview of all the ways you can animate in React with Motion.\nWhat you'll learn\nHow to create your first animation with the <motion.div /> component.\nWhich values and elements you can animate.\nHow to customise your animations with transition options.\nHow to animate elements as they enter and exit the DOM.\nHow to orchestrate animations with variants.\nAnimate with <motion />\nMost animations in Motion are created with the <motion /> component. Import it from \"motion/react\":\nimport { motion } from \"motion/react\"\nEvery HTML & SVG element can be defined with a motion component:\n<motion.div />\n<motion.a href=\"#\" />\n<motion.circle cx={0} />\nThese work identically to their HTML/SVG counterparts - same props, same behaviour - but with additional animation props like animate, whileHover, and exit.\nThe most common animation prop is animate. When values passed to animate change, the element will automatically animate to that value.\n<motion.div animate={{ opacity: 1 }} />\nAnimate stateOpen example\nEnter animations\nWe can set initial values for an element with the initial prop. So an element defined like this will fade in when it enters the DOM:\n<motion.article\ninitial={{ opacity: 0 }}\nanimate={{ opacity: 1 }}\n/>\nAnimatable values\nMotion can animate any CSS value, like opacity, filter etc.\n<motion.section\ninitial={{ filter: \"blur(10px)\" }}\nanimate={{ filter: \"none\" }}\n/>\nIt can even animate values that aren't normally animatable by browsers, like background-image or mask-image:\n<motion.nav\ninitial={{ maskImage: \"linear-gradient(to right, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%)\" }}\nanimate={{ maskImage: \"linear-gradient(to right, rgba(0,0,0,1) 90%, rgba(0,0,0,1) 100%)\" }}\n/>\nTransforms\nUnlike CSS, Motion can animate every transform axis independently.\n<motion.div animate={{ x: 100 }} />\nIt supports the following special transform values:\nTranslate: x, y, z\nScale: scale, scaleX, scaleY\nRotate: rotate, rotateX, rotateY, rotateZ\nSkew: skewX, skewY\nPerspective: transformPerspective\nmotion components also have enhanced style props, allowing you to use these shorthands statically:\n<motion.section style={{ x: -20 }} />\nAnimating transforms independently provides great flexibility, especially when animating different transforms with gestures:\n<motion.button\ninitial={{ y: 10 }}\nanimate={{ y: 0 }}\nwhileHover={{ scale: 1.1 }}\nwhileTap={{ scale: 0.9 }}\n/>\n<motion.li\ninitial={{ transform: \"translateX(-100px)\" }}\nanimate={{ transform: \"translateX(0px)\" }}\ntransition={{ type: \"spring\" }}\n/>\nSupported value types\nMotion can animate any of the following value types:\nNumbers: 0, 100 etc.\nStrings containing numbers: \"0vh\", \"10px\" etc.\nColors: All CSS color formats like hex, rgba, hsla, oklch, oklab, color-mix etc.\nComplex strings containing multiple numbers and/or colors (like box-shadow).\ndisplay: \"none\"/\"block\" and visibility: \"hidden\"/\"visible\".\nValue type conversion\nIn general, values can only be animated between two of the same type (i.e \"0px\" to \"100px\").\nColors can be freely animated between hex, RGBA and HSLA types.\nAdditionally, x, y, width, height, top, left, right and bottom can animate between different value types.\n<motion.div\ninitial={{ x: \"100%\" }}\nanimate={{ x: \"calc(100vw - 50%)\" }}\n/>\nIt's also possible to animate width and height in to/out of \"auto\".\n<motion.div\ninitial={{ height: 0 }}\nanimate={{ height: \"auto\" }}\n/>\nTransform origin\ntransform-origin has three shortcut values that can be set and animated individually:\noriginX\noriginY\noriginZ\nIf set as numbers, originX and Y default to a progress value between 0 and 1. originZ defaults to pixels.\n<motion.div style={{ originX: 0.5 }} />\nCSS variables\nMotion for React can animate CSS variables, and also use CSS variable definitions as animation targets.\nAnimating CSS variables\nSometimes it's convenient to be able to animate a CSS variable to animate many children:\n<motion.ul\ninitial={{ '--rotate': '0deg' }}\nanimate={{ '--rotate': '360deg' }}\ntransition={{ duration: 2, repeat: Infinity }}\n>\n<li style={{ transform: 'rotate(var(--rotate))' }} />\n<li style={{ transform: 'rotate(var(--rotate))' }} />\n<li style={{ transform: 'rotate(var(--rotate))' }} />\n</motion.ul>\nCSS variables as animation targets\nHTML motion components accept animation targets with CSS variables:\n<motion.li animate={{ backgroundColor: \"var(--action-bg)\" }} />\nTransitions\nBy default, Motion will create appropriate transitions for snappy animations based on the type of value being animated.\nFor instance, physical properties like x or scale are animated with spring physics, whereas values like opacity or color are animated with duration-based easing curves.\nHowever, you can define your own animations via the transition prop.\n<motion.div\nanimate={{ x: 100 }}\ntransition={{ ease: \"easeOut\", duration: 2 }}\n/>\nA default transition can be set for many components with the MotionConfig component:\n<MotionConfig transition={{ duration: 0.3 }}>\n<motion.div animate={{ opacity: 1 }} />\n// etc\nOr you can set a specific transition on any animation prop:\n<motion.div\nanimate={{ opacity: 1 }}\nwhileHover={{\nopacity: 0.7,\n// Specific transitions override default transitions\ntransition: { duration: 0.3 }\n}}\ntransition={{ duration: 0.5 }}\n/>\nEnter animations\nWhen a motion component is first created, it'll automatically animate to the values in animate if they're different from those initially rendered, which you can either do via CSS or via the initial prop.\n<motion.li\ninitial={{ opacity: 0, scale: 0 }}\nanimate={{ opacity: 1, scale: 1 }}\n/>\nEnter animationOpen example\nYou can also disable the enter animation entirely by setting initial={false}. This will make the element render with the values defined in animate.\n<motion.div initial={false} animate={{ y: 100 }} />\nExit animations\nMotion for React can animate elements as they're removed from the DOM.\nIn React, when a component is removed, it's usually removed instantly. Motion provides the AnimatePresence component which keeps elements in the DOM while they perform an animation defined with the exit prop.\n<AnimatePresence>\n{isVisible && (\n<motion.div\nkey=\"modal\"\ninitial={{ opacity: 0 }}\nanimate={{ opacity: 1 }}\nexit={{ opacity: 0 }}\n/>\n)}\n</AnimatePresence>\nExit animationOpen example\nKeyframes\nSo far, we've set animation props like animate and exit to single values, like opacity: 0.\nThis is great when we want to animate from the current value to a new value. But sometimes we want to animate through a series of values. In animation terms, these are called keyframes.\nAll animation props can accept keyframe arrays:\n<motion.div animate={{ x: [0, 100, 0] }} />\nKeyframesOpen example\nWhen we animate to an array of values, the element will animate through each of these values in sequence.\nIn the previous example, we explicitly set the initial value as 0. But we can also say \"use the current value\" by setting the first value to null.\n<motion.div animate={{ x: [null, 100, 0] }} />\nKeyframe wildcardsOpen example\nThis way, if a keyframe animation is interrupting another animation, the transition will feel more natural.\nWildcard keyframes\nThis null keyframe is called a wildcard keyframe. A wildcard keyframe simply takes the value before it (or the current value, if this is the first keyframe in the array).\nWildcard keyframes can be useful for holding a value mid-animation without having to repeat values.\n<motion.div\nanimate={{ x: [0, 100, null, 0 ] }}\n// same as x: [0, 100, 100, 0] but easier to maintain\n/>\nKeyframe timing\nBy default, each keyframe is spaced evenly throughout the animation. You can override this by setting the times option via transition.\ntimes is an array of progress values between 0 and 1, defining where in the animation each keyframe should be positioned.\n<motion.circle\ncx={500}\nanimate={{\ncx: [null, 100, 200],\ntransition: { duration: 3, times: [0, 0.2, 1] }\n}}\n/>\n0 is the start of the animation, and 1 is the end of the animation. Therefore, 0.2 places this keyframe somewhere towards the start of the animation.\nMotion along a path\nBy default, x and y animate in a straight line. Pass arc() to transition.path to dynamically bend that line into a curve.\nAdd to basketOpen example\nimport { arc, motion } from \"motion/react\"\n<motion.div\nanimate={{ x: 200, y: -120 }}\ntransition={{ duration: 0.6, path: arc() }}\n/>\narc() works alongside any x/y animation, plus layout animations. See the arc() reference for more.\nGesture animations\nMotion for React has animation props that can define how an element animates when it recognises a gesture.\nSupported gestures are:\nwhileHover\nwhileTap\nwhileFocus\nwhileDrag\nwhileInView\nWhen a gesture starts, it animates to the values defined in while-, and then when the gesture ends it animates back to the values in initial or animate.\n<motion.button\ninitial={{ opacity: 0 }}\nwhileHover={{ backgroundColor: \"rgba(220, 220, 220, 1)\" }}\nwhileTap={{ backgroundColor: \"rgba(255, 255, 255, 1)\" }}\nwhileInView={{ opacity: 1 }}\n/>\nGesturesOpen example\nThe custom Cursor component available in Motion+ takes this a step further with magnetic and target-morphing effects as a user hovers clickable targets (like buttons and links):\n<Cursor magnetic />\niOS pointer animationOpen example\nVariants\nThe animate prop works well for single elements, but real interfaces often need coordinated animations across parent and child components. Variants solve this by defining named animation states that propagate through the component tree.\nVideo guideOpen video\nVariants are a set of named targets. These names can be anything.\nconst variants = {\nvisible: { opacity: 1 },\nhidden: { opacity: 0 },\n}\nVariants are passed to motion components via the variants prop:\n<motion.div variants={variants} />\nThese variants can now be referred to by a label, wherever you can define an animation target:\n<motion.div\nvariants={variants}\ninitial=\"hidden\"\nwhileInView=\"visible\"\nexit=\"hidden\"\n/>\nYou can also define multiple variants via an array:\nanimate={[\"visible\", \"danger\"]}\niOS Notifications stackOpen example\nPropagation\nVariants are useful for reusing and combining animation targets. But it becomes powerful for orchestrating animations throughout trees.\nVariants will flow down through motion components. So in this example when the ul enters the viewport, all of its children with a \"visible\" variant will also animate in:\nconst list = {\nvisible: { opacity: 1 },\nhidden: { opacity: 0 },\n}\nconst item = {\nvisible: { opacity: 1, x: 0 },\nhidden: { opacity: 0, x: -100 },\n}\nreturn (\n<motion.ul\ninitial=\"hidden\"\nwhileInView=\"visible\"\nvariants={list}\n>\n<motion.li variants={item} />\n<motion.li variants={item} />\n<motion.li variants={item} />\n</motion.ul>\n)\nVariantsOpen example\nOrchestration\nBy default, this children animations will start simultaneously with the parent. But with variants we gain access to new transition props when and delayChildren.\nconst list = {\nvisible: {\nopacity: 1,\ntransition: {\nwhen: \"beforeChildren\",\ndelayChildren: stagger(0.3), // Stagger children by .3 seconds\n},\n},\nhidden: {\nopacity: 0,\ntransition: {\nwhen: \"afterChildren\",\n},\n},\n}\nDynamic variants\nEach variant can be defined as a function that resolves when a variant is made active.\nconst variants = {\nhidden: { opacity: 0 },\nvisible: (index) => ({\nopacity: 1,\ntransition: { delay: index * 0.3 }\n})\n}\nThese functions are provided a single argument, which is passed via the custom prop:\nitems.map((item, index) => <motion.div custom={index} variants={variants} />)\nThis way, variants can be resolved differently for each animating element.\nAnimation controls\nDeclarative animations via animate and whileHover cover most UI interactions. For cases that need sequencing, timeline scrubbing, or triggering animations from events outside React's render cycle, the useAnimate hook provides imperative controls:\nAnimating any HTML/SVG element (not just motion components).\nComplex animation sequences.\nControlling animations with time, speed, play(), pause() and other playback controls.\nfunction MyComponent() {\nconst [scope, animate] = useAnimate()\nuseEffect(() => {\nconst controls = animate([\n[scope.current, { x: \"100%\" }],\n[\"li\", { opacity: 1 }]\n])\ncontrols.speed = 0.8\nreturn () => controls.stop()\n}, [])\nreturn (\n<ul ref={scope}>\n<li />\n<li />\n<li />\n</ul>\n)\n}\nAnimate content\nBy passing a MotionValue as the child of a motion component, it will render its latest value in the HTML.\nimport { useMotionValue, motion, animate } from \"motion/react\"\nfunction Counter() {\nconst count = useMotionValue(0)\nuseEffect(() => {\nconst controls = animate(count, 100, { duration: 5 })\nreturn () => controls.stop()\n}, [])\nreturn <motion.pre>{count}</motion.pre>\n}\nThis avoids React re-renders entirely. The motion component updates the DOM text node directly, making it suitable for high-frequency value changes like counters or live data.\nHTML contentOpen example\nIt's also possible to animate numbers with a ticking counter effect using the AnimateNumber component in Motion+ by passing them directly to the component:\n<AnimateNumber>{value}</AnimateNumber>\nRadix: Slider with AnimateNumberOpen example\nFor text rather than numbers, the Typewriter component types content out character by character, with the speed variance and backspacing of a real person. The text animation guide maps every technique, from split text to scroll reveals.\nNext\nIn this guide we've covered the basic kinds of animations we can perform in Motion using its animation props. However, there's much more to discover.\nMost of the examples on this page have used HTML elements, but Motion also has unique SVG animation features, like its simple line drawing API.\nWe've also only covered time-based animations, but Motion also provides powerful scroll animation features like useScroll and whileInView.\nIt also provides a powerful layout animation engine, that can animate between any two layouts using performant transforms.\nFinally, there's also a whole Basics examples category that covers all the basics of animating with Motion for React with live demos and copy-paste code.",
+    "nearHeadings": [
+     "React animation",
+     "What you'll learn"
+    ]
+   }
+  },
+  "image": "img/motion-docs.webp"
+ },
+ {
+  "id": "news-guardian",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.theguardian.com/science/2026/nov/06/better-conversation-study-pink-noise",
+   "site": "theguardian.com",
+   "pageTitle": "Want to have a better chat? Scientists say the secret is ‘pink noise’ | Psychology | The Guardian"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Skip to main content\nSkip to navigation\nSupport the Guardian\nFund independent journalism with €12 per month\nSupport us\nPrint subscriptions\nSign in\nEur\nThe Guardian - Back to home\nThe Guardian\nNews\nOpinion\nSport\nCulture\nLifestyle\nShow more\nWorld\nUK\nClimate crisis\nUkraine\nEnvironment\nScience\nGlobal development\nFootball\nTech\nBusiness\nObituaries\nView image in fullscreen\nPsychology\nWant to have a better chat? Scientists say the secret is ‘pink noise’\nIan Sample Science editor\nFri 6 Nov 2026 20.00 CET\nShare\nPrefer the Guardian on Google",
+   "meta": {
+    "description": "The most enjoyable conversations strike a balance between exploring a topic and pulling in fresh ideas, study finds",
+    "og": {
+     "og:url": "https://www.theguardian.com/science/2026/nov/06/better-conversation-study-pink-noise",
+     "og:image:width": "1200",
+     "og:image": "https://i.guim.co.uk/img/media/2fe2db5db0ee1a6165ecdd69a9aeb124791f8063/1149_895_3479_2783/master/3479.jpg?width=1200&height=630&quality=85&auto=format&fit=crop&precrop=40:21,offset-x50,offset-y0&overlay-align=bottom%2Cleft&overlay-width=100p&overlay-base64=L2ltZy9zdGF0aWMvb3ZlcmxheXMvdGctZGVmYXVsdC5wbmc&enable=upscale&s=5fc55a72c3a9ef04e72b27379716a015",
+     "og:title": "Want to have a better chat? Scientists say the secret is ‘pink noise’",
+     "og:image:height": "960",
+     "og:description": "The most enjoyable conversations strike a balance between exploring a topic and pulling in fresh ideas, study finds",
+     "og:type": "article",
+     "og:site_name": "the Guardian"
+    }
+   },
+   "headings": [
+    "Support the Guardian",
+    "Want to have a better chat? Scientists say the secret is ‘pink noise’",
+    "Most viewed"
+   ],
+   "alts": [
+    "Four university friends sit on concrete steps, smiling and chatting, one holding a basketball"
+   ],
+   "page": {
+    "text": "As an early stab at rules for conversation, Cicero did a fine job: watch your tone, never look bored, never lose your temper and never ramble on, particularly about yourself, he advised.\nNow scientists have followed in the great orator’s footsteps and discovered a telltale signature of an enjoyable chinwag. The secret of a mutually satisfying exchange is a healthy dose of pink noise, they say.\nThe colour of noise tends to animate physicists more than linguists, but researchers at Dartmouth College in New Hampshire in the US found the concept provided fresh insights into what makes a good conversation.\nKathryn O’Nell, the first author on the study, said: “In physics, people talk about pink noise as existing on the edge of chaos, where you can stay at a stable point, but you’re not stuck there for ever.\n“It’s particularly cool for conversation, because you can stay somewhere long enough to really get to know each other, to understand the topic, but you’re not stuck there while it gets stale.”\nThe researchers analysed more than 1,000 conversations between strangers, who answered questions on the chats afterwards. People enjoyed conversations more, wanted to continue chatting, and felt a stronger sense of connection when the tête-à-têtes exhibited more pink noise, they found.\nTo see whether the effect applied beyond strangers, the researchers ran a similar analysis on conversations between friends about their formative experiences. Again, more pink noise meant more enjoyment.\nThe effect had real-world consequences, too. When the scientists turned to speed-dating conversations, they found that more pink noise predicted which pairs met up for a second date. Details have been published in Science Advances.\nCicero had plenty of conversational pointers. Over 2,000 years later, scientists are still exploring the secrets of a successful chinwag. Photograph: Jozef Sedmak/Alamy\nNailing down what makes a great chat is notoriously tricky, the researchers said. In a bold opening statement to their paper, the authors write: “Good conversation is like pornography – it is difficult to define, but we know it when we see it.”\nColloquially, people talk about being in sync, but the metaphor misses something, said Dr Emily Finn, a neuroscientist and senior author on the paper. “In sync can be incredibly dull,” she said. People can be in sync when they repeat each other’s words and circle a single subject. They might well be immensely bored.\nIn the study, the scientists took conversations and fed each side into an AI called MPNet. The program scored every turn of the chat on 768 different criteria, covering aspects such as meaning, tone and context. This allowed the scientists to quantify how conversations ebbed and flowed over time.\nConversations exhibit white noise when people fail to follow what has just been said: the chat might jump all over the place, or be dominated by a person who seems oblivious to the other person’s responses. Other conversations can have red noise, which arises when people mirror each other’s language and fall into a conversational rut.\nPink noise lies somewhere in between: a conversational Goldilocks zone that balances stability and flexibility. People will synchronise as they explore a topic, then drift apart as they pull in fresh ideas before converging again to explore those.\nThe pinkiness of a conversation depends on the people involved, but O’Nell said she suspected the skill could be learned and developed. As part of the study, the team analysed podcasts fronted by two hosts and found that the pinkiness of their conversations increased over the first 50 episodes.\nProf Elizabeth Stokoe, a conversation analyst at the London School of Economics, praised the researchers for moving beyond the idea that “more similarity is better”. But asking whether a conversation is enjoyable risks missing the point, she added.\n“There’s a lovely study of a phone call in which a father and his daughter, a young woman with learning disabilities living in residential care, take a long time to say goodbye, and the ending is painful and poignant,” she said. “Reducing conversations to whether they are ‘enjoyable’ can feel bloodless, since many of the conversations that matter most in our lives are like this.”",
+    "nearHeadings": [
+     "Support the Guardian",
+     "Want to have a better chat? Scientists say the secret is ‘pink noise’"
+    ]
+   }
+  },
+  "image": "img/news-guardian.webp"
+ },
+ {
+  "id": "news-publico",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.publico.pt/2026/11/07/ciencia/noticia/farmacos-base-glp1-ajudam-controlar-prediabetes-melhor-actual-terapiapadrao-2193709?ref=ciencia&cx=page__content",
+   "site": "publico.pt",
+   "pageTitle": "Fármacos à base de GLP-1 ajudam a controlar pré-diabetes melhor do que terapia-padrão | Saúde | PÚBLICO"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Avançar\nReceba alertas com notícias de última hora e os temas que marcam o dia.\nMais tarde\nReceber alertas\nIr para o conteúdo\nIr para navegação principal\nPesquise no Público\nPÚBLICO\nCiência\nAmbiente\nEspaço\nMedicina\nMais\nAssine já\nEntrar\n[USER_NAME]\nBom dia.\nOs leitores são a força e a vida dos jornais. Contamos com o seu apoio,\nÁrea de leitor\nEditar perfil\nConsultar assinatura\nNewsletters\nNotificações\nTorne-se perito\nFale connosco\nAjuda\nChat online\nTerminar sessão\nCom o apoio\nSaúde\nFármacos à base de GLP-1 ajudam a controlar a pré-diabetes melhor do que a actual terapia-padrão\nInvestigadores analisaram os registos médicos de mais de 256.000 adultos com pré-diabetes e obesidade, dos quais cerca de metade tomava medicamentos à base de GLP-1.\nNancy Lapid (Reuters)\n7 de Novembro de 2026, 14:01\nPartilhar notícia\nPartilhar no Facebook\nPartilhar no LinkedIn\nPartilhar no Threads\nPartilhar no Bluesky\nEnviar por email\nCopiar Link\nGuardar\nAlertas\nFoto\nComentários\nParticipe no debate com respeito. Os comentários são públicos e cada utilizador é responsável, nos termos da lei, pelo que publica.\n×",
+   "meta": {
+    "description": "Investigadores analisaram os registos médicos de mais de 256.000 adultos com pré-diabetes e obesidade, dos quais cerca de metade tomava medicamentos à base de GLP-1.",
+    "og": {
+     "og:type": "article",
+     "og:title": "Fármacos à base de GLP-1 ajudam a controlar a pré-diabetes melhor do que a actual terapia-padrão",
+     "og:image": "https://imagens.publico.pt/imagens.aspx/2128828?tp=UH&db=IMAGENS&type=JPG&share=1&o=BarraFacebook_Publico.png",
+     "og:url": "https://www.publico.pt/2026/11/07/ciencia/noticia/farmacos-base-glp1-ajudam-controlar-prediabetes-melhor-actual-terapiapadrao-2193709",
+     "og:site_name": "PÚBLICO",
+     "og:description": "Investigadores analisaram os registos médicos de mais de 256.000 adultos com pré-diabetes e obesidade, dos quais cerca de metade tomava medicamentos à base de GLP-1."
+    }
+   },
+   "headings": [
+    "PÚBLICO",
+    "Bom dia.",
+    "A minha área",
+    "Personalize a sua área",
+    "Área de leitor",
+    "Fale connosco",
+    "Fármacos à base de GLP-1 ajudam a controlar a pré-diabetes melhor do que a actual terapia-padrão",
+    "Tópicos",
+    "Ler mais",
+    "Mais populares",
+    "Relaxar",
+    "Comentários",
+    "Em destaque",
+    "Edição impressa",
+    "Opinião",
+    "Siga-nos",
+    "Sobre",
+    "Serviços",
+    "Assinaturas",
+    "Informação legal",
+    "Notificações bloqueadas",
+    "Gerir notificações"
+   ],
+   "alts": [
+    "close",
+    "Logo",
+    "logo",
+    "Imagem de MyPublico",
+    "Advertisement",
+    "…"
+   ],
+   "page": {
+    "text": "Os medicamentos à base de GLP-1 podem ajudar a prevenir a diabetes de tipo 2 e a reduzir o risco de ataque cardíaco e acidente vascular cerebral em pessoas diagnosticadas com pré-diabetes de forma mais eficaz do que a medicação padrão actual, de acordo com dados que serão apresentados este fim-de-semana na reunião da Associação Americana do Coração em Chicago, nos EUA.\nOs investigadores analisaram os registos médicos de mais de 256.000 adultos com pré-diabetes e obesidade, dos quais cerca de metade tomava os medicamentos à base de GLP-1 semaglutido, tirzepatida, liraglutido ou dulaglutido.\nO semaglutido e o liraglutido são medicamentos para a diabetes da farmacêutica dinamarquesa Novo Nordisk, comercializados sob os nomes de Ozempic e Victoza, respectivamente. A tirzepatida e o dulaglutido da farmacêutica norte-americana Eli Lilly são comercializadas sob as marcas Mounjaro e Trulicity para o tratamento da diabetes.\nA outra metade dos pacientes estava a tomar metformina, um medicamento genérico de referência prescrito para a pré-diabetes.\nDurante o período de estudo de três anos, os doentes que tomaram fármacos à base de GLP-1 apresentaram uma probabilidade 50% superior de reverter os níveis elevados de açúcar no sangue para valores normais, um risco 31% inferior de desenvolver diabetes de tipo 2 em estado avançado e um risco 41% inferior de morte por qualquer causa, em comparação com os doentes que tomaram metformina.\nOs medicamentos à base de GLP-1 também foram associados a uma redução de 15% nos ataques cardíacos, de 20% nos acidentes vasculares cerebrais, de 25% nos casos de insuficiência cardíaca e de 8% nos casos de arritmia cardíaca conhecida como fibrilação auricular, que pode quintuplicar o risco de acidente vascular cerebral, de acordo com um resumo do estudo.\n“Esta investigação poderá reforçar os argumentos a favor de se considerar a prescrição de medicamentos à base de GLP-1 numa fase mais precoce para determinados doentes, em vez de se esperar até que desenvolvam diabetes de tipo 2”, afirmou, num comunicado, o coordenador do estudo, Vinicius de Sousa Barzon Serra, da Clínica Mayo em Scottsdale, no Arizona, EUA.\nOs benefícios estão provavelmente relacionados com a perda de peso, que, como se sabe, ajuda a prevenir a diabetes de tipo 2, acrescentou, numa declaração, Robert Eckel, antigo presidente da Associação Americana do Coração, que não participou no estudo.\nAinda assim, a metformina continua a ser uma opção de tratamento de primeira linha que é segura, económica e com um longo historial, destacou Vinicius de Sousa Barzon Serra.",
+    "keywords": [
+     "Ciência",
+     "Saúde",
+     "Diabetes",
+     "Obesidade",
+     "Medicamentos",
+     "Ozempic",
+     "Doenças"
+    ],
+    "nearHeadings": [
+     "PÚBLICO",
+     "Bom dia.",
+     "Área de leitor",
+     "Fale connosco",
+     "Fármacos à base de GLP-1 ajudam a controlar a pré-diabetes melhor do que a actual terapia-padrão",
+     "Comentários"
+    ]
+   }
+  },
+  "image": "img/news-publico.webp"
+ },
+ {
+  "id": "recipe-allrecipes",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.allrecipes.com/recipe/10813/best-chocolate-chip-cookies/",
+   "site": "allrecipes.com",
+   "pageTitle": "Best Chocolate Chip Cookies Recipe (with Video)"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Skip to content\nAllrecipes\nSearch the site\nNewsletters\nSweepstakes\nDinner Tonight\nRecipes\nIngredients\nOccasions\nCuisines\nIn the Kitchen\nNews\nCommunity\nVideo\nAbout Us\nGET THE MAGAZINE\nDon't lose your favorite Thanksgiving recipes. Save using the MyRecipes app now!\nRecipes\nDesserts\nCookies\nChocolate Chip Cookie Recipes\nBest Chocolate Chip Cookies\n4.6\n(19,333)\n14,912 Reviews\n4,926 Photos\nJump to Recipe\nThis chocolate chip cookie recipe makes dozens of delicious cookies with crisp edges, chewy centers, and plenty of chocolate chips.\nSubmitted by\nDora\nUpdated on October 5, 2026\nTested by\nAllrecipes Test Kitchen\nSave\nRate\nPrint\nShare",
+   "meta": {
+    "description": "This classic chocolate chip cookie recipe makes deliciously buttery cookies with crisp edges, chewy middles, and gooey chocolate chips in every bite.",
+    "og": {
+     "og:type": "article",
+     "og:site_name": "Allrecipes",
+     "og:url": "https://www.allrecipes.com/recipe/10813/best-chocolate-chip-cookies/",
+     "og:title": "Best Chocolate Chip Cookies",
+     "og:description": "This classic chocolate chip cookie recipe makes deliciously buttery cookies with crisp edges, chewy middles, and gooey chocolate chips in every bite.",
+     "og:image": "https://www.allrecipes.com/thmb/tE0hu3yYOGBJpQ9X_govmxWcTGY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/4462051_Best-Chocolate-Chip-Cookies-2x1-1-b196424f3d6c441c94e22c5cd58303c0.jpg"
+    }
+   },
+   "headings": [
+    "Best Chocolate Chip Cookies",
+    "Chocolate Chip Cookies Ingredients",
+    "Test Kitchen Tips",
+    "How to Store Chocolate Chip Cookies",
+    "Can You Freeze Chocolate Chip Cookies?",
+    "Allrecipes Community Tips and Praise",
+    "Ingredients",
+    "Directions",
+    "Tips",
+    "Nutrition Facts (per serving)",
+    "Ask the Community (36)",
+    "Reviews (14,912)",
+    "Featured Tweaks",
+    "Photos of Best Chocolate Chip Cookies",
+    "Most-Saved Recipes Like This",
+    "You’ll Also Love",
+    "We Care About Your Privacy",
+    "We and our partners process data to provide:"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Why You’ll Love This Recipe\nA generous batch makes this recipe perfect for parties, cookie swaps, and holiday trays.\nHome cooks love customizing them with walnuts, pecans, or different chocolate chips.\nFreeze baked cookies or portioned dough to enjoy fresh-baked treats anytime.\nThis chocolate chip cookie recipe makes dozens of cookies with crisp edges, chewy centers, and melty chocolate chips. It is truly the best! With more than 14,000 rave reviews from the Allrecipes community, this top-rated chocolate chip cookie recipe will quickly become your go-to for every occasion.\nChocolate Chip Cookies Ingredients\nHere’s what you’ll need to make the best chocolate chip cookies:\nButter: Softened butter blends easily with the sugars and creates a smooth dough. Salted or unsalted butter will work.\nSugars: A combination of white and brown sugar gives the cookies their balanced flavor and texture.\nEggs and vanilla: Eggs bind the dough, while vanilla adds flavor.\nBaking soda, hot water, and salt: These pantry staples help the cookies bake properly and balance the sweetness.\nFlour: Use all-purpose flour and measure it carefully to avoid dry cookies.\nChocolate chips: Semisweet chocolate chips provide classic flavor, but milk or dark chocolate chips also work.\nWalnuts: The nuts are optional. Substitute chopped pecans, if preferred.\nAllrecipes Video\nTest Kitchen Tips\n“Everyone needs a good chocolate chip cookie recipe,” says culinary producer Nicole McLaughlin (a.k.a. NicoleMcMom). Here are a few of her expert tips and tricks for making perfect chocolate chip cookies every time:\nBeating the butter and sugar is the most important part of the chocolate chip cookie-making process, according to Nicole. It takes a lot longer than you might think: She recommends beating the ingredients together for about four minutes.\nNicole suggests chilling the dough before baking to prevent spreading. This is essential if you want a cookie that’s still a little gooey in the middle, she says.\nRemove the cookies when the edges are lightly browned and the centers are just set. They will continue to firm up on the baking sheet. Let them rest briefly before moving them to a wire rack so they don’t break apart.\nHow to Store Chocolate Chip Cookies\nStore the cooled chocolate chip cookies in an airtight container at room temperature for up to a week. If you want to go the extra mile, throw a piece of white bread into the container — it’ll absorb the dry air and keep the cookies soft for longer.\nLearn more: How to Store Cookies So They Stay Fresh\nCan You Freeze Chocolate Chip Cookies?\nYes! You can freeze baked chocolate chip cookies and chocolate chip cookie dough.\nTo freeze baked cookies: Allow the baked cookies to cool completely. Arrange them in a single layer on a baking sheet, cover, and freeze for about three hours or up to overnight. Transfer the now-frozen cookies to a resealable plastic freezer bag or freezer-safe container. Wrap in at least one layer of aluminum foil for extra protection. Freeze for up to two months.\nTo freeze cookie dough: Drop balls of dough onto a parchment-lined baking sheet. Cover and freeze for about three hours or up to overnight. Transfer the frozen cookie dough balls to a resealable plastic freezer bag or freezer-safe container. Wrap in at least one layer of aluminum foil for extra protection. Freeze for up to two months.\nLearn more: How to Freeze Cookies and Cookie Dough for Easy Baking\nAllrecipes Community Tips and Praise\n“My go-to recipe,” says Andrea Howard. “I sometimes add oatmeal, nuts, raisins, etc. but they are also fantastic without. Crunchy and chewy in every bite!”\n“This is hands down the best chocolate chip cookie recipe!” raves Baybos the baker man. “So good that we want to quadruple the recipe and freeze a few batches.”\n“I decided to give this recipe a try,” says another reviewer. “I have been making chocolate chip cookies for my family for years and this recipe turned out to be the best for cookies ever! I usually add about 2 and a half cups of chocolate chips because it gives it that gooey, chocolatey taste that I think chocolate chip cookies need.”\nDirections\nGather your ingredients, making sure your butter is softened, and your eggs are room temperature.\nDotdash Meredith Food Studios\nPreheat the oven to 350 degrees F (175 degrees C). Beat butter, white sugar, and brown sugar together in a large bowl with an electric mixer until light and creamy, about 4 minutes.\nDotdash Meredith Food Studios\nBeat in eggs, one at a time, then stir in vanilla.\nDotdash Meredith Food Studios\nDissolve baking soda in hot water; add to batter along with salt and mix until combined.\nDotdash Meredith Food Studios\nStir in flour just until no dry streaks remain. Fold in chocolate chips and walnuts, if using, until evenly distributed.\nDotdash Meredith Food Studios\nDrop rounded 1 ½-tablespoon portions of dough 2 inches apart onto ungreased baking sheets, using a medium cookie scoop if desired.\nDotdash Meredith Food Studios\nBake in the preheated oven until the edges are lightly browned and the centers are just set, about 10 minutes.\nDotdash Meredith Food Studios\nLet the cookies cool briefly on the baking sheets, then transfer them to a wire rack to cool completely.\nDotdash Meredith Food Studios\nServe or store cooled cookies in an airtight container.\nDotdash Meredith Food Studio\nTips\nThe walnuts are optional. You can leave them out or substitute chopped pecans.\nIf the dough feels very soft or the first batch spreads too much, chill the remaining dough until it is firm enough to scoop.\nTo get ahead, scoop the dough onto a baking sheet and freeze until firm. Transfer the portions to a freezer-safe container and freeze for up to two months. Thaw in the refrigerator before baking as directed.",
+    "nearHeadings": [
+     "Best Chocolate Chip Cookies"
+    ]
+   }
+  },
+  "image": "img/recipe-allrecipes.webp"
+ },
+ {
+  "id": "map-osm",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "area",
+  "source": {
+   "url": "https://www.openstreetmap.org/#map=15/38.71100/-9.13660",
+   "site": "openstreetmap.org",
+   "pageTitle": "OpenStreetMap"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "",
+   "meta": {
+    "description": "OpenStreetMap is a map of the world, created by people like you and free to use under an open license.",
+    "og": {
+     "og:site_name": "OpenStreetMap",
+     "og:title": "OpenStreetMap",
+     "og:type": "website",
+     "og:url": "https://www.openstreetmap.org/",
+     "og:description": "OpenStreetMap is a map of the world, created by people like you and free to use under an open license.",
+     "og:image": "https://www.openstreetmap.org/assets/osm_logo_256-ed028f90468224a272961c380ecee0cfb73b8048b34f4b4b204b7f0d1097875d.png",
+     "og:image:alt": "OpenStreetMap logo"
+    }
+   },
+   "headings": [
+    "OpenStreetMap",
+    "Select Language",
+    "Welcome to OpenStreetMap!",
+    "Map Layers",
+    "Legend",
+    "Share"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Welcome to OpenStreetMap!\nOpenStreetMap is a map of the world, created by people like you and free to use under an open license.\nHosting is supported by Fastly, OSMF corporate members, and other partners.\nBy using this website or other infrastructure provided by the OpenStreetMap Foundation, you agree to the Terms of Use.",
+    "nearHeadings": [
+     "OpenStreetMap"
+    ]
+   }
+  },
+  "image": "img/map-osm.webp"
+ },
+ {
+  "id": "product-ikea",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.ikea.com/us/en/cat/billy-bookcases-58288/",
+   "site": "ikea.com",
+   "pageTitle": "BILLY Bookcases & Bookshelves - IKEA"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "US English\nEarly Black Friday deals! Up to 30% off select items.*\nEnter ZIP code\nSelect store\nProducts\nRooms\nDeals\nDesign & ideas\nServices\nHej! Log in or sign up\nFavorites\nShopping bag\nHej 👋 Have a question or need help with your purchase? Chat with one of our Home Furnishing Specialists!\nBILLY bookcases\nSeries\nBILLY series\nBILLY bookcases\nBeing a Swedish design classic and icon is very nice, of course. But the BILLY bookcase has also kept evolving. Today it's as versatile as your imagination and is the perfect storage solution to personalize and show who you are. Which BILLY expression sums up your essence best?\nDesign your own with the BILLY planner\nRead more\nIconic bookshelf, iconic price\nRun, don't walk: This white BILLY bookcase is an IKEA classic and it's available in-store now for less. BILLY Bookcase, white. IKEA Family price $65 . Regular price $79 Offer valid 9/8/26 – 12/24/26\nExplore more\n74 items\nSort and Filter\nSize (Width)",
+   "meta": {
+    "description": "The BILLY bookcase is a timeless storage solution with adjustable shelves to fit books, decor and more. Shop BILLY bookshelves at IKEA.",
+    "og": {
+     "og:title": "BILLY Bookcases & Bookshelves",
+     "og:type": "product.group",
+     "og:url": "https://www.ikea.com/us/en/cat/billy-bookcases-58288/",
+     "og:site_name": "IKEA",
+     "og:image": "https://www.ikea.com/global/assets/range-categorisation/images/billy-bookcases-58288.jpeg",
+     "og:description": "The BILLY bookcase is a timeless storage solution with adjustable shelves to fit books, decor and more. Shop BILLY bookshelves at IKEA."
+    }
+   },
+   "headings": [
+    "BILLY bookcases",
+    "Iconic bookshelf, iconic price",
+    "Sort and Filter",
+    "Size (Width)",
+    "Width",
+    "Height",
+    "Depth",
+    "Results list",
+    "BILLY Bookcase, white, 31 1/2x11x79 1/2 \"",
+    "BILLY Bookcase, white, 15 3/4x11x79 1/2 \"",
+    "BILLY Bookcase, white, 31 1/2x11x41 3/4 \"",
+    "BILLY Bookcase with height extension unit, brown walnut effect, 31 1/2x11x93 1/4 \"",
+    "BILLY / OXBERG Bookcase with doors, white, 31 1/2x11 3/4x79 1/2 \"",
+    "BILLY Bookcase corner comb w ext units, brown walnut effect, 53 1/2/53 1/2x11x93 1/4 \"",
+    "BILLY Bookcase combination, brown walnut effect, 63x11x79 1/2 \"",
+    "BILLY Bookcase, white, 15 3/4x11x93 1/4 \"",
+    "BILLY Bookcase, white, 15 3/4x11x41 3/4 \"",
+    "BILLY Bookcase combination/crn solution, white, 37 3/8/37 3/8x11x79 1/2 \"",
+    "BILLY / OXBERG Bookcase with doors, white, 31 1/2x11 3/4x41 3/4 \"",
+    "BILLY Bookcase comb w extension units, brown walnut effect, 78 3/4x11x93 1/4 \"",
+    "BILLY Bookcase with glass doors, dark blue, 31 1/2x11 3/4x79 1/2 \"",
+    "BILLY / OXBERG Bookcase with panel/glass doors, white, 31 1/2x11 3/4x79 1/2 \"",
+    "BILLY / OXBERG Bookcase w glass doors, black oak effect, 31 1/2x11 3/4x79 1/2 \"",
+    "BILLY Bookcase combination, white, 94 1/2x11x41 3/4 \"",
+    "BILLY Bookcase with foldable table, white, 31 1/2x12 3/4/44 1/4x41 3/4 \"",
+    "BILLY / OXBERG Bookcase comb w doors, brown walnut effect, 94 1/2x11 3/4x41 3/4 \"",
+    "BILLY Bookcase, white, 84 5/8/53 1/8x11x93 1/4 \"",
+    "BILLY / OXBERG Bookcase with glass-door, white/glass, 15 3/4x11 3/4x79 1/2 \"",
+    "BILLY / OXBERG Bookcase, white/glass, 63x11 3/4x79 1/2 \"",
+    "BILLY Bookcase comb w extension units, brown walnut effect, 47 1/4x11x93 1/4 \"",
+    "Recommended for you",
+    "Related categories",
+    "Why customers love BILLY bookcases",
+    "Affordable storage that lasts",
+    "A look all your own",
+    "Storage that grows with you",
+    "Where to place a BILLY bookcase?",
+    "How satisfied are you with your shopping experience?",
+    "Footer",
+    "Join IKEA Family"
+   ],
+   "alts": [
+    "Explore more"
+   ],
+   "page": {
+    "text": "Iconic bookshelf, iconic price\nRun, don't walk: This white BILLY bookcase is an IKEA classic and it's available in-store now for less.\nBILLY Bookcase, white. IKEA Family price $65. Regular price $79\nOffer valid 9/8/26 – 12/24/26\nExplore more\n74 items\nSort and Filter\n74 items\nSkip to results\nWidth\nHeight\nDepth\nLast chance3 products\nBest seller4 products\nNew products9 products\nResults list\nCompare\nBest seller\nBILLY\nPrice $ 79.00\nIn-store only price $65.00\nOffer valid from Sep 8, 2026 until Dec 24, 2026\nExclusive IKEA family offer\nMore optionsBILLYOption: BILLY, Bookcase, white, 31 1/2x11x79 1/2 \"Option: BILLY, Bookcase, brown walnut effect, 31 1/2x11x79 1/2 \"Option: BILLY, Bookcase, black oak effect, 31 1/2x11x79 1/2 \"Option: BILLY, Bookcase, oak effect, 31 1/2x11x79 1/2 \"Option: BILLY, Bookcase, dark-brown oak effect, 31 1/2x11x79 1/2 \"\nCompare\nBest seller\nMore optionsBILLYOption: BILLY, Bookcase, white, 15 3/4x11x79 1/2 \"Option: BILLY, Bookcase, blue, 15 3/4x11x79 1/2 \"Option: BILLY, Bookcase, black oak effect, 15 3/4x11x79 1/2 \"Option: BILLY, Bookcase, brown walnut effect, 15 3/4x11x79 1/2 \"+2\nCompare\nBest seller\nMore optionsBILLYOption: BILLY, Bookcase, white, 31 1/2x11x41 3/4 \"Option: BILLY, Bookcase, brown walnut effect, 31 1/2x11x41 3/4 \"Option: BILLY, Bookcase, black oak effect, 31 1/2x11x41 3/4 \"Option: BILLY, Bookcase, oak effect, 31 1/2x11x41 3/4 \"Option: BILLY, Bookcase, dark-brown oak effect, 31 1/2x11x41 3/4 \"\nCompare\nMore optionsBILLYOption: BILLY, Bookcase with height extension unit, brown walnut effect, 31 1/2x11x93 1/4 \"Option: BILLY, Bookcase with height extension unit, white, 31 1/2x11x93 1/4 \"Option: BILLY, Bookcase with height extension unit, dark-brown oak effect, 31 1/2x11x93 1/4 \"Option: BILLY, Bookcase with height extension unit, oak effect, 31 1/2x11x93 1/4 \"\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase with doors, white, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with doors, brown walnut effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with doors, oak effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with doors, black oak effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with doors, dark-brown oak effect, 31 1/2x11 3/4x79 1/2 \"\nCompare\nMore optionsBILLYOption: BILLY, Bookcase corner comb w ext units, brown walnut effect, 53 1/2/53 1/2x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, white, 53 1/2/53 1/2x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, black oak effect, 53 1/2/53 1/2x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, dark-brown oak effect, 53 1/2/53 1/2x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, oak effect, 53 1/2/53 1/2x11x93 1/4 \"\nCompare\nMore optionsBILLYOption: BILLY, Bookcase combination, brown walnut effect, 63x11x79 1/2 \"Option: BILLY, Bookcase, white, 63x11x79 1/2 \"Option: BILLY, Bookcase combination, dark-brown oak effect, 63x11x79 1/2 \"Option: BILLY, Bookcase combination, oak effect, 63x11x79 1/2 \"\nCompare\nMore optionsBILLYOption: BILLY, Bookcase, white, 15 3/4x11x93 1/4 \"Option: BILLY, Bookcase with height extension unit, brown walnut effect, 15 3/4x11x93 1/4 \"Option: BILLY, Bookcase with height extension unit, dark-brown oak effect, 15 3/4x11x93 1/4 \"Option: BILLY, Bookcase with height extension unit, oak effect, 15 3/4x11x93 1/4 \"\nPlanner\nDesign your own BILLY bookcase\nCompare\nBest seller\nMore optionsBILLYOption: BILLY, Bookcase, white, 15 3/4x11x41 3/4 \"Option: BILLY, Bookcase, brown walnut effect, 15 3/4x11x41 3/4 \"Option: BILLY, Bookcase, black oak effect, 15 3/4x11x41 3/4 \"Option: BILLY, Bookcase, oak effect, 15 3/4x11x41 3/4 \"Option: BILLY, Bookcase, dark-brown oak effect, 15 3/4x11x41 3/4 \"\nCompare\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase with doors, white, 31 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase with doors, brown walnut effect, 31 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase with doors, oak effect, 31 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase with doors, black oak effect, 31 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase with doors, dark-brown oak effect, 31 1/2x11 3/4x41 3/4 \"\nCompare\nMore optionsBILLYOption: BILLY, Bookcase comb w extension units, brown walnut effect, 78 3/4x11x93 1/4 \"Option: BILLY, Bookcase, white, 78 3/4x11x93 1/4 \"Option: BILLY, Bookcase comb w extension units, black oak effect, 78 3/4x11x93 1/4 \"Option: BILLY, Bookcase comb w extension units, oak effect, 78 3/4x11x93 1/4 \"Option: BILLY, Bookcase comb w extension units, dark-brown oak effect, 78 3/4x11x93 1/4 \"\nCompare\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase with panel/glass doors, white, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with panel/glass doors, brown walnut effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with panel/glass doors, oak effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with panel/glass doors, black oak effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with panel/glass doors, dark-brown oak effect, 31 1/2x11 3/4x79 1/2 \"\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase w glass doors, black oak effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase w glass doors, brown walnut effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase, white, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase w glass doors, oak effect, 31 1/2x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase w glass doors, dark-brown oak effect, 31 1/2x11 3/4x79 1/2 \"\nCompare\nCompare\nMore optionsBILLYOption: BILLY, Bookcase combination, white, 94 1/2x11x41 3/4 \"Option: BILLY, Bookcase combination, dark-brown oak effect, 94 1/2x11x41 3/4 \"Option: BILLY, Bookcase combination, brown walnut effect, 94 1/2x11x41 3/4 \"Option: BILLY, Bookcase combination, oak effect, 94 1/2x11x41 3/4 \"\nCompare\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase comb w doors, brown walnut effect, 94 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase comb w doors, oak effect, 94 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase comb w doors, black oak effect, 94 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase comb w doors, white, 94 1/2x11 3/4x41 3/4 \"Option: BILLY / OXBERG, Bookcase comb w doors, dark-brown oak effect, 94 1/2x11 3/4x41 3/4 \"\nCompare\nMore optionsBILLYOption: BILLY, Bookcase, white, 84 5/8/53 1/8x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, dark-brown oak effect, 84 5/8/53 1/8x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, brown walnut effect, 84 5/8/53 1/8x11x93 1/4 \"Option: BILLY, Bookcase corner comb w ext units, oak effect, 84 5/8/53 1/8x11x93 1/4 \"\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase with glass-door, white/glass, 15 3/4x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with glass-door, brown walnut effect/clear glass, 15 3/4x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with glass-door, dark-brown oak effect/clear glass, 15 3/4x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase with glass-door, oak effect/clear glass, 15 3/4x11 3/4x79 1/2 \"\nCompare\nMore optionsBILLY / OXBERGOption: BILLY / OXBERG, Bookcase, white/glass, 63x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase comb w glass doors, brown walnut effect, 63x79 1/2 \"Option: BILLY, Bookcase, dark blue, 63x11 3/4x79 1/2 \"Option: BILLY / OXBERG, Bookcase comb w glass doors, black oak effect, 63x79 1/2 \"+2\nCompare\nMore optionsBILLYOption: BILLY, Bookcase comb w extension units, brown walnut effect, 47 1/4x11x93 1/4 \"Option: BILLY, Bookcase comb w extension units, black oak effect, 47 1/4x11x93 1/4 \"Option: BILLY, Bookcase comb w extension units, oak effect, 47 1/4x11x93 1/4 \"Option: BILLY, Bookcase comb w extension units, dark-brown oak effect, 47 1/4x11x93 1/4 \"\nWhy customers love BILLY bookcases\nSince 1979, IKEA BILLY bookcases have been flying off shelves around the world. Here are just a few reasons customers love this iconic design.\nAffordable storage that lasts\nOne of our customers’ favorite things about BILLY bookshelves is the price tag. Their affordability makes it easier to organize your home without sacrificing style, whether you’re furnishing a first apartment or refreshing your forever home.\nA look all your own\nBILLY bookcases come in a range of finishes and sizes, making it easy to find an option that fits your style and space. Optional doors let you choose between open and hidden storage, so you can show off your treasures or keep them neatly tucked away.\nStorage that grows with you\nIKEA BILLY bookcases adapt as your needs change. Have a growing collection? Adjust the shelves to fit different items over time. Moving to a larger space? Add additional units to create a larger, more customized storage solution.\nWhere to place a BILLY bookcase?\nIKEA BILLY bookcases are designed to work throughout your home. And with narrow, low and extra-tall options, it works just as well in a studio apartment as it does in a larger home. You can use BILLY bookshelves in:\nLiving rooms to display favorite reads, houseplants and collected trinkets\nHome offices for organizing paperwork and tech\nBedrooms to keep books and everyday essentials within easy reach\nPlayrooms and children's rooms for toys and children’s books\nDining rooms and kitchens to store cookbooks, table linens and serving items\nPantries for easy-to-reach spices and canned goods\nDon’t be afraid to think outside the box. Line an entire wall with BILLY bookcases to create a home library or DIY built-in effect. Or use a combination of low and high bookshelves to design your own entertainment storage wall or dining room sideboard. Need help exploring the possibilities? Our online BILLY bookcase planning tool lets you design your perfect layout before you buy.",
+    "keywords": [
+     "BILLY Bookcases & Bookshelves"
+    ],
+    "nearHeadings": [
+     "BILLY bookcases",
+     "Iconic bookshelf, iconic price",
+     "Sort and Filter",
+     "Size (Width)",
+     "How satisfied are you with your shopping experience?"
+    ]
+   }
+  },
+  "image": "img/product-ikea.webp"
+ },
+ {
+  "id": "product-apple",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.apple.com/macbook-air/",
+   "site": "apple.com",
+   "pageTitle": "MacBook Air 13-inch and MacBook Air 15-inch - Apple"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Escolha para ver conteúdos específicos ou comprar online noutro país ou região.\nPortugal\nContinuar\nApple\nStore\nMac\niPad\niPhone\nWatch\nVision\nAirPods\nHome\nEntertainment\nAccessories\nSupport\nMacBook Air\nOverview\nTech Specs\nCompare\nSwitch from PC to Mac\nBuy\nMacBook Air\nLease a new Mac with low monthly payments for 24 or 36 months and upgrade at the end of your term with Apple Upgrade. § Learn more\nMacBook Air\nMight takes flight.\nNow supercharged by M5.",
+   "meta": {
+    "description": "MacBook Air laptop with the superfast M5 chip. Lightweight, with all-day battery life. Built for AI and Apple Intelligence.",
+    "og": {
+     "og:image": "https://www.apple.com/v/macbook-air/z/images/meta/macbook_air_mx__ez5y0k5yy7au_og.png?202610261111",
+     "og:title": "MacBook Air 13-inch and MacBook Air 15-inch",
+     "og:description": "MacBook Air laptop with the superfast M5 chip. Lightweight, with all-day battery life. Built for AI and Apple Intelligence.",
+     "og:url": "https://www.apple.com/macbook-air/",
+     "og:locale": "en_US",
+     "og:site_name": "Apple",
+     "og:type": "website"
+    }
+   },
+   "headings": [
+    "Shop",
+    "Quick Links",
+    "Shop Special Stores",
+    "Explore Mac",
+    "Shop Mac",
+    "More from Mac",
+    "Explore iPad",
+    "Shop iPad",
+    "More from iPad",
+    "Explore iPhone",
+    "Shop iPhone",
+    "More from iPhone",
+    "Explore Watch",
+    "Shop Watch",
+    "More from Watch",
+    "Explore Vision",
+    "Shop Vision",
+    "More from Vision",
+    "Explore AirPods",
+    "Shop AirPods",
+    "More from AirPods",
+    "Explore Home",
+    "Shop Home",
+    "More from Home",
+    "Explore Entertainment",
+    "Support",
+    "Shop by Product",
+    "Shop by Category",
+    "More to Explore",
+    "Explore Support",
+    "Get Help",
+    "Helpful Topics",
+    "MacBook Air",
+    "Get the highlights.",
+    "Design",
+    "Two perfectly portable sizes.",
+    "Four beautiful colors will have you on cloud nine.",
+    "Performance",
+    "AI",
+    "AI apps on Mac. Born to run."
+   ],
+   "alts": [
+    "Two open MacBook Air laptops in sky blue color forming arrow shape, emphasizing narrow profile"
+   ],
+   "page": {
+    "text": "Lease a new Mac with low monthly payments for 24 or 36 months and upgrade at the end of your term with Apple Upgrade.§\nLearn more\nBuy MacBook Air starting at $1199 with education savings.*\nShop\nFrom $1299 or $108.25/mo. for 12 mo.**\nLease from $24.99/mo. for 36 mo. with Apple Upgrade◊\nDesign\nBuilt to go places.\nMacBook Air is remarkably light at just 2.7 pounds, and less than half an inch thin. It’s designed to fit easily into your bag, so you can always take it with you. It’s also made with over 50 percent recycled materials and has a durable recycled aluminum enclosure built to withstand daily use.\n13” display\n15” display\nTwo perfectly portable sizes.\nThe 13‑inch MacBook Air is the ultimate on-the-go laptop, and the 15‑inch model gives you even more space onscreen for multitasking.3\nFour beautiful colors will have you on cloud nine.\nAnd every MacBook Air comes with a color‑matched MagSafe charging cable.\nPerformance\nM5. The chip that zips.\nUp to9.5xfaster than\nMacBook Air\nwith M14\nUp to4xfaster than\nMacBook Air\nwith M45\nUp to3.8xfaster than\nPC laptop\nwith\nIntel Core Ultra X76\nAI in the fast lane. MacBook Air delivers blazing‑fast AI performance thanks to the powerful combination of the GPU, Neural Engine, and unified memory in M5. With a Neural Accelerator built into each GPU core, AI tasks run with amazing efficiency. From AI image upscaling to running the latest large language models, you’ll be more productive and creative than ever.\nMultitasker. Multifaster. The M5 chip brings even more speed and fluidity to everything you do, like seamless switching between loads of apps and tabs, editing 4K video, or playing immersive games like Neverness to Everness. All with a silent, fanless design.\nLive a full battery life. MacBook Air has up to 18 hours of battery life. And it supports fast charging, getting up to 50 percent in about 30 minutes.16 So you can power through everything from work to class to your favorite movies without worrying about your battery.\nAI\nBuilt for AI.\nFrom the silicon up.\nFor everyone from students to small business owners to creative professionals, MacBook Air with M5 is designed to leverage AI in everyday workflows while preserving your privacy. Whether using powerful Apple Intelligence features across apps and macOS, running LLMs on your Mac, or vibe coding, you’ll stay productive — and protected.\nAI apps on Mac. Born to run.\nMac is optimized to handle AI apps — like ChatGPT, LM Studio, Msty Studio, Topaz Video, and Topaz Photo — so you can learn faster, think in new ways, and get more done.\nAI tools in apps. Mac makes magic.\nUse intelligent tools to unlock new levels of productivity and creativity — from editing images in Adobe Photoshop to rendering 3D models in Shapr3D to creating films in Final Cut Pro.\nApple Intelligence.\nDo more. Effort less.\nApple Intelligence is the personal intelligence system that helps you write, express yourself, and get things done effortlessly. With groundbreaking privacy protections, it gives you peace of mind that no one else can access your data — not even Apple.2\nGreat powers come\nwith great privacy.\nApple Intelligence is designed to protect your privacy at every step. It’s integrated into the core of your Mac through on‑device processing. So it’s aware of your personal information without collecting your personal information.\nAnd with groundbreaking Private Cloud Compute, Apple Intelligence can draw on larger server‑based models, running on Apple silicon, to handle more complex requests for you while protecting your privacy.\nmacOS\nPowering possibility.\nmacOS is designed to support the way you work, create, and connect, with powerful apps and seamless multitasking.\nContinuity\nBetter together.\nMac and iPhone are incredible on their own. But when you use them together, they work wonders. Thanks to Continuity features, you can move seamlessly across devices to share files and photos, hand off tasks, and even control your iPhone from your Mac.\nAnswer calls and texts\nUniversal Clipboard\niPhone Mirroring\nLive Activities\nMarkup and Sketch\nYour calls and texts come right to your laptop, so there’s no need to switch devices when you’re in the zone.19\nNew to Mac?\nDisplay\nLove at every sight.\nThe Liquid Retina display on MacBook Air supports 1 billion colors and delivers absolutely stunning resolution. Photos and videos pop with rich contrast and sharp detail, and text appears supercrisp.\n500 nits of brightness. Work comfortably in a range of lighting environments.\nP3 wide color. Enjoy an accurate and vivid range of colors for viewing and editing photos and videos.\nTrue Tone technology. True Tone adjusts the warmth of your display to match the ambient light, for a more natural viewing experience.\nCamera and Audio\nWhen you move, it moves.\nCenter Stage\nDesk View\nStay in frame during video calls, even as you move around or when more people join your frame.\nThree‑mic array.\nMacBook Air provides enhanced voice clarity in audio and video calls while minimizing background noise.\nImmersive sound system.\nThe speakers on MacBook Air support Spatial Audio along with Dolby Atmos, so you can enjoy a three‑dimensional soundstage for music and movies.\nPorts and+ Connectivity\nWell connected.\nMagSafe\nTwo Thunderbolt\n4 ports\nHeadphone jack\nThe MagSafe charging cable attaches and detaches magnetically, preventing any unintended flights. Two Thunderbolt 4 ports let you connect high‑speed accessories and charge your Mac. The headphone jack supports high‑impedance headphones. And the Apple N1 wireless chip provides Wi‑Fi 7 and Bluetooth 6, improving performance and reliability.22\nTurn MacBook Air into the perfect workspace by connecting up to two external displays, including Studio Display. The extra screen space makes working with multiple documents or apps a breeze.\nSecurity\nPeace of mind\nat your fingertip.\nTouch ID on the Magic Keyboard gives you a fast, easy, and secure way to unlock your Mac, sign in to accounts, and authorize payments for purchases. And built-in, industry-leading encryption, robust virus protections, and free, automatic security updates help keep your data safe.\nThere’s never been a better time to upgrade.\nSelect your current MacBook Air:\nWhich laptop is right for you?\nMacBook Air\n13” and 15”\nM5 chip\nFrom $1299 or $108.25/mo. for 12 mo.**\nLease from $24.99/mo. for 36 mo. with Apple Upgrade◊\n13.6‑inch or 15.3‑inch Liquid Retina display24\nApple M5 chip\nApple Intelligence and Siri AI2\n16GB to 32GB\nunified memory\n512GB to\n4TB storage25\nUp to\n18 hours battery life1\nTouch ID\nNew 14” with M6 MacBook Pro 14” and 16”\nM6, M5 Pro,\nor M5 Max chip\nFrom $1999 or $166.58/mo. for 12 mo.**\nLease from $38.99/mo. for 36 mo. with Apple Upgrade◊\n14.2‑inch or 16.2‑inch\nLiquid Retina XDR display24\nApple M6, M5 Pro,\nor M5 Max chip\nApple Intelligence and Siri AI2\n16GB to 128GB\nunified memory\n1TB to\n8TB storage25\nUp to\n24 hours battery life26\nTouch ID\nAccessories\nExplore Mac accessories.\nShop\nApple Upgrade\nLease a new Mac.\nGet a new Mac with low monthly\npayments for 24 or 36 months and\nupgrade at the end of your term.§\nLearn more\nApple Trade In\nGet credit toward a new MacBook Air.\nJust trade in your eligible computer for credit or recycle it for free. It’s good for you and the planet.23\nSee what your device is worth\nApple Card\nGet 3% Daily Cash back with Apple Card.\nAnd pay over time, interest‑free when you choose to check out at Apple with Apple Card Monthly Installments.†\nLearn more\nEducation\nSave on MacBook Air.\nCollege students and educators can save through the Apple Store.*\nShop",
+    "nearHeadings": [
+     "Shop",
+     "Quick Links",
+     "Shop Special Stores",
+     "Explore Mac",
+     "Shop Mac",
+     "More from Mac",
+     "Explore iPad",
+     "Shop iPad",
+     "More from iPad",
+     "Explore iPhone"
+    ]
+   }
+  },
+  "image": "img/product-apple.webp"
+ },
+ {
+  "id": "design-dribbble",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://dribbble.com/shots/popular/web-design",
+   "site": "dribbble.com",
+   "pageTitle": "Trending Website, Landing Page and Splash Page Designs on Dribbble"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Shots\nExplore\nHire Talent\nGet Hired\nCommunity\nSign up\nLog in\nGet 20% off your first payment for design and development services on Dribbble. Use code WELCOME20 🎉\nGet Started\nPopular\nDiscover\nAnimation\nBranding\nIllustration\nMobile\nPrint\nProduct Design\nTypography\nWeb Design\nFilters\nAI-Powered Vegetation Management Website\nHusain\nPRO\n56\n5k\nSaaS Pricing Page UI/UX — AI Voice to Text Platform\nAlamin Hossen\nPRO\n93\n6.9k\n1\nSprig — Modern Digital Banking Website Design\nYscale Studio\nPRO\n94\n1.6k\nAI Healthcare App UI – Doctor Booking & Telemedicine Platform\nSM Rubel ✦\nPRO\n47\n3k\nEnterprise AI Website & Motion Design\nArtspire\nPRO\n+\n178\n20k\nConnect Claude, Codex and Cursor to Framer with MCP\nFramer\nHide ads\n●\nAdvertise\nStrategic Consulting Firm Website Design\nTopnotch Studio\nPRO\n49\n4.9k\nLuxury Resort Hotel Landing page\nKris Anfalova\nPRO\n+\n178\n27.5k",
+   "meta": {
+    "description": "Explore popular website and landing page designs on Dribbble, your best resource to connect with creative professionals worldwide.",
+    "og": {
+     "og:type": "article",
+     "og:site_name": "Dribbble",
+     "og:image": "https://cdn.dribbble.com/uploads/68059/original/f95c1a744395b01385a3685ba20daac0.png?1770659618"
+    }
+   },
+   "headings": [],
+   "alts": [
+    "AI-Powered Vegetation Management Website ai powered branding energy solution landing landing page management platform motion graphics power line power safety renewable energy ui ui design ux design vegetation web web design website website design",
+    "Husain",
+    "SaaS Pricing Page UI/UX — AI Voice to Text Platform ai voice to text minimal ui pricing page pricing table product saas pricing saas ui saas website speech to text subscription plans voice to text web",
+    "Alamin Hossen",
+    "Sprig — Modern Digital Banking Website Design banking website digital banking fintech fintech design landing page uiux design web web design website website design",
+    "Yscale Studio",
+    "AI Healthcare App UI – Doctor Booking & Telemedicine Platform ai healthcare ai healthcare app ai healthcare platform app appointment booking app doctor doctor app doctor appointment app doctor booking doctor booking app doctor finder health companion healthcare ui design healthcare ui ux medical app",
+    "SM Rubel ✦",
+    "Enterprise AI Website & Motion Design ai agents ai website animation artificial intelligence enterprise website design landing page design motion design saas landing page web design",
+    "Artspire",
+    "Framer",
+    "Strategic Consulting Firm Website Design agency website business website consulting website corporate website landing page portfolio agency topnotch studio ui ux web design webflow template website design",
+    "Topnotch Studio",
+    "Luxury Resort Hotel Landing page animation awwwards bold typography card ui hero section homepage hotel website landing page luxury hotel luxury website minimal website resort travel website ui ui design web animation web design inspiration webdesign website website design",
+    "Kris Anfalova",
+    "Website for a Drink ✦ Yubbo design interface product service startup ui ux web website",
+    "Velora - Wellness Landing Page Animation animation clean coach fitness healthcare healthness healthy landing page mentor mindfullness motion motion graphics trainer ui ux web web design wellness workout yoga",
+    "Hero",
+    "UX/UI Design for Agency Health-Australian healthtech startup branding clean health healthcare healthtech llm medicine minimal ui web design website wellness"
+   ],
+   "page": {
+    "text": "56\n5k\n93\n6.9k\n94\n1.6k\n47\n3k\n178\n20k\n49\n4.9k\n178\n27.5k\n69\n12k\n171\n26.3k\nView Hero\nConnect Claude, Codex and Cursor to Framer with MCP\n59\n18.1k\n98\n20.6k\n46\n2.9k\n36\n3.2k\n24\n1.5k\n41\n7k\n46\n11.5k\n35\n1.9k\n68\n1.4k\n9\n5.9k\n18\n2.9k\n175\n25.5k\n83\n6k\nLoading more…"
+   }
+  },
+  "image": "img/design-dribbble.webp"
+ },
+ {
+  "id": "video-youtube",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://www.youtube.com/watch?v=aircAruvnKk",
+   "site": "youtube.com",
+   "pageTitle": "But what is a neural network? | Deep learning chapter 1 - YouTube"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "PT\nSign in\n0:01 / 18:40\nIntroduction example\nBut what is a neural network? | Deep learning chapter 1\n3Blue1Brown\n8.74M subscribers\nSubscribe\n569K\n25M views 9y ago\nNeural networks\nWhat are the neurons, why are there layers, and what is the math underlying it? Help fund future projects: / 3blue1brown Written/interactive form of this series: https://www.3blue1brown.com/topics/ne...\nmore\nShop the 3Blue1Brown store\nFrom Dftba Records\n3Blue1Brown | Mathematical Quotebook Notebook\n3Blue1Brown | Logo Crewneck Sweatshirt 5XL\n20:33\nGradient descent, how neural networks learn | Deep Learning Chapter 2\n3Blue1Brown\n9.7M\n9y ago\n8:23\nHow to Learn So Fast People Assume You're Naturally Gifted\nJustin Sung\n6.5M\n2mo ago\n16:50\nNew\nThe Real Reason Hitler Never Invaded Portugal\nElias Brandt\n195K\n6d ago\n#28 hyped\n10 lessons\nNeural networks\n3Blue1Brown\nCourse\nView full course\n1:33:33\nIs AI Hiding Its Full Power? With Geoffrey Hinton\nStarTalk\n4.3M\n8mo ago\n35:45\nMIT Explains the 12 Possible Endings for AI\nSpecies | Documenting AGI\n16M\n7mo ago",
+   "meta": {
+    "description": "What are the neurons, why are there layers, and what is the math underlying it?Help fund future projects: https://www.patreon.com/3blue1brownWritten/interact...",
+    "og": {
+     "og:site_name": "YouTube",
+     "og:url": "https://www.youtube.com/watch?v=aircAruvnKk",
+     "og:title": "But what is a neural network? | Deep learning chapter 1",
+     "og:image": "https://i.ytimg.com/vi/aircAruvnKk/maxresdefault.jpg",
+     "og:image:width": "1280",
+     "og:image:height": "720",
+     "og:description": "What are the neurons, why are there layers, and what is the math underlying it?Help fund future projects: https://www.patreon.com/3blue1brownWritten/interact...",
+     "og:type": "video.other",
+     "og:video:url": "https://www.youtube.com/embed/aircAruvnKk",
+     "og:video:secure_url": "https://www.youtube.com/embed/aircAruvnKk",
+     "og:video:type": "text/html",
+     "og:video:width": "1280",
+     "og:video:height": "720"
+    }
+   },
+   "headings": [
+    "But what is a neural network? | Deep learning chapter 1",
+    "Chapters View all",
+    "Introduction example",
+    "Series preview",
+    "What are neurons?",
+    "Introducing layers",
+    "Why layers?",
+    "Edge detection example",
+    "Counting weights and biases",
+    "How learning relates",
+    "Course progress",
+    "3Blue1Brown",
+    "Shop the 3Blue1Brown store",
+    "Comments",
+    "Comments 9.4K",
+    "In this video",
+    "Chapters",
+    "Notation and linear algebra",
+    "Recap",
+    "Some final words",
+    "ReLU vs Sigmoid",
+    "Transcript",
+    "Gradient descent, how neural networks learn | Deep Learning Chapter 2",
+    "How to Learn So Fast People Assume You're Naturally Gifted",
+    "The Real Reason Hitler Never Invaded Portugal",
+    "Neural networks",
+    "Is AI Hiding Its Full Power? With Geoffrey Hinton",
+    "MIT Explains the 12 Possible Endings for AI",
+    "The Race to Harness Quantum Computing's Mind-Bending Power | The Future With Hannah Fry",
+    "Bernie vs. Claude",
+    "Backpropagation, intuitively | Deep Learning Chapter 3",
+    "I Dressed Like a 1950s Man for a Week, Here's What Happened",
+    "LLMs Explained: Tokens, Embeddings, Transformers and More",
+    "OpenAI Made History. Nobody Understands It.",
+    "7 Detalhes PERTURBADORES Sobre a Queda do Jato na Flórida | Reconstrução 3D",
+    "Stanford CME295 Transformers & LLMs | Autumn 2026 | Lecture 1 - Transformers",
+    "Transformers, the tech behind LLMs | Deep Learning Chapter 5",
+    "The Uranium Problem",
+    "Once You Understand MONEY, You'll Stop Saving It [PART #1]",
+    "1: Introduction to Neural Networks and Deep Learning; Training Deep NNs"
+   ],
+   "alts": [
+    "3Blue1Brown"
+   ],
+   "page": {
+    "text": "What are the neurons, why are there layers, and what is the math underlying it?\nHelp fund future projects: / 3blue1brown\nWritten/interactive form of this series: https://www.3blue1brown.com/topics/ne...\nAdditional funding for this project was provided by Amplify Partners\nFor those who want to learn more, I highly recommend the book by Michael Nielsen that introduces neural networks and deep learning: https://goo.gl/Zmczdy\nThere are two neat things about this book. First, it's available for free, so consider joining me in making a donation to Nielsen if you get something out of it. And second, it's centered around walking through some code and data, which you can download yourself, and which covers the same example that I introduced in this video. Yay for active learning!\nhttps://github.com/mnielsen/neural-ne...\nI also highly recommend Chris Olah's blog: http://colah.github.io/\nFor more videos, Welch Labs also has some great series on machine learning:\n• Learning To See [Part 1: Introduction]\n• Neural Networks Demystified [Part 1: Data ...\nFor those of you looking to go even deeper, check out the text \"Deep Learning\" by Goodfellow, Bengio, and Courville.\nAlso, the publication Distill is just utterly beautiful: https://distill.pub/\nLion photo by Kevin Pluck\nЗвуковая дорожка на русском языке: Влад Бурмистров.\nThanks to these viewers for their contributions to translations\nGerman: @fpgro\nHebrew: Omer Tuchfeld\nHungarian: Máté Kaszap\nItalian: @teobucci, Teo Bucci\n-----------------\nTimeline:\n0:00 - Introduction example\n1:07 - Series preview\n2:42 - What are neurons?\n3:35 - Introducing layers\n5:31 - Why layers?\n8:38 - Edge detection example\n11:34 - Counting weights and biases\n12:30 - How learning relates\n13:26 - Notation and linear algebra\n15:17 - Recap\n16:27 - Some final words\n17:03 - ReLU vs Sigmoid\nCorrection 14:45 - The final index on the bias vector should be \"k\"\n------------------\nAnimations largely made using manim, a scrappy open source python library. https://github.com/3b1b/manim\nIf you want to check it out, I feel compelled to warn you that it's not the most well-documented tool, and has many other quirks you might expect in a library someone wrote with only their own use in mind.\nMusic by Vincent Rubinetti.\nDownload the music on Bandcamp:\nhttps://vincerubinetti.bandcamp.com/a...\nStream the music on Spotify:\nhttps://open.spotify.com/album/1dVyjw...\nIf you want to contribute translated subtitles or to help review those that have already been made by others and need approval, you can click the gear icon in the video and go to subtitles/cc, then \"add subtitles/cc\". I really appreciate those who do this, as it helps make the lessons accessible to more people.\n------------------\n3blue1brown is a channel about animating math, in all senses of the word animate. And you know the drill with YouTube, if you want to stay posted on new videos, subscribe, and click the bell to receive notifications (if you're into that).\nIf you are new to this channel and want to see more, a good place to start is this playlist: http://3b1b.co/recommended\nVarious social media stuffs:\nWebsite: https://www.3blue1brown.com\nTwitter: / 3blue1brown\nPatreon: / 3blue1brown\nFacebook: / 3blue1brown\nReddit: / 3blue1brown\nCourse progress\n0 of 10 lessons complete",
+    "keywords": [
+     "video",
+     "sharing",
+     "camera phone",
+     "video phone",
+     "free",
+     "upload"
+    ],
+    "nearHeadings": [
+     "But what is a neural network? | Deep learning chapter 1",
+     "Shop the 3Blue1Brown store",
+     "Gradient descent, how neural networks learn | Deep Learning Chapter 2",
+     "How to Learn So Fast People Assume You're Naturally Gifted",
+     "The Real Reason Hitler Never Invaded Portugal",
+     "Neural networks",
+     "Is AI Hiding Its Full Power? With Geoffrey Hinton",
+     "MIT Explains the 12 Possible Endings for AI"
+    ]
+   }
+  },
+  "image": "img/video-youtube.webp"
+ },
+ {
+  "id": "x-post",
+  "userId": "eval",
+  "type": "link",
+  "kind": "link",
+  "source": {
+   "url": "https://x.com/jack/status/20",
+   "site": "x.com",
+   "pageTitle": "jack (@jack) no X"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "",
+   "meta": {
+    "description": "just setting up my twttr",
+    "og": {
+     "og:site_name": "X (formerly Twitter)",
+     "og:locale": "pt_BR",
+     "og:url": "https://x.com/jack/status/20",
+     "og:type": "article",
+     "og:title": "jack (@jack) no X",
+     "twitter:title": "jack (@jack) no X",
+     "og:description": "just setting up my twttr",
+     "twitter:description": "just setting up my twttr",
+     "og:image": "https://pbs.twimg.com/profile_images/1661201415899951105/azNjKOSH_400x400.jpg",
+     "og:image:secure_url": "https://pbs.twimg.com/profile_images/1661201415899951105/azNjKOSH_400x400.jpg",
+     "og:image:type": "image/jpeg",
+     "og:image:width": "400",
+     "og:image:height": "400",
+     "og:image:alt": "Imagem do perfil de jack",
+     "twitter:card": "summary",
+     "twitter:site": "@x",
+     "twitter:creator": "@jack",
+     "twitter:image": "https://pbs.twimg.com/profile_images/1661201415899951105/azNjKOSH_400x400.jpg",
+     "twitter:image:alt": "Imagem do perfil de jack"
+    }
+   },
+   "headings": [
+    "Postar",
+    "Entrar ou inscrever-se no X",
+    "Pessoas relevantes",
+    "O que está acontecendo"
+   ],
+   "alts": [],
+   "page": {
+    "text": "just setting up my twttr"
+   }
+  },
+  "link": {
+   "title": "jack (@jack) no X",
+   "description": "just setting up my twttr",
+   "siteName": "X (formerly Twitter)",
+   "ogType": "article",
+   "favicon": "https://x.com/apple-touch-icon.png",
+   "fetchedAt": "2026-11-08T00:00:00.000Z"
+  },
+  "image": "img/x-post.webp"
+ },
+ {
+  "id": "wiki-nata",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "area",
+  "source": {
+   "url": "https://en.wikipedia.org/wiki/Pastel_de_nata",
+   "site": "en.wikipedia.org",
+   "pageTitle": "Pastel de nata - Wikipedia"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Text\nWidth\nColor\nPastel de nata\nThe typical appearance of the pastel de nata in Lisbon , Portugal\nAlternative names\nPastel de Belém Pastries of Bethlehem Portuguese Egg Tart\nCourse\nDessert\nPlace of origin\nPortugal\nRegion or state\nBelém , Lisbon (originally); produced worldwide within the Lusosphere\nCreated by\nReligious of the Jerónimos Monastery\nServing temperature\nFresh from oven, with cinnamon and icing sugar\nMain ingredients\nEgg yolks\nVariations\nEgg tart , custard tart\nFood energy (per serving)\n1,300 kilojoules (299 kcal)\nMedia : Pastel de nata\npastéis de nata . [ 1 ] Western Europe , former Malacca . The Macau variant has been adopted by Mardijker )\ntarts are pastries inspired by an original recipe called , which were created before the 18th century by Catholic monks at the civil parish of At the time, convents and monasteries used large quantities of egg-whites for clothes, such as It was quite common for monasteries and\n, following the dissolution of religious orders and in the face of the impending closure of many convents and monasteries, the monks started selling at a nearby sugar refinery to bring in revenue. In 1834, the monastery was closed and the recipe sold to the sugar refinery, whose owners opened the in 1837. The descendants own the business to this day.",
+   "meta": {
+    "og": {
+     "og:image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Pasteis_de_Belem.jpg/1280px-Pasteis_de_Belem.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+     "og:image:width": "1200",
+     "og:image:height": "1200",
+     "og:title": "Pastel de nata - Wikipedia",
+     "og:type": "website"
+    }
+   },
+   "headings": [
+    "Contents",
+    "Pastel de nata",
+    "History",
+    "See also",
+    "Notes",
+    "References",
+    "Bibliography",
+    "External links"
+   ],
+   "alts": [
+    "Wikimedia Commons logo"
+   ],
+   "page": {
+    "text": "From Wikipedia, the free encyclopedia\nPastel de nata\nThe typical appearance of the pastel de nata\nin Lisbon, Portugal\nAlternative namesPastel de Belém\nPastries of Bethlehem\nPortuguese Egg Tart\nCourseDessert\nPlace of originPortugal\nRegion or stateBelém, Lisbon (originally); produced worldwide within the Lusosphere\nCreated byReligious of the Jerónimos Monastery\nServing temperatureFresh from oven, with cinnamon and icing sugar\nMain ingredientsEgg yolks\nVariationsEgg tart, custard tart\nFood energy\n(per serving)\n1,300 kilojoules (299 kcal)\nMedia: Pastel de nata\nPastel de nata (Portuguese: [pɐʃˈtɛl dɨ ˈnatɐ]; literally, cream pastry; pl.: pastéis de nata) is a Portuguese egg custard tart pastry, optionally dusted with cinnamon.[1] Outside Portugal, they are particularly popular in other parts of Western Europe, former Portuguese colonies, such as Brazil, Mozambique, Macau, Goa, Malacca and Timor-Leste, and other parts of Asia. The Macau variant has been adopted by KFC and is available in regions such as mainland China, Hong Kong, Taiwan, Thailand, South Korea, Singapore and Malaysia. In Indonesia, this pastry is especially popular in Kampung Tugu, Jakarta, a culturally Portuguese (Mardijker) enclave.[2]\nPastel de nata (locally known as tart telur Portugis) in Malaysia\nPastéis de nata tarts are pastries inspired by an original recipe called pastéis de Belém, which were created before the 18th century by Catholic monks at the Jerónimos Monastery in the civil parish of Belém, in Lisbon.[3] At the time, convents and monasteries used large quantities of egg-whites for starching clothes, such as friars and nuns' religious habits.[dubious – discuss] It was quite common for monasteries and convents to use the leftover egg yolks to make cakes and pastries, resulting in the proliferation of sweet pastry recipes throughout the country.\nIn the aftermath of the Liberal Revolution of 1820, following the dissolution of religious orders and in the face of the impending closure of many convents and monasteries, the monks started selling pastéis de nata at a nearby sugar refinery to bring in revenue. In 1834, the monastery was closed and the recipe sold to the sugar refinery, whose owners opened the Fábrica de Pastéis de Belém in 1837. The descendants own the business to this day.[4]\nSince the opening of Fábrica de Pastéis de Belém, the original recipe that inspired pastel de nata varieties is kept in a secret room. The Fábrica de Pastéis de Belém is, therefore, the only place in the world that produces the original pastry that inspired many variations commonly known as \"pastéis de nata\"; the shop is located just a short three-minute walk from the Jerónimos Monastery.[5] The shop offers both takeout and sit-in services and sells over 20,000 pastéis a day.[6]\nIn 2009, The Guardian listed pastéis de Belém as one of the 50 \"best things to eat\" in the world.[7] In 2011, following the result of a public vote, the pastry was announced as one of Portugal's Seven Wonders of Gastronomy, further cementing it as one of the country's most popular national dishes.[8]\nList of egg dishes\nTorta de nata\n↑ Baggini, Julian (18 February 2015). \"Custard tart fight: can the British version ever compete with Portugal's pastéis de nata?\". The Guardian.\n↑ \"3 KUDAPAN KHAS JAKARTA HASIL AKULTURASI BUDAYA\". infobudaya.net (in Indonesian). 2017-09-18.\n↑ Santos, Nina (26 February 2017). \"A Brief Introduction to Pastel De Nata, Portuguese Custard Tarts\". Culture Trip. Archived from the original on 2020-06-11. Retrieved 2019-11-12.\n↑ \"175 anos de pastéis de Belém [175 years of pasteléis de Belém]\". Correio da Manhã (in Portuguese). 12 August 2012. Archived from the original on 2018-07-03. Retrieved 2018-06-06.\n↑ \"Jeronimos Monastery, Lisbon\". www.golisbon.com.\n↑ \"Pastéis de Belém: A Taste of History\". Lisbon Guru Travel Guide. 2016-05-27.\n↑ Fox, Killian (13 September 2009). \"The 50 best things to eat in the world, and where to eat them (The Guardian)\". London.\n↑ Pastel de Nata wetravelportugal.com. Retrieved 9 July 2022.\nMerle, Dominick (11 August 2004), \"There's history - and a secret - in every bite\", The Christian Science Monitor, retrieved 23 April 2012\nLeite, David (8 September 2004), \"Pastéis de Belém–The World's First Pastéis de Nata\", Leite's Culinaria, retrieved 9 June 2022\nAmaral, André; Pires, Carla; Castro e Silva, Daniel; Medeiros, Luís; André, Mário Rui (December 2011), O Segredo do Marketing dos Pastéis de Belém (PDF) (in Portuguese), Lisbon, Portugal: Escola Superior de Comunicação Social, Instituto Politécnico de Lisboa, archived from the original (PDF) on 1 October 2022, retrieved 23 April 2012\nOfficial website of Pastéis de Belém",
+    "nearHeadings": [
+     "Contents"
+    ]
+   }
+  },
+  "image": "img/wiki-nata.webp"
+ },
+ {
+  "id": "stripe-pricing",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://stripe.com/pt-pt/pricing",
+   "site": "stripe.com",
+   "pageTitle": "Preços e tarifas"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Produtos\nSoluções\nDesenvolvedores\nRecursos\nPreços\nEntrar\nFale com nossa equipe\nPagamentos\nPayments\nPagamentos online\nManaged Payments\nSolução do Comerciante responsável\nPayment links\nPagamentos sem código\nCheckout\nUIs de pagamento pré-construídas\nElements\nComponentes flexíveis de IU\nFormas de pagamento\nAcesso a mais de 125\nTerminal\nPagamentos presenciais\nAuthorization Boost\nOtimizações de aceitação\nLink\nCheckout acelerado\nFinancial Connections\nDados de contas vinculadas\nReceita​\nBilling\nReceita recorrente\nMetronome\nCobrança por uso\nAssinaturas​\n​Gerenciamento​ de​ assinaturas​\nInvoicing\nÚnica ou recorrente\nTax\nAutomação de impostos\nRevenue Recognition\nAutomação contábil\nStripe Sigma\nRelatórios personalizados\nData Pipeline\nSincronização de dados\nGestão dos valores\nGlobal Payouts\nRepasses para terceiros\nCrypto\nCarteira, emissão de stablecoin e infraestrutura de cartões\nCrypto Onramp\nCompras de cripto incorporáveis\nFinanças integradas\nConnect\nPagamentos para plataformas\nTreasury for platforms\nServiços financeiros integrados\nIssuing\nCartões físicos e virtuais\nVer todos os produtos\nMais\nRoadmap de produtos\nVeja o que está chegando\nRadar\nPrevenção de fraudes\nAtlas\nIncorporação de startups\nClimate\nRemoção de carbono\nIdentity\nVerificação de identidade\nStripe Sessions 2026\nVeja como a Stripe está construindo a infraestrutura econômica da IA.\nAssista agora\nPor estágio\nEmpresas\nStartups\nPor caso de uso\nComércio agêntico\nCriptomoedas\nE-commerce\nFinanças integradas\nAutomação de finanças\nEmpresas do mundo todo\nPagamentos no aplicativo\nMarketplaces\nGestão dos valores\nPlataformas\nSaaS\nPor setor\nEmpresas de IA\nEconomia de criadores\nFintech\nJogos\nHospitalidade, viagens e lazer\nSeguros\nMídia e entretenimento\nOrganizações sem fins lucrativos\nServiços profissionais\nSetor público\nVarejo\nEcossistema\nParceiros\nStripe App Marketplace\nDocumentação\nDocumentação da Stripe\nReferência da API\nBibliotecas e SDKs\nStripe Apps\nGuias\nAceitar pagamentos online\nImplementar um checkout pré-construído\nCriar uma plataforma ou marketplace\nGerenciar assinaturas\nOfereça cobrança por uso\nEmita cartões respaldados por stablecoins\nProvisione e gerencie serviços com agentes\nRecursos\nIntegrações de aplicativos\nExemplos de códigos\nBlog de desenvolvedores\nStatus da API\nAprenda\nBlog\nHistórias de clientes\nGuias\nSuporte​\nObter suporte\nPlanos de suporte gerenciado\nServiços profissionais\nEmpresa\nRoadmap de produtos\nConferência anual das sessões\nCarreiras\nSala de imprensa\nStripe Press\nSobre\nContato\nFale com a equipe de vendas\nSeja um parceiro\nPreços para empresas de todos os tamanhos\nPadrão\nAcesse uma plataforma de pagamentos completa com preços simples e pagamento conforme o uso. Sem tarifas mensais, ocultas ou de configuração.\nComece já\n1,5% + € 0,25\npara cartões padrão do Espaço Econômico Europeu\n2,5% + € 0,25\npara cartões do Reino Unido\nPersonalizado\nCrie um pacote individualizado. Disponível para empresas com um grande volume de pagamentos ou modelos de negócios únicos.\nFale com nossa equipe\nPrecificação IC+\nDescontos por volume\nDescontos ao adquirir vários produtos\nTarifas específicas por país\nPreços padrão\nPreços personalizados\nPerguntas frequentes\nRecursos disponíveis prontos para uso:\nPreços padrão\nPreços personalizados\nPerguntas frequentes\nFale com a equipe de vendas\nUsamos cookies para aprimorar sua experiência e para fins de publicidade. Leia nossa Política de Cookies ou gerencie os cookies .\nAceitar todos\nRejeitar todos",
+   "meta": {
+    "description": "Encontre informações sobre tarifas e preços da Stripe. Veja as tarifas de processamento para cartões de crédito, os modelos de preços e as tarifas com pagamento por uso para empresas.",
+    "og": {
+     "og:title": "Preços e tarifas",
+     "og:description": "Encontre informações sobre tarifas e preços da Stripe. Veja as tarifas de processamento para cartões de crédito, os modelos de preços e as tarifas com pagamento por uso para empresas.",
+     "og:image": "https://images.stripeassets.com/fzn2n1nzq965/7ITBvIUjBudsnymEYtOddj/3f4e576e49ed82d6442ff9b8a3e07784/pricing-stripe-default-social-card.jpg?q=80"
+    }
+   },
+   "headings": [
+    "Stripe logo",
+    "Pagamentos",
+    "Receita​",
+    "Gestão dos valores",
+    "Finanças integradas",
+    "Mais",
+    "Preços para empresas de todos os tamanhos",
+    "Padrão",
+    "1,5% + € 0,25",
+    "2,5% + € 0,25",
+    "Personalizado",
+    "Recursos disponíveis prontos para uso:",
+    "Acesso global",
+    "Prevenção contra fraudes integrada",
+    "Ferramentas para otimizar o checkout",
+    "Otimizações de pagamentos para aumentar a receita",
+    "Pagamentos incorporados para plataformas e marketplaces",
+    "Repasses rápidos e previsíveis para suas contas bancárias",
+    "Suporte por telefone, e-mail e chat",
+    "Segurança, confiabilidade e conformidade",
+    "Preços padrão de todos os produtos",
+    "Explore os preços da plataforma completa da Stripe",
+    "Pagamentos globais",
+    "Payments",
+    "Cartões nacionais",
+    "Cartões internacionais",
+    "Link",
+    "Formas de pagamento bancárias e outros tipos",
+    "Contestações",
+    "Smart Disputes",
+    "Prevenção de contestações",
+    "Autenticação 3D Secure",
+    "Impulsionar a autorização",
+    "Adaptive Pricing",
+    "Liquidação multimoedas",
+    "Conversão instantânea de moedas",
+    "Instant Payouts",
+    "API Vault and Forward",
+    "API Foreign Exchange Quotes",
+    "Tokens de pagamento compartilhado"
+   ],
+   "alts": [
+    "Sessions Background"
+   ],
+   "page": {
+    "text": "Padrão\nAcesse uma plataforma de pagamentos completa com preços simples e pagamento conforme o uso. Sem tarifas mensais, ocultas ou de configuração.\n2,5% + € 0,25\npara cartões do Reino Unido\nPersonalizado\nCrie um pacote individualizado. Disponível para empresas com um grande volume de pagamentos ou modelos de negócios únicos.\nPrecificação IC+\nDescontos por volume\nDescontos ao adquirir vários produtos\nTarifas específicas por país\nPagamentos online e presenciais, cobrança recorrente, pagamentos integrados e muito mais.\nPagamentos globais\nPayments\nPayment Links\nCheckout\nManaged Payments\nTerminal\nFinancial Connections\nGestão dos valores\nConnect\nIssuing\nAutomação de receitas e finanças\nBilling\nMetronome\nInvoicing\nImposto\nStripe Sigma\nData Pipeline\nRevenue Recognition\nMais\nRadar\nAtlas\nClimate\nIdentity\nFluxos de trabalho\nOtimize a taxa de conversão, aceite formas de pagamento locais e aumente as taxas de aceitação.\nAceite cartões de crédito e débito, cartões pré-pagos e carteiras digitais para cartões nacionais amplamente utilizados.\nSaiba mais sobre nossos diferentes tipos de cartão.\nAceite cartões de crédito e débito, cartões pré-pagos e carteiras digitais amplamente para cartões internacionais amplamente utilizados.\n2,5% + € 0,25\npara cartões do Reino Unido\n+\n2%\nse for necessário converter a moeda\n3,15% + € 0,25\npara cartões internacionais\n+\n2%\nse for necessário converter a moeda\nSaiba mais\nPreencha automaticamente os dados de pagamento preferenciais dos clientes para proporcionar uma experiência de checkout sem atritos.\nOfereça débitos bancários, transferências bancárias e outras formas de pagamento com relevância local.\nResponda a contestações de pagamentos com cartão, também conhecidas como estornos.\nSaiba​ mais​​​\nTarifa de contestação recebida\n€ 20,00\npor cada contestação que você recebe.\nEm casos raros, tarifas da bandeira de cartão também se aplicam.\nTarifa de refutação de contestação\n€ 20,00\npor cada contestação que você responde manualmente.\nVocê recebe essa tarifa de volta em contestações ganhas. Você não recebe essa tarifa de volta em contestações perdidas.\nSaiba mais\nDispute appealed fee\n€ 20,00\nfor each dispute you appeal.\nYou don't get this fee back, even if you win. Additional network fees apply.\nLearn more\nResponda a contestações com os comprovantes que a IA da Stripe prepara para você. Você também pode adicionar seus próprios comprovantes.\ntarifa do Smart Disputes\n30%\ndo valor contestado por cada contestação ganha.\nNão há tarifa do Smart Disputes para contestações perdidas. A tarifa de contestação recebida ainda é válida.\nSaiba mais\nAjude a reduzir as taxas de contestação com ferramentas de prevenção de contestações viabilizadas pela Verifi da Visa e Ethoca da Mastercard.\nIncluído no Payments\nAceite pagamentos realizados com um link de pagamento.\nIncluso\ncom Payments\nUse seu próprio domínio e hospede sua página de pagamentos ou portal de clientes na Stripe.\nGere automaticamente uma fatura após uma compra avulsa.\n0,4%\nsobre o total da transação\nUS$ 2,00\nteto por fatura\nSaiba mais\nAceite pagamentos realizados no Stripe Checkout.\nIncluso\ncom Payments\nUse seu próprio domínio e hospede sua página de pagamentos ou portal de clientes na Stripe.\nGere automaticamente uma fatura após uma compra avulsa.\n0,4%\nsobre o total da transação\nUS$ 2,00\nteto por fatura\nSaiba mais\nUma solução completa de comerciante de registro para o comércio digital global. Inclui conformidade fiscal indireta (imposto sobre vendas, IVA, GST) e repasse em mais de 75 países, além de prevenção a fraudes, gestão de contestações, faturamento e suporte ao cliente em escala mundial.\n3,5%\npor transação bem-sucedida de Managed Payments, além das taxas de Payments\nSaiba mais​​\nAceite cartões de crédito e débito e carteiras digitais amplamente utilizados para pagamentos presenciais.\n1,4% + € 0,10\npor cobrança bem-sucedida para cartões do EEE e do Reino Unido\n2,9% + € 0,10\npor cobrança bem-sucedida para todos os outros cartões\n+\n€ 0,10\npor autorização do Tap to Pay\n+\n€ 0,05\npor autorização para criptografia de ponto a ponto opcional\nUse máquinas de cartão pré-certificadas com gerenciamento de frota baseado na nuvem que otimiza a logística e o gerenciamento de dispositivos em grande escala.\n€ 59,00\nBBPOS WisePad 3\nSem IVA\n€ 259,00\nStripe Reader S710\nSem IVA\n€ 199,00\nBBPOS WisePOS E\nSem IVA\n€ 259,00\nStripe Reader S700\nSem IVA\n€ 289,00\nStripe Reader T600\nSem IVA\nUso ilimitado de dados celulares em máquinas de cartão habilitadas. O uso de dados de Apps no Dispositivo é limitado a 10 GB por máquina de cartão por mês.\n€ 9,00\npor máquina por mês\nObtenha números de conta tokenizados para verificar instantaneamente contas bancárias para fins de ACH Direct Debit, repasses e outras movimentações financeiras.\n€ 1,25\npor verificação instantânea bem-sucedida\nAs verificações por microdepósitos são gratuitas\nAcesse os saldos das contas para avaliação de risco, gestão financeira ou prevenção de falhas nos pagamentos por falta de fundos.\n€ 0,10\npor chamada de API bem-sucedida\nVerifique a titularidade da conta bancária para minimizar fraudes ao fazer repasses ou receber pagamentos.\n€ 1,25\npor chamada de API bem-sucedida\nAssine um feed com atualização automática das transações da conta.\n€ 0,25\npor instituição, por titular de conta, por mês\nAprimore sua plataforma integrando serviços financeiros: configure contas financeiras, emita cartões e ofereça financiamentos.\nA Stripe define e cobra tarifas dos seus usuários para que você não precise fazer isso. Saiba mais sobre como se qualificar para uma participação em receita da Stripe.\nIncluso\ncom Payments\n0,25%\nde tarifa de entrada para plataformas que aplicam seus próprios preços sobre pagamentos para gerar receita em cada transação\nVeja detalhes dos preços\nCrie e emita cartões instantaneamente e envie cartões físicos com marca em apenas dois dias.\n€ 3,50\npor cartão físico padrão\nOs cartões personalizados estão sujeitos a preços adicionais. Tarifas de envio não incluídas.\nSaiba mais\nDefina controles personalizados para cada transação e atualize-os quando quiser.\nIncluso\npara os primeiros € 500 mil em transações por cartão\n0,2% + € 0,20\npor transação posterior\nUse um processo orientado para compreender e responder de forma eficaz às contestações de transações com cartão (também conhecidas como estornos).\n€ 15,00\npor contestação*\n*Pode haver exclusões, sujeitas à legislação aplicável. Os usuários do Connect não podem repassar as tarifas de contestação para as contas conectadas.\nAceite pagamentos internacionais com cartão para sua empresa ou seus clientes.\n1% + € 0,30\npara transações internacionais.\n+\n2%\nse for necessário converter a moeda\nOtimize processos essenciais de negócios com ferramentas modulares de cobrança, impostos, relatórios de receita e análises de dados que operam de forma integrada.\nEscolha um plano\nAssinatura anual com pagamento mensal baseado em um nível de volume adequado para sua empresa.\nA partir de\n€ 500,00\npor mês em contrato de 1 ano\nPague pelo que usar.Sem tarifas recorrentes. Melhor opção para volumes baixos ou imprevisíveis.\n0,7%\ndo volume no Billing\nEscolha um plano\nPara equipes que estão lançando produtos com faturamento por uso. Pague conforme sua empresa cresce.\nUS$ 0,04\npor 1.000 eventos de ingestão\n0,8%\ndo volume de faturamento\nSaiba mais\nPara empresas que estão expandindo a receita ou transformando a precificação. Preços personalizados para suas necessidades.\nRecursos de faturamento para você começar a usar em pouco tempo.\nEscolha um plano\nConformidade fiscal completa, incluindo monitoramento automático de limites, cadastros, cálculos e declarações.\nA partir de\n€ 80,00\npor mês em contrato de 1 ano\nEste plano inclui apenas cálculos fiscais automatizados para empresas que atuam em regiões limitadas.\nIntegração no-code\n0,5%\npor transação, onde você estiver cadastrado para recolher impostos\nIntegração via API\n€ 0,45\npor transação, onde você estiver cadastrado para recolher impostos\nPlanos mensais flexíveis - cancele quando quiser.\nExperimente gratuitamente por 30 dias\n€ 13,00\npor mês\nEconomize mais com um plano anual, pago mensalmente.\nExperimente gratuitamente por 30 dias\nA partir de\n€ 9,00\npor mês em contrato de 1 ano\nEscolha um plano\nPotencialize aplicativos com dados em tempo real. Sincronize dados da API da Stripe em tempo real, incluindo pagamentos, cobranças, assinaturas e muito mais.\nPagamento por uso\n€ 0,002\npor linha sincronizada\n5.000 linhas sincronizadas gratuitamente por mês\nAssinatura mensal\nA partir de\n€ 90,00\npor mês, inclui até 50.000 linhas sincronizadas\nObtenha insights mais detalhados e relatórios mais rápidos. Sincronize conjuntos de dados enriquecidos, relatórios pré-criados e dados da API da Stripe em um ritmo programado para o Snowflake, Google BigQuery, Databricks e outros. Inclui o Stripe Sigma.\nExperimente gratuitamente por 30 dias\nAssinatura mensal\nA partir de\n€ 57,00\npor mês, inclui até 1.000 cobranças\nAssinatura anual\nA partir de\n€ 44,00\npor mês, contrato de 1 ano, inclui até 1.000 cobranças\nEscolha um plano\nAssinatura mensal flexível, com cancelamento a qualquer momento. Melhor para empresas com volume de pagamento baixo ou imprevisível.\nExperimente gratuitamente por 30 dias\n€ 20,00\npor mês\nAssinatura anual, paga mensalmente. Melhor para empresas com maior volume de pagamentos que desejam maximizar a economia.\nExperimente gratuitamente por 30 dias\nA partir de\n€ 175,00\npor mês em contrato de 1 ano\nEscolha um plano\nAssinatura mensal para preços mais previsíveis. Ideal para empresas com maiores volumes de pagamento que buscam maximizar a economia.\nA partir de\n€ 10,00\npor mês, cancele a qualquer momento\nPague pelo que usar. Sem taxas recorrentes. Ideal para volumes baixos ou imprevisíveis.\nA partir de\n€ 0,05\npor transação rastreada\nAbra sua empresa, obtenha seu EIN, emita ações e declare sua opção fiscal 83(b).\nUS$ 500,00\ntarifa única de configuração (inclui tarifas governamentais e do primeiro ano do agente registrado)\nVeja detalhes dos preços\nCapture e verifique a autenticidade de documentos de identificação do mundo todo. Use as verificações biométricas para comparar selfies do titular do documento com fotos de identificação.\n€ 1,25\npor verificação\nPermita que os usuários informem nome, data de nascimento e número do documento de identificação oficial local. Faça a validação junto a bancos de dados do governo e de terceiros (disponível apenas para SSNs dos EUA).\n€ 0,40\npor busca\nSem compromisso, sem taxas recorrentes. Comece a desenvolver fluxos de trabalho hoje mesmo.\nIncluso\n10.000 etapas por mês\n€ 0,015\npor etapa adicional\nSaiba mais\nCrie soluções personalizadas para facilitar a expansão para novos mercados, otimizar o desempenho dos pagamentos, automatizar os fluxos de trabalho de receita e finanças, monetizar os serviços financeiros e muito mais.\nPreços IC+, taxas fixas com desconto, assinaturas e taxas de juros especiais para plataformas.\nDescontos com base em níveis de volume, comprometimentos e utilização de produtos.\nPreços agregados opcionais para todos os mercados, facilitando a sua expansão global.\nDashboards, ferramentas e APIs que oferecem uma visão transparente dos seus custos.\nO estudo Total Economic Impact da Forrester sugere um retorno sobre o investimento de mais de 3 vezes nas empresas que implantaram a Stripe.\nGuidesCard_32\nRelatório\nThe Total Economic Impact™ Of Stripe\nAcesse uma plataforma completa de pagamentos com modelo de preços simples baseado em uso ou fale conosco para criarmos um pacote personalizado, específico para sua empresa.\nDescubra como milhões de empresas, de startups a grandes corporações, usam a Stripe para iniciar e expandir seus negócios.\nComece a criar sua integração e aceite seu primeiro pagamento em minutos. As bibliotecas da Stripe estão disponíveis em todas as linguagens, de Rubi a Go.",
+    "nearHeadings": [
+     "Stripe logo",
+     "Pagamentos",
+     "Receita​",
+     "Gestão dos valores",
+     "Finanças integradas",
+     "Mais",
+     "Preços para empresas de todos os tamanhos",
+     "Padrão",
+     "1,5% + € 0,25",
+     "2,5% + € 0,25"
+    ]
+   }
+  },
+  "image": "img/stripe-pricing.webp"
+ },
+ {
+  "id": "arxiv-attention",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "area",
+  "source": {
+   "url": "https://arxiv.org/abs/1706.03762",
+   "site": "arxiv.org",
+   "pageTitle": "[1706.03762] Attention Is All You Need"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Computer Science > Computation and Language\n[Submitted on 12 Jun 2017 ( v1 ), last revised 2 Aug 2023 (this version, v7)]\nAttention Is All You Need\nAshish Vaswani , Noam Shazeer , Niki Parmar , Jakob Uszkoreit , Llion Jones , Aidan N. Gomez , Lukasz Kaiser , Illia Polosukhin\nThe dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.\nComments:\n15 pages, 5 figures\nSubjects:\nComputation and Language (cs.CL) ; Machine Learning (cs.LG)\nCite as:\narXiv:1706.03762 [cs.CL]\n(or arXiv:1706.03762v7 [cs.CL] for this version)\nhttps://doi.org/10.48550/arXiv.1706.03762\nFocus to learn more\nSubmission history\nFrom: Llion Jones [ view email ]\nAccess Paper:\nView PDF\nHTML (experimental)\nTeX Source\nview license\nAdditional Features\nAudio Summary\nCurrent browse context:\ncs.CL\n< prev\nnew |\nChange to browse by:\ncs cs.LG\nReferences & Citations\nSciX\nGoogle Scholar\nSemantic Scholar\n123 blog links\nDBLP\nlisting",
+   "meta": {
+    "description": "Abstract page for arXiv paper 1706.03762: Attention Is All You Need",
+    "og": {
+     "og:type": "website",
+     "og:site_name": "arXiv.org",
+     "og:title": "Attention Is All You Need",
+     "og:url": "https://arxiv.org/abs/1706.03762v7",
+     "og:image": "/static/browse/0.3.4/images/arxiv-logo-fb.png",
+     "og:image:secure_url": "/static/browse/0.3.4/images/arxiv-logo-fb.png",
+     "og:image:width": "1200",
+     "og:image:height": "700",
+     "og:image:alt": "arXiv logo",
+     "og:description": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transforme"
+    }
+   },
+   "headings": [
+    "Computer Science > Computation and Language",
+    "Title:Attention Is All You Need",
+    "Submission history",
+    "Access Paper:",
+    "Additional Features",
+    "Current browse context:",
+    "References & Citations",
+    "123 blog links",
+    "DBLP - CS Bibliography",
+    "BibTeX formatted citation",
+    "Bookmark",
+    "Bibliographic and Citation Tools",
+    "Code, Data and Media Associated with this Article",
+    "Demos",
+    "Recommenders and Search Tools",
+    "arXivLabs: experimental projects with community collaborators"
+   ],
+   "alts": [
+    "archive"
+   ],
+   "page": {
+    "text": "View PDF\nHTML (experimental)\nAbstract:The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.\nComments:\n15 pages, 5 figures\nSubjects:\nComputation and Language (cs.CL); Machine Learning (cs.LG)\nCite as:\narXiv:1706.03762 [cs.CL]\n(or\narXiv:1706.03762v7 [cs.CL] for this version)\nhttps://doi.org/10.48550/arXiv.1706.03762\narXiv-issued DOI via DataCite\nSubmission history\nFrom: Llion Jones [view email]\n[v1]\nMon, 12 Jun 2017 17:57:34 UTC (1,102 KB)\n[v2]\nMon, 19 Jun 2017 16:49:45 UTC (1,125 KB)\n[v3]\nTue, 20 Jun 2017 05:20:02 UTC (1,125 KB)\n[v4]\nFri, 30 Jun 2017 17:29:30 UTC (1,124 KB)\n[v5]\nWed, 6 Dec 2017 03:30:32 UTC (1,124 KB)\n[v6]\nMon, 24 Jul 2023 00:48:54 UTC (1,124 KB)\n[v7]\nWed, 2 Aug 2023 00:41:18 UTC (1,124 KB)",
+    "nearHeadings": [
+     "Computer Science > Computation and Language",
+     "Title:Attention Is All You Need",
+     "Submission history",
+     "Access Paper:",
+     "Additional Features",
+     "Current browse context:",
+     "References & Citations",
+     "123 blog links",
+     "DBLP - CS Bibliography"
+    ]
+   }
+  },
+  "image": "img/arxiv-attention.webp"
+ },
+ {
+  "id": "hn-front",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "full",
+  "source": {
+   "url": "https://news.ycombinator.com/",
+   "site": "news.ycombinator.com",
+   "pageTitle": "Hacker News"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "1.The end of Microsoft Research's AI Frontiers group (hunch.net)\n345 points by srean 6 hours ago | hide | 200 comments\n2.GitHub New pull request overview page in public preview (github.blog)\n32 points by xiaoyu2006 1 hour ago | hide | 22 comments\n3.What I run on my $10 USD OpenStick homelab (bosscher.ch)\n307 points by LaurensBER 6 hours ago | hide | 76 comments\n4.Making any integer with four 2s (2025) (thegreenplace.net)\n41 points by germanrabbit 2 hours ago | hide | 8 comments\n5.Claude Code's \"Don't Ask Again\" exposes passwords in 1,122 public GitHub files (apiiro.com)\n132 points by shmulc 3 hours ago | hide | 96 comments\n6.Apple’s grey list: Words and phrases your iPhone won’t help you spell (theguardian.com)\n332 points by user_7832 7 hours ago | hide | 224 comments\n7.MaxxBench – \"Nice DeepSWE score. But is it true?\" (unlap.ai)\n184 points by antiuniverse 7 hours ago | hide | 55 comments\n8.Show HN: Coldframe, a honeypot that poses as a supermarket fridge controller (github.com/hedgerow-dev)\n185 points by hedgerow-dev 7 hours ago | hide | 39 comments\n9.Uranium cubes reveal why the German nuclear project failed (arstechnica.com)\n51 points by rbanffy 3 hours ago | hide | 11 comments\n10.Need for Speed Underground 2 online in the browser (nfsu2.xyz)\n787 points by fluxusars 15 hours ago | hide | 224 comments\n11.Turning Every Radio into a Radar (tiaminetworks.com)\n19 points by hasley 2 hours ago | hide | 5 comments\n12.Study solved a 150-year-old mystery into the identity of the extinct giant crane (bournemouth.ac.uk)\n9 points by gmays 2 hours ago | hide | discuss\n13.Show HN: An offline desktop companion to help maintain a healthy blink rhythm (eyesrhythm.com)\n22 points by prnysoni 2 hours ago | hide | 6 comments\n14.Five memorable books about programming (2008) (dadgum.com)\n79 points by andsoitis 7 hours ago | hide | 51 comments\n15.Retro Song Bird: Plug in any Game Boy cartridge to hear the soundtrack (retrosongbird.com)\n30 points by hentrep 3 hours ago | hide | 8 comments\n16.Every Mac comes with an (undocumented) family member classifier (8rank.ai)\n582 points by infwhispers 14 hours ago | hide | 333 comments\n17.The $8 Linux Computer (2022) (thelittleengineerthatcould.blogspot.com)\n192 points by zenincognito 10 hours ago | hide | 84 comments\n18.Every Windows 11 app should kill Electron, and Discord just showed why (windowslatest.com)\n201 points by thunderbong 13 hours ago | hide | 197 comments\n19.GeoWorks, Microsoft Windows' Upstart '90s Competitor (2016) (atlasobscura.com)\n39 points by andsoitis 6 hours ago | hide | 14 comments\n20.How Long Can Life Wait? (mceglowski.substack.com)\n120 points by Ariarule 8 hours ago | hide | 69 comments\n21.IRA Velinsky – Commodore's Industrial Designer (commodore.ca)\n7 points by erickhill 1 hour ago | hide | discuss\n22.Text.js: Build full-stack React apps that render inside console.log (textjs.org)\n80 points by nateb2022 9 hours ago | hide | 47 comments\n23.Shadow of the Sun (2021) (mattlakeman.org)\n18 points by andsoitis 3 hours ago | hide | 4 comments\n24.Every processor die anyone has photographed and given away (sheets.works)\n69 points by user_7832 8 hours ago | hide | 16 comments\n25.Terry Pratchett's Study (sussi.dk)\n91 points by ColinWright 8 hours ago | hide | 24 comments\n26.MeccanicOS (meccanicos.com)\n14 points by tomcam 3 hours ago | hide | 4 comments\n27.Running a law firm on Free software (decoded.legal)\n229 points by DeepLogin 15 hours ago | hide | 110 comments\n28.Asahi Linux Progress Linux 7.3 (asahilinux.org)\n309 points by ackyshake 19 hours ago | hide | 253 comments\n29.A barbarian tribe's mythic origin story is true, ancient DNA reveals (science.org)\n206 points by benbreen 19 hours ago | hide | 184 comments\n30.Commodore PET – The Worlds First Personal Computer (commodore.ca)\n3 points by andsoitis 1 hour ago | hide | discuss\nMore",
+   "meta": {},
+   "headings": [],
+   "alts": [],
+   "page": {
+    "text": ""
+   }
+  },
+  "image": "img/hn-front.webp"
+ },
+ {
+  "id": "fonts-inter",
+  "userId": "eval",
+  "type": "screenshot",
+  "kind": "visible",
+  "source": {
+   "url": "https://fonts.google.com/specimen/Inter",
+   "site": "fonts.google.com",
+   "pageTitle": "Inter - Google Fonts"
+  },
+  "createdAt": "2026-11-08T00:00:00.000Z",
+  "updatedAt": "2026-11-08T00:00:00.000Z",
+  "deletedAt": null,
+  "media": [],
+  "user": {
+   "tags": [],
+   "categoryId": null,
+   "hiddenAiTags": []
+  },
+  "ai": {
+   "tipo": [],
+   "visual": [],
+   "keys": [],
+   "colors": [],
+   "model": "",
+   "processedAt": null
+  },
+  "text": {
+   "selection": "Skip to content\nfont_download\nFonts\nlanguage\nNoto\ninterests\nIcons\nschool\nKnowledge\nhelp\nFAQ\ndark_mode\nThis site uses cookies from Google to deliver its services and to analyze traffic.\nLearn more\nclose\nYour Privacy and Google Fonts Learn how building websites with Google Fonts is safe for you and your users.\nLearn more\nclose\nsearch\nshopping_bag\nView selected families. Dismiss\nfont_download\nSpecimen\ninfo\nAbout\narticle\nLicense\nglyphs\nGlyphs & languages\nGet font\nInter\nDesigned by Rasmus Andersson\nlanguage\nrsms.me/inter\nLearn more about variable fonts\nlightbulb\nSans Serif — Neo Grotesque\nTechnology — Variable\nFeeling — Competent\nFeeling — Calm\nFeeling — Rugged\nFeeling — Sincere\nFeeling — Vintage\nSans Serif — Geometric\nWhereas disregard and contempt for human rights have resulted\nfeedback",
+   "meta": {
+    "description": "Inter is a variable font family carefully crafted & designed for computer screens. Inter features a tall x-height to aid in readability of mixed-case and lower-",
+    "og": {
+     "og:site_name": "Google Fonts",
+     "og:url": "https://fonts.google.com/specimen/Inter",
+     "og:title": "Inter - Google Fonts",
+     "og:description": "Inter is a variable font family carefully crafted & designed for computer screens. Inter features a tall x-height to aid in readability of mixed-case and lower-",
+     "og:image": "https://www.gstatic.com/images/icons/material/apps/fonts/1x/catalog/v5/opengraph_color.png",
+     "og:image:width": "1200",
+     "og:image:height": "630",
+     "og:image:type": "image/png",
+     "og:type": "website"
+    }
+   },
+   "headings": [
+    "Inter",
+    "Styles",
+    "Choosing type"
+   ],
+   "alts": [],
+   "page": {
+    "text": "Heading 1\n28px\nAaLl\nWhereas recognition of the inherent dignity\nNo one shall be subjected to arbitrary arrest, detention or exile.\nEveryone is entitled in full equality to a fair and public hearing by an independent and impartial tribunal, in the determination of his rights and obligations and of any criminal charge against him.\nNo one shall be subjected to arbitrary interference with his privacy, family, home or correspondence, nor to attacks upon his honour and reputation. Everyone has the right to the protection of the law against such interference or attacks.\nEveryone has the right to freedom of thought, conscience and religion; this right includes freedom to change his religion or belief, and freedom, either alone or in community with others and in public or private, to manifest his religion or belief in teaching, practice, worship and observance.\nEveryone has the right to freedom of opinion and expression; this right includes freedom to hold opinions without interference and to seek, receive and impart information and ideas through any media and regardless of frontiers.\nEveryone has the right to rest and leisure, including reasonable limitation of working hours and periodic holidays with pay.\nSize: 28\nItalic: 0 Optical Size: Auto Weight: 400\nHeading 1\nSize: 22\nItalic: 0 Optical Size: Auto Weight: 400\nHeading 2\nSize: 18\nItalic: 0 Optical Size: Auto Weight: 400\nHeading 3",
+    "nearHeadings": [
+     "Inter"
+    ]
+   }
+  },
+  "image": "img/fonts-inter.webp"
+ }
+]

@@ -1,0 +1,6 @@
+{
+  "name": "ai-eval",
+  "private": true,
+  "type": "module",
+  "dependencies": { "esbuild": "0.28.2", "playwright-core": "1.65.0" }
+}

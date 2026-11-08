@@ -1,0 +1,23 @@
+{
+  "_": "Hand-written expected tags (pt-PT; tech terms as people say them). Written before running any approach. 'a|b' = either counts. Each entry is matched at most once.",
+  "ff-surfaces": ["componentes ui", "dialog", "dropdown|combobox", "design system", "modo escuro", "sombras|elevação", "documentação"],
+  "gh-readability": ["repositório", "github", "javascript", "open source|biblioteca", "npm", "código"],
+  "mdn-flexbox": ["documentação", "css", "flexbox", "layout", "desenvolvimento web|html", "tutorial"],
+  "tailwind-docs": ["documentação", "css", "tailwind css", "flexbox", "layout", "modo escuro"],
+  "shadcn-combobox": ["componentes ui", "combobox|dropdown", "react", "tailwind css", "documentação", "design system", "modo escuro"],
+  "motion-docs": ["animação", "react", "documentação", "javascript", "biblioteca"],
+  "news-guardian": ["notícia|artigo", "ciência", "psicologia", "comunicação|conversa", "investigação|estudo"],
+  "news-publico": ["notícia|artigo", "saúde", "medicina|medicamentos", "diabetes", "ciência", "obesidade"],
+  "recipe-allrecipes": ["receita", "culinária", "sobremesa|doces", "bolachas", "chocolate"],
+  "map-osm": ["mapa", "lisboa", "portugal", "cartografia|geografia"],
+  "product-ikea": ["loja|e-commerce", "mobiliário", "estante", "decoração|casa", "preços"],
+  "product-apple": ["apple", "portátil", "mac", "hardware|tecnologia", "loja|produto"],
+  "design-dribbble": ["inspiração", "web design", "design|ui design", "landing page", "galeria", "dribbble"],
+  "video-youtube": ["vídeo", "youtube", "redes neuronais", "deep learning|machine learning", "inteligência artificial", "matemática"],
+  "x-post": ["rede social", "x|twitter", "publicação|post"],
+  "wiki-nata": ["pastelaria|doces", "sobremesa", "portugal", "lisboa", "culinária|gastronomia", "wikipedia|enciclopédia"],
+  "stripe-pricing": ["preços", "pagamentos", "finanças|fintech", "saas|software", "negócios|empresas"],
+  "arxiv-attention": ["artigo científico", "inteligência artificial", "machine learning|deep learning", "redes neuronais", "nlp|processamento de linguagem natural", "tradução automática"],
+  "hn-front": ["lista de links", "notícias|notícia", "tecnologia", "fórum|comunidade", "programação"],
+  "fonts-inter": ["tipografia", "tipo de letra|fonte", "design", "sans-serif", "google fonts|google"]
+}
