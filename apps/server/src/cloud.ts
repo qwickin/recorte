@@ -1,3 +1,4 @@
+import { cleanLangTag } from "@recorte/shared";
 import sharp from "sharp";
 import { z } from "zod";
 
@@ -13,6 +14,8 @@ export interface CloudInput {
   site: string;
   text: string;
   headings: string[];
+  /** The page's `<html lang>` (cleaned BCP 47 tag), when known. */
+  lang?: string;
 }
 
 export interface CloudResult {
@@ -30,9 +33,52 @@ const Answer = z.object({
   keys: z.array(z.string()).optional(),
 });
 
-const SYSTEM =
-  "Descreves capturas de ecrã para uma galeria pessoal pesquisável. Responde em português de Portugal, " +
-  'apenas com JSON: {"title": string (até 80 caracteres), "description": string (1 a 2 frases), "keys": string[] (até 8 palavras-chave)}.';
+/** Frequent short words that tell languages apart (each list leaves out what it shares with the others). */
+const STOPWORDS: Record<string, string[]> = {
+  en: ["the", "and", "of", "to", "is", "that", "for", "with", "this", "you", "are", "on", "it", "was", "from", "be", "by", "have", "not", "or", "which", "your"],
+  pt: ["não", "uma", "com", "para", "também", "são", "você", "isso", "está", "pelo", "pela", "os", "das", "dos", "ao", "à", "foi", "seu", "sua", "muito", "já", "em", "mas", "ou"],
+  es: ["el", "los", "las", "una", "con", "para", "también", "es", "está", "más", "pero", "del", "al", "por", "sus", "muy", "ya", "fue", "y", "se", "en", "lo", "o"],
+  fr: ["le", "la", "les", "des", "une", "est", "et", "pour", "avec", "pas", "dans", "du", "au", "ce", "qui", "sur", "sont", "plus", "vous", "nous", "être", "en", "ou"],
+  it: ["il", "gli", "della", "delle", "una", "con", "per", "anche", "è", "sono", "non", "che", "del", "nel", "alla", "più", "questo", "essere", "di", "da", "ma", "o"],
+  de: ["der", "die", "das", "und", "ist", "nicht", "mit", "ein", "eine", "für", "auf", "den", "dem", "sich", "auch", "von", "zu", "im", "wird", "oder", "aber"],
+  nl: ["de", "het", "een", "en", "van", "is", "niet", "met", "voor", "op", "zijn", "dat", "ook", "aan", "naar", "maar", "worden", "deze"],
+};
+const LOOKUP = new Map<string, string[]>();
+for (const [lang, words] of Object.entries(STOPWORDS)) for (const w of words) LOOKUP.set(w, [...(LOOKUP.get(w) ?? []), lang]);
+
+/** The language of a text from its stopwords (a primary subtag such as "pt"), or null when it is not clear. */
+export function detectLanguage(text: string): string | null {
+  const counts = new Map<string, number>();
+  for (const w of text.toLowerCase().match(/\p{L}+/gu)?.slice(0, 2000) ?? []) {
+    for (const lang of LOOKUP.get(w) ?? []) counts.set(lang, (counts.get(lang) ?? 0) + 1);
+  }
+  const [best, second] = [...counts].sort((a, b) => b[1] - a[1]);
+  if (!best || best[1] < 3 || (second && best[1] < second[1] * 1.3)) return null;
+  return best[0];
+}
+
+const LANGUAGE_NAMES = new Intl.DisplayNames(["en"], { type: "language", fallback: "none" });
+
+/**
+ * The language the cloud AI writes in, as an English name for the prompt: the page's `<html lang>`, else what its
+ * text looks like, else English.
+ */
+export function answerLanguage(input: Pick<CloudInput, "lang" | "pageTitle" | "text" | "headings">): string {
+  const name = (tag: string | null | undefined) => {
+    const clean = cleanLangTag(tag);
+    try {
+      return clean ? LANGUAGE_NAMES.of(clean) : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+  return name(input.lang) ?? name(detectLanguage([input.pageTitle, ...input.headings, input.text].join("\n"))) ?? "English";
+}
+
+const system = (language: string) =>
+  "You describe screenshots of web pages for a personal, searchable gallery. " +
+  `Write the title, the description and the keywords in ${language}, the language of the captured page. ` +
+  'Answer only with JSON: {"title": string (up to 80 characters), "description": string (1 to 2 sentences), "keys": string[] (up to 8 keywords)}.';
 
 export function cloudEndpoint(url: string): string {
   const base = url.replace(/\/+$/, "");
@@ -59,7 +105,7 @@ export function parseAnswer(content: string): CloudResult {
 export function createCloudAi(cfg: CloudConfig, fetchFn: FetchFn = fetch, timeoutMs = 60_000): CloudAi {
   return async (input) => {
     const jpeg = await sharp(input.image).resize({ width: 1024, height: 1024, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 80 }).toBuffer();
-    const context = [`Título da página: ${input.pageTitle}`, `Site: ${input.site}`, input.headings.length ? `Títulos: ${input.headings.slice(0, 8).join(" | ")}` : "", input.text ? `Texto: ${input.text.slice(0, 1500)}` : ""]
+    const context = [`Page title: ${input.pageTitle}`, `Site: ${input.site}`, input.headings.length ? `Headings: ${input.headings.slice(0, 8).join(" | ")}` : "", input.text ? `Text: ${input.text.slice(0, 1500)}` : ""]
       .filter(Boolean)
       .join("\n");
     const res = await fetchFn(cloudEndpoint(cfg.url), {
@@ -70,7 +116,7 @@ export function createCloudAi(cfg: CloudConfig, fetchFn: FetchFn = fetch, timeou
         temperature: 0.2,
         max_tokens: 400,
         messages: [
-          { role: "system", content: SYSTEM },
+          { role: "system", content: system(answerLanguage(input)) },
           {
             role: "user",
             content: [

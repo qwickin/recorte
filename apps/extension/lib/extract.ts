@@ -62,6 +62,9 @@ function pageMeta(doc: Document): ItemText["meta"] {
     if (Object.keys(og).length >= MAX_OG) break;
   }
   if (Object.keys(og).length) meta.og = og;
+  // The page's language, for the cloud AI's title and description (the server cleans and checks it).
+  const lang = (doc.documentElement.getAttribute("lang") || doc.querySelector<HTMLMetaElement>('meta[http-equiv="content-language" i]')?.content || "").trim();
+  if (lang) meta.lang = lang.slice(0, 35);
   return meta;
 }
 

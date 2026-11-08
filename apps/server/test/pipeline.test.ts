@@ -162,6 +162,14 @@ describe("pipeline", () => {
     expect(img.image_url.url).toMatch(/^data:image\/jpeg;base64,/);
     const sent = Buffer.from(img.image_url.url.split(",")[1], "base64");
     expect((await sharp(sent).metadata()).width).toBeLessThanOrEqual(1024);
+    // No <html lang> and too little text to tell: English.
+    expect(body.messages[0].content).toContain("in English, the language of the captured page");
+
+    // The page's <html lang> (sent by the extension) decides the language of the title and description.
+    const b = await upload({ text: { selection: "mapa", meta: { lang: "pt_br" }, headings: [], alts: [] } });
+    await createPipeline({ deps: d, classifier: async () => fakeClassifier(), cloud }).process(userId, b.id);
+    expect(d.storage.readMeta(userId, b.id)!.text.meta.lang).toBe("pt-BR");
+    expect(JSON.parse(String(seen[1]!.init.body)).messages[0].content).toContain("in Brazilian Portuguese");
 
     // failure: keeps the previous title, job still succeeds
     const bad = createCloudAi({ url: "https://llm.test/v1", key: "k", model: "m" }, async () => new Response("boom", { status: 500 }));

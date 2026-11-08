@@ -39,6 +39,8 @@ export const ItemText = z.object({
   meta: z.object({
     description: z.string().optional(),
     og: z.record(z.string(), z.string()).optional(),
+    /** The page's language (`<html lang>`), a BCP 47 tag such as "pt-BR"; the cloud AI writes in it. */
+    lang: z.string().optional(),
   }),
   /** h1–h3 of the whole page (up to UPLOAD_LIMITS.headings). */
   headings: z.array(z.string()),
@@ -139,6 +141,17 @@ export const ItemPage = z.object({
 });
 export type ItemPage = z.infer<typeof ItemPage>;
 
+/** A BCP 47 language tag as pages write it ("pt_BR", " EN-us "), cleaned ("pt-BR", "en-US"); undefined when not one. */
+export function cleanLangTag(raw: string | null | undefined): string | undefined {
+  const s = (raw ?? "").trim().replace(/_/g, "-");
+  if (!/^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8}){0,3}$/.test(s) || s.length > 35) return undefined;
+  try {
+    return Intl.getCanonicalLocales(s)[0];
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Applies UPLOAD_LIMITS to the extracted text. The total budget goes to the selection first, then headings,
  * description, alts and og values. `truncated` is true when anything was cut. The whole-page context (`page`)
@@ -168,6 +181,9 @@ export function clampUploadText(text: ItemText): { text: ItemText; truncated: bo
   const headings = list(text.headings, L.headings, L.heading);
   const meta: ItemText["meta"] = {};
   if (text.meta.description !== undefined) meta.description = take(text.meta.description, L.metaValue);
+  // Not counted in the budget; a value that is not a language tag is dropped, never an error.
+  const lang = cleanLangTag(text.meta.lang);
+  if (lang) meta.lang = lang;
   const alts = list(text.alts, L.alts, L.alt);
   if (text.meta.og) {
     const entries = Object.entries(text.meta.og);

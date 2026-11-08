@@ -146,7 +146,8 @@ export const LINK_MAX_BYTES = 5 * 1024 * 1024;
 const DEFAULT_HEADERS = {
   "user-agent": "Mozilla/5.0 (compatible; RecorteBot/1.0; +https://github.com/qwickin/recorte)",
   accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.5",
-  "accept-language": "pt-PT,pt;q=0.9,en;q=0.8",
+  // No preferred language of our own: English, then whatever the site serves by default.
+  "accept-language": "en-US,en;q=0.9,*;q=0.5",
   "accept-encoding": "gzip, deflate, br",
 };
 

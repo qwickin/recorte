@@ -1,6 +1,6 @@
 import { type Classifier, MODEL_ID, TAGGER_ID, createTopicTagger, extractColors, extractKeywords, tagItem } from "@recorte/ai";
 import { keywordInput, topicInput } from "./ai-input";
-import { type Item, UPLOAD_LIMITS } from "@recorte/shared";
+import { type Item, UPLOAD_LIMITS, cleanLangTag } from "@recorte/shared";
 import { makeImages } from "./items/images";
 import { type FetchedLink, fetchImage, fetchLink } from "./links/fetch-link";
 import { type SafeFetchOptions, fetchErrorCode } from "./links/safe-fetch";
@@ -55,6 +55,10 @@ export function mergeLink(m: Item, f: FetchedLink | null, error: string | null, 
   const text = { ...m.text, meta: { ...m.text.meta } };
   if (f) {
     if (!text.meta.description && f.description) text.meta.description = f.description;
+    if (!text.meta.lang && f.lang) {
+      const lang = cleanLangTag(f.lang);
+      if (lang) text.meta.lang = lang;
+    }
     const og = { ...f.og, ...clientOg };
     const keys = Object.keys(og).slice(0, UPLOAD_LIMITS.ogKeys);
     if (keys.length) text.meta.og = Object.fromEntries(keys.map((k) => [k, og[k]!]));
@@ -175,6 +179,7 @@ export function createPipeline(p: PipelineDeps) {
           site: m0.source.site,
           text: m0.text.selection || (m0.text.page?.text ?? "").slice(0, 4000),
           headings: m0.text.headings,
+          ...(m0.text.meta.lang ? { lang: m0.text.meta.lang } : {}),
         });
       } catch (e) {
         console.warn(`cloud ai failed for ${id} (continuing):`, (e as Error).message);

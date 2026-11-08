@@ -20,6 +20,8 @@ export interface ParsedPage {
   keywords: string[];
   /** Readability main text (block breaks kept), capped. */
   text: string;
+  /** `<html lang>`, as written. */
+  lang?: string;
 }
 
 const collapse = (s: string | null | undefined): string => (s ?? "").replace(/\s+/g, " ").trim();
@@ -126,6 +128,7 @@ export function parsePage(html: string, pageUrl: string): ParsedPage {
     headings,
     keywords,
     text: readable(html, document),
+    lang: collapse(document.documentElement?.getAttribute("lang")) || undefined,
   };
 }
 
