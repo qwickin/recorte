@@ -60,8 +60,6 @@ It runs as **one Docker container**. Your captures stay on your disk.
 | <img src="site/assets/search.webp" alt="⌘K search palette with image results"> | <img src="site/assets/detail.webp" alt="Detail view with zoomable capture, tags and note"> |
 | <img src="site/assets/filters.webp" alt="The filter Dock with the color filter open"> | <img src="site/assets/phone.webp" alt="The gallery on a phone" width="260"> |
 
-> The screenshots show the earlier Portuguese interface; the UI is now English by default.
-
 ## How it works
 
 ```
