@@ -12,6 +12,8 @@ Branch `feat/zero-config`. Base `7cfe7ec`. Nothing pushed or merged. No new depe
 | `71b6642` | test(e2e): ⌘K results are a grid of image cards with arrow-key movement |
 | `4b1082f` | fix(gallery): hero keeps its height while tags load; empty copy waits for the library total |
 | `fda277f` | fix(gallery): text-card tiles keep their title visible |
+| `33cbc47` | docs: round 2 part C report (gallery UI) |
+| `212a9fb` | fix(gallery): 44 px touch targets on phones (detail, tags, Dock, top bar); ⌘K from every page |
 
 C1–C8 are in a single UI commit because they share `styles.css`. The commit message has a section for each item.
 
@@ -20,10 +22,14 @@ C1–C8 are in a single UI commit because they share `styles.css`. The commit me
 **C1 Layout shift**
 - `html { scrollbar-gutter: stable }`. React Aria 3.53's scroll lock detects `scrollbarGutter` and sets it instead of adding padding, so opening a modal doesn't double the shift.
 - The top bar is identical on every page:
-  - The search pill is now on every page. Away from the gallery it navigates to `/` and opens the palette, via `lib/palette.ts`.
+  - The search pill is now on every page. Away from the gallery, both the pill and ⌘K/Ctrl+K navigate to `/` and open the palette, via `lib/palette.ts`. Verified from `/definicoes`.
   - "Selecionar" left the top bar.
   - The bar is always one row, 72 px.
-- Measured in Chromium 1440×900: the nav links and search pill sit at the same x on `/`, `/lixo`, `/extensao` and `/definicoes` (`995, 1044, 1124, 1224`).
+- Measured in Chromium 1440×900 with real scrollbars (launched with `--hide-scrollbars` removed). The search pill sits at x=1224 on every page and state:
+  - `/` (scrolls), `/extensao` and `/definicoes` (scroll): `clientWidth` reads 1425.
+  - `/lixo` (no scrollbar): `clientWidth` reads 1440, but the pill is still at x=1224, so the gutter is reserved and nothing moves. Chrome simply reports the full width for a root element that isn't scrolling.
+  - With the detail modal open (`overflow: hidden`, `padding-right: 0`): the pill is at x=1224, so there is no shift and no double padding.
+- The nav links also stay at the same x on all four pages (`995, 1044, 1124`).
 - Fonts: the latin 200 and 300 woff2 files are preloaded from `index.html`, and `font-display` changed from `swap` to `block`. The fonts are same-origin and the CSP is unchanged.
 - The hero reserves its count line while tags load (fix commit `4b1082f`).
 - The `Private` route wrapper was already not remounting between paths.
@@ -38,7 +44,7 @@ C1–C8 are in a single UI commit because they share `styles.css`. The commit me
 **C3 Zoom** (`components/ZoomImage.tsx`, math in `lib/zoom.ts`)
 - Wheel zooms around the pointer. It is a native non-passive listener, so the page doesn't scroll. Lines and pages are normalised, and a trackpad pinch (`ctrlKey`) is handled more finely.
 - Drag pans, clamped so the image never leaves an empty margin. Double-click resets, or zooms 2.5× at the point when already reset. Keys `+`, `-` and `0` work when the image has focus.
-- Touch: two-finger pinch plus pan around the midpoint, and one-finger pan.
+- Touch: two-finger pinch plus pan around the midpoint, and one-finger pan. Verified in a real browser: a two-finger spread sent through CDP `Input.dispatchTouchEvent` took the scale from 0.244 to 1.056 (`detail-zoom-phone.png`).
 - Rendering is a single `translate3d(...) scale()` on one element, written from a rAF loop with easing, so React doesn't re-render per frame. `will-change` is set only while moving, so Chrome re-rasterises sharply when idle.
 - The hint "Usa a roda do rato para fazer zoom" ("Junta dois dedos para fazer zoom" on touch) fades after the first use. That is remembered in `localStorage`, wrapped in try/catch.
 - Zoom state resets per item (keyed by id).
@@ -90,6 +96,10 @@ C1–C8 are in a single UI commit because they share `styles.css`. The commit me
 - The palette is full-screen with a "Fechar" button.
 - The masonry was already 2 columns under 520 px.
 - No horizontal overflow on `/definicoes`, `/extensao` or `/lixo` at 390 px (measured `scrollWidth − clientWidth = 0`).
+- Touch targets were audited at 390×844 (touch context) over every visible `button, a, input, select, textarea, [role=option]`, excluding the tag-cloud words, on the gallery, the detail sheet and the palette.
+  - First pass found 18 controls under 44 px: Dock chips at 42, the icon-only Selecionar at 42 wide, tag chips and their × at 28, the add-tag input, the category select and "Abrir página" at 36, the site link at 20, and the modal close button at 24.
+  - These are fixed with `@media (pointer: coarse)` and phone rules (plus `min-h-11` on the top-bar chips and "Limpar").
+  - Second pass: 0 controls under 44 px on all three screens.
 
 **C9 PWA**
 - `public/manifest.webmanifest`: name Recorte, standalone, black theme and background.
@@ -131,16 +141,15 @@ The grid tests cover reading order, short last rows, Home/End and edge cases. Th
 | Server `npx vitest run` | 9 files passed, 1 skipped; 179 passed, 1 skipped (`static.test.ts` now 9 tests, incl. PWA) |
 | Extension `pnpm typecheck` | ok |
 | e2e `tsc` | ok |
-| E2E `node --import tsx --test stack.spec.ts` (Docker) | 12/12 passed, total 39 s, image 1145 MB |
+| E2E `node --import tsx --test stack.spec.ts` (Docker) | 12/12 passed (run twice; the second run on final code `212a9fb`) |
 
 The E2E ⌘K test now asserts that:
 - the "Pastel de nata" option contains an `img`
+- the grid has at least 2 columns (checked unconditionally)
 - the first two results sit side by side
 - ↓ then → selects the second card
 
-That part is guarded by `count >= 2`. The run passed, but the log doesn't show whether this search returned two or more results, so that sub-check may have been skipped.
-
-The E2E ran on commit `71b6642`. The two later commits only touch the hero and tile CSS and JSX, and were checked with typecheck, build, unit tests and screenshots.
+The last two checks need at least 2 results. In the final run they ran: the log says `palette: 2 result(s), 4 columns, arrow-key check ran`.
 
 ## Screenshots
 
@@ -154,10 +163,11 @@ Data: a throwaway container (`recorte:e2e`, port 18731, volume `recorte-c-shots`
 - **Mobile detail sheet:** `detail-sheet-phone.png`, `detail-sheet-scrolled-phone.png`
 - **⌘K grid:** `palette-grid-desktop.png` (after ↓ → ↓, the active card shows its snippet), `palette-grid-phone.png`
 - **Dock:** `dock-filter-panel-desktop.png`, `dock-filter-panel-phone.png`, `dock-selection-desktop.png`, `dock-selection-phone.png`, `dock-back-desktop.png`
-- **Dock morph:** `dock-morph-sequence-desktop.png` (frames of the morph at 0.1× animation speed, top to bottom), `dock-morph-mid-desktop.png`, `dock-morph-mid-phone.png`
+- **Dock morph:** `dock-morph-sequence-desktop.png` and `dock-morph-sequence-phone.png` (frames of the morph at 0.1× animation speed, top to bottom)
+- **Detail with zoom on phone:** `detail-zoom-phone.png` (after a CDP pinch)
 - **Other:** `topbar-menu-phone.png`, `page-definicoes-phone.png`, `page-extensao-phone.png`, `page-lixo-phone.png`, `settings-desktop.png`
 
-I looked at each one. Problems they showed that I fixed:
+I opened and checked every file listed. The two `empty-*` shots are from the first, empty container and predate a small change that makes the empty copy wait for the library total; the copy itself is unchanged. Problems the screenshots showed that I fixed:
 - see-through crossfade in the morph (solid group background)
 - a text-card tile clipping its title on phones
 - a doubled caption on text cards
@@ -186,6 +196,5 @@ I looked at each one. Problems they showed that I fixed:
 - **Upscaling past 1:1 is soft.** The maximum zoom is 8× the contain scale (at least 2× natural size), so on 1× captures the deepest zoom is visibly blurry.
 - **View Transitions** need Chromium 111+, Safari 18+ or a recent Firefox; elsewhere the Dock swap is instant. During the 440 ms morph the page ignores pointer input, which is inherent to View Transitions.
 - **Selection Dock on phones:** the status message ("N capturas movidas…") is screen-reader-only to save room.
-- **Opening search from other pages:** ⌘K still works only on the gallery. On other pages the search pill navigates to the gallery and opens the palette.
 - **One UI commit** covers C1–C8, because the items share `styles.css`.
 - **Throwaway image tag:** the screenshot container's image was built with a wrong `APP_VERSION` build arg ("0.0.55 0.0.18"). That only affected the throwaway; the E2E rebuilt the image itself. The local `recorte:e2e` image tag remains.
