@@ -262,6 +262,35 @@ test("AI processing: tipo 'mapa' on the OpenStreetMap capture", { timeout: 10 * 
   assert.ok(item.ai.colors.length > 0);
 });
 
+test("a saved link (type link) through the API: no image, the server fetches it (SSRF-guarded)", { timeout: 3 * 60_000 }, async () => {
+  const meta = (url: string) =>
+    JSON.stringify({ type: "link", kind: "link", url, pageTitle: "", tags: [], categoryId: null, text: { selection: "", meta: {}, headings: [], alts: [] }, capturedAt: new Date().toISOString() });
+  const form = new FormData();
+  form.set("meta", meta("https://example.com/"));
+  const r = await api("/api/items", { method: "POST", body: form });
+  assert.equal(r.status, 201, await r.clone().text());
+  const s = (await r.json()) as { id: string; type: string; thumb: string | null };
+  assert.equal(s.type, "link");
+  assert.equal(s.thumb, null);
+  const m = await until("link fetched", 150_000, async () => {
+    const x = (await (await api(`/api/items/${s.id}`)).json()) as { link?: { fetchedAt?: string; title?: string; fetchError?: string }; source: { pageTitle: string } };
+    return x.link?.fetchedAt ? x : null;
+  });
+  assert.equal(m.link?.fetchError, undefined);
+  assert.match(m.source.pageTitle, /Example Domain/);
+  // Runs after the AI test: the worker is sequential, so the link jobs wait behind the screenshots.
+  // The container must not reach its own loopback (nor the embedded Meilisearch) through a saved link.
+  const inner = new FormData();
+  inner.set("meta", meta("http://127.0.0.1:7700/keys"));
+  const ri = (await (await api("/api/items", { method: "POST", body: inner })).json()) as { id: string };
+  const mi = await until("blocked link processed", 150_000, async () => {
+    const x = (await (await api(`/api/items/${ri.id}`)).json()) as { link?: { fetchedAt?: string; fetchError?: string } };
+    return x.link?.fetchedAt ? x : null;
+  });
+  assert.match(mi.link?.fetchError ?? "", /not allowed/);
+  for (const id of [s.id, ri.id]) assert.equal((await api(`/api/items/${id}`, { method: "DELETE" })).status, 204);
+});
+
 test("search 'doce português' finds the pastel de nata (API, waits for the embedder)", { timeout: 20 * 60_000 }, async () => {
   const t = Date.now();
   const rank = await until(
