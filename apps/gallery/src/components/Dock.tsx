@@ -1,8 +1,8 @@
 import { Button } from "@heroui/react";
-import { type Category, normalizeTags } from "@recorte/shared";
+import { type Category, canonicalTags } from "@recorte/shared";
 import { createContext, use, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { api, type Filters } from "../api";
-import { type Msg, msgText, useFormat, useT } from "../i18n";
+import { type Msg, msgText, useFormat, useT, useTagLabel } from "../i18n";
 import { COLORS, colorKey, isColorName, ITEM_TYPES, typeKey } from "../lib/text";
 import { CloseIcon, SelectIcon } from "./icons";
 
@@ -214,6 +214,7 @@ type SelectionProps = {
 
 export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }: SelectionProps) {
   const t = useT();
+  const tagLabel = useTagLabel();
   const [tag, setTag] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Msg | null>(null);
@@ -242,18 +243,20 @@ export function SelectionDock({ ids, categories, onDone, onSelectAll, onCancel }
 
   // PATCH replaces user.tags, so each item is merged on its own (summary tags also hold AI tags).
   const addTag = () => {
-    const add = normalizeTags([tag]);
+    // The same matching as the server: a label of an AI tag (any language) is that tag's ID, so typing
+    // "modo escuro" also brings back a hidden "dark mode".
+    const add = canonicalTags([tag]);
     if (!add.length) return;
     setTag("");
     return run(async () => {
       for (const id of ids) {
         const m = await api.getItem(id);
-        const merged = normalizeTags([...m.user.tags, ...add]);
+        const merged = canonicalTags([...m.user.tags, ...add]);
         const unhide = m.user.hiddenAiTags.filter((t) => !add.includes(t));
         await api.patchItem(id, { tags: merged, ...(unhide.length !== m.user.hiddenAiTags.length ? { hiddenAiTags: unhide } : {}) });
       }
       return [];
-    }, (n) => ({ key: "dock.tagAdded", vars: { tag: add[0]!, count: n } }));
+    }, (n) => ({ key: "dock.tagAdded", vars: { tag: tagLabel(add[0]!), count: n } }));
   };
 
   const setCategory = (categoryId: string) =>

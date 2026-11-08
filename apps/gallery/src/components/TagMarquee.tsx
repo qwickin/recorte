@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { TagCount } from "@recorte/shared";
-import { type MessageKey, useT } from "../i18n";
+import { useT, useTagLabel } from "../i18n";
 import { Link } from "../lib/router";
 
 type Props = {
@@ -52,13 +52,18 @@ function useLaneDurations(deps: unknown) {
   return root;
 }
 
-/** Example tags of the ghost marquee: one comma-separated lane per message. */
-const EXAMPLES: MessageKey[] = ["marquee.examples1", "marquee.examples2", "marquee.examples3"];
+/** Example tags of the ghost marquee (tag IDs, shown in the viewer's language): one lane each. */
+const EXAMPLES: string[][] = [
+  ["design system", "recipe", "map", "typography", "react", "inspiration", "dashboard", "photo"],
+  ["article", "ui components", "color", "travel", "documentation", "animation", "product"],
+  ["dark mode", "illustration", "code", "news", "architecture", "landing page", "ux"],
+];
 
 /** First visit: a ghost of what the hero will look like, and how to get there. */
 function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
   const t = useT();
-  const lanes = useMemo(() => EXAMPLES.map((k) => t(k).split(/\s*,\s*/)), [t]);
+  const label = useTagLabel();
+  const lanes = useMemo(() => EXAMPLES.map((lane) => lane.map(label)), [label]);
   const root = useLaneDurations(lanes);
   const waiting = !!libraryTotal; // captures exist, the AI has not tagged them yet
   return (
@@ -107,6 +112,7 @@ function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
 
 export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }: Props) {
   const t = useT();
+  const label = useTagLabel();
   const list = tags ?? [];
   const lv = useMemo(() => levels(list), [list]);
   const lanes = useMemo(() => {
@@ -116,8 +122,10 @@ export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }:
       tags: [...lane].sort((a, b) => hash(a.tag) - hash(b.tag)),
       // Short lanes are repeated so one run is always wider than the screen.
       reps: Math.max(1, Math.ceil(10 / Math.max(1, lane.length))),
+      // In the lane so the lane durations are measured again when the language (so the widths) changes.
+      labels: lane.map((x) => label(x.tag)),
     }));
-  }, [list, rows]);
+  }, [list, rows, label]);
   const root = useLaneDurations(lanes);
 
   if (tags === null) return <div className="h-[168px]" aria-hidden="true" />;
@@ -145,7 +153,7 @@ export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }:
                         tabIndex={primary ? 0 : -1}
                         onClick={() => onToggle(tag.tag)}
                       >
-                        {tag.tag}
+                        {label(tag.tag)}
                         <span className="tag-count" aria-label={t("marquee.count", { count: tag.count })}>
                           {tag.count}
                         </span>

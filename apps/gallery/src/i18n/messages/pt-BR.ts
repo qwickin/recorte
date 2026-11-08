@@ -199,9 +199,6 @@ export const ptBR: Messages<typeof en> = {
   "marquee.emptyTitle": "Ainda não há tags.",
   "marquee.emptyBody": "Instale a {extension} e salve a primeira captura: as tags aparecem aqui.",
   "marquee.extension": "extensão",
-  "marquee.examples1": "design system, receitas, mapa, tipografia, react, inspiração, dashboard, fotografia",
-  "marquee.examples2": "artigo, componente web, paleta de cores, viagens, documentação, animação, produto",
-  "marquee.examples3": "modo escuro, ilustração, código, notícias, arquitetura, landing page, ux",
 
   "dock.filters": "Filtros",
   "dock.removeFilter": "Remover filtro {label}",

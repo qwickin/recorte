@@ -1,4 +1,4 @@
-import { type Category, DEFAULT_LOCALE, formatNumber, normalizeTag, normalizeTags, type TagCount } from "@recorte/shared";
+import { type Category, DEFAULT_LOCALE, canonicalTags, formatNumber, normalizeTag, tagLabel, type TagCount } from "@recorte/shared";
 import { makeT, type T } from "./i18n";
 import { MAX_FULL_PAGE_HEIGHT } from "./stitch";
 import type { DialogInput, LinkPreview } from "./messages";
@@ -122,6 +122,8 @@ const fold = (s: string) => normalizeTag(s).normalize("NFD").replace(/\p{M}/gu, 
 /** Renders the dialog into `container`; resolves with the user's input, or null when cancelled. */
 export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Promise<DialogInput | null> {
   const t = o.t ?? makeT(DEFAULT_LOCALE);
+  /** AI tags are IDs: shown (and matched while typing) by their label in the UI language; typed tags as they are. */
+  const label = (tag: string) => tagLabel(tag, t.locale);
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
   return new Promise((resolve) => {
@@ -160,19 +162,20 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     const renderChips = () => {
       chips.replaceChildren(
         ...tags.map((tag) => {
-          const x = h("button", { type: "button", "aria-label": t("dialog.removeTag", { tag }) }, "×");
+          const x = h("button", { type: "button", "aria-label": t("dialog.removeTag", { tag: label(tag) }) }, "×");
           x.addEventListener("click", () => {
             tags.splice(tags.indexOf(tag), 1);
             renderChips();
             tagInput.focus();
           });
-          return h("span", { class: "chip" }, tag, x);
+          return h("span", { class: "chip" }, label(tag), x);
         }),
         tagInput,
       );
     };
     const addTag = (raw: string) => {
-      for (const tag of normalizeTags(raw.split(","))) if (!tags.includes(tag)) tags.push(tag);
+      // As the server stores it: a label of an AI tag (any language) becomes its ID.
+      for (const tag of canonicalTags(raw.split(","))) if (!tags.includes(tag)) tags.push(tag);
       tagInput.value = "";
       renderChips();
       updateSuggest();
@@ -182,8 +185,8 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
       const q = fold(tagInput.value);
       suggestions = q
         ? allTags
-            .filter((x) => !tags.includes(x.tag) && fold(x.tag).includes(q))
-            .sort((a, b) => Number(fold(b.tag).startsWith(q)) - Number(fold(a.tag).startsWith(q)) || b.count - a.count)
+            .filter((x) => !tags.includes(x.tag) && fold(label(x.tag)).includes(q))
+            .sort((a, b) => Number(fold(label(b.tag)).startsWith(q)) - Number(fold(label(a.tag)).startsWith(q)) || b.count - a.count)
             .slice(0, 8)
             .map((x) => x.tag)
         : [];
@@ -191,7 +194,7 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
       suggest.replaceChildren(
         ...suggestions.map((s, i) => {
           const count = allTags.find((x) => x.tag === s)?.count ?? 0;
-          const li = h("li", { role: "option", "aria-selected": String(i === active) }, h("span", {}, s), h("span", { class: "n" }, String(count)));
+          const li = h("li", { role: "option", "aria-selected": String(i === active) }, h("span", {}, label(s)), h("span", { class: "n" }, String(count)));
           li.addEventListener("mousedown", (e) => {
             e.preventDefault();
             addTag(s);

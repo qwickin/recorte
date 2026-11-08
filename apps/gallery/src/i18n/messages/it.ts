@@ -199,9 +199,6 @@ export const it: Messages<typeof en> = {
   "marquee.emptyTitle": "Ancora nessun tag.",
   "marquee.emptyBody": "Installa l’{extension} e salva la tua prima cattura: i tag compariranno qui.",
   "marquee.extension": "estensione",
-  "marquee.examples1": "design system, ricette, mappa, tipografia, react, ispirazione, dashboard, fotografia",
-  "marquee.examples2": "articolo, componente web, palette di colori, viaggi, documentazione, animazione, prodotto",
-  "marquee.examples3": "modalità scura, illustrazione, codice, notizie, architettura, landing page, ux",
 
   "dock.filters": "Filtri",
   "dock.removeFilter": "Rimuovi il filtro {label}",

@@ -16,7 +16,7 @@ import { useItemFeed } from "../hooks/useItemFeed";
 import { displayTags, displayTitle, matchesFilters } from "../lib/item";
 import { inLoadedRange } from "../api/feed";
 import { takePaletteRequest } from "../lib/palette";
-import { useFormat, useT } from "../i18n";
+import { useFormat, useT, useTagLabel } from "../i18n";
 import { colorKey, isColorName, isMac, typeKey } from "../lib/text";
 
 const ratio = (c: ItemSummary) => (c.width > 0 ? c.height / c.width : 0.62);
@@ -35,6 +35,7 @@ function morph(update: () => void) {
 
 export function GalleryPage() {
   const t = useT();
+  const tagLabel = useTagLabel();
   const fmt = useFormat();
   // null until the first response: the empty hero must not flash on every load.
   const [tags, setTags] = useState<TagCount[] | null>(null);
@@ -165,7 +166,7 @@ export function GalleryPage() {
   const colorLabel = (c: string) => (isColorName(c) ? t(colorKey(c)) : c);
   const categoryName = (id: string) => categories.find((c) => c.id === id)?.name ?? t("gallery.category");
   const chips: FilterChip[] = [
-    ...filters.tags.map((t) => ({ key: `tag:${t}`, label: t, onRemove: () => toggleTag(t) })),
+    ...filters.tags.map((t) => ({ key: `tag:${t}`, label: tagLabel(t), onRemove: () => toggleTag(t) })),
     ...(filters.site ? [{ key: "site", label: filters.site, onRemove: () => changeFilters({ ...filters, site: undefined }) }] : []),
     ...(filters.type ? [{ key: "type", label: t(typeKey(filters.type)), onRemove: () => changeFilters({ ...filters, type: undefined }) }] : []),
     ...(filters.color ? [{ key: "color", label: colorLabel(filters.color), onRemove: () => changeFilters({ ...filters, color: undefined }) }] : []),
@@ -177,7 +178,7 @@ export function GalleryPage() {
 
   const describe = () => {
     const parts: string[] = [];
-    if (filters.tags.length) parts.push(t("gallery.withTags", { tags: fmt.list(filters.tags) }));
+    if (filters.tags.length) parts.push(t("gallery.withTags", { tags: fmt.list(filters.tags.map(tagLabel)) }));
     if (filters.site) parts.push(t("gallery.fromSite", { site: filters.site }));
     if (filters.color) parts.push(t("gallery.inColor", { color: colorLabel(filters.color) }));
     if (filters.category) parts.push(t("gallery.inCategory", { category: categoryName(filters.category) }));
@@ -288,7 +289,7 @@ export function GalleryPage() {
             <>
               <p className="text-[15px] text-white/80">{t("gallery.noMatch")}</p>
               <Button size="sm" variant="outline" onPress={() => (filters.tags.length ? toggleTag(filters.tags.at(-1)!) : changeFilters(EMPTY_FILTERS))}>
-                {filters.tags.length ? t("gallery.removeTag", { tag: filters.tags.at(-1)! }) : t("gallery.clearFilters")}
+                {filters.tags.length ? t("gallery.removeTag", { tag: tagLabel(filters.tags.at(-1)!) }) : t("gallery.clearFilters")}
               </Button>
             </>
           )}

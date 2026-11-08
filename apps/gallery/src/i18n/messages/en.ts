@@ -214,9 +214,6 @@ export const en = {
   "marquee.emptyTitle": "No tags yet.",
   "marquee.emptyBody": "Install the {extension} and save your first capture: tags show up here.",
   "marquee.extension": "extension",
-  "marquee.examples1": "design system, recipes, map, typography, react, inspiration, dashboard, photography",
-  "marquee.examples2": "article, web component, color palette, travel, documentation, animation, product",
-  "marquee.examples3": "dark mode, illustration, code, news, architecture, landing page, ux",
 
   // ---- Dock (filters + selection)
   "dock.filters": "Filters",

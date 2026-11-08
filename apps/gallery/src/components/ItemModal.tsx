@@ -1,11 +1,11 @@
 import { Button, Modal, Spinner, Tooltip } from "@heroui/react";
 import { buttonVariants } from "@heroui/styles";
-import { API, type Category, type Item, type ItemPatch, type ItemSummary, aiTags, normalizeTag } from "@recorte/shared";
+import { API, type Category, type Item, type ItemPatch, type ItemSummary, aiTags, canonicalTag } from "@recorte/shared";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { api, originalUrl } from "../api";
 import { PHONE, useMedia } from "../hooks/useMedia";
 import { displayTags, displayTitle, hiddenAiTags } from "../lib/item";
-import { type MessageKey, useFormat, useT } from "../i18n";
+import { type MessageKey, useFormat, useT, useTagLabel } from "../i18n";
 import { kindKey, typeKey } from "../lib/text";
 import { CheckIcon, ChevronIcon, CloseIcon, CopyIcon, ExternalIcon, TrashIcon } from "./icons";
 import { ZoomImage } from "./ZoomImage";
@@ -117,6 +117,7 @@ async function copyText(text: string): Promise<void> {
 
 export function ItemModal({ summary, categories, onCategoryCreated, onClose, onPrev, onNext, onTag, onSite, onChanged, onDeleted, onOpen }: Props) {
   const t = useT();
+  const tagLabel = useTagLabel();
   const fmt = useFormat();
   // Keep the last summary rendered while the exit animation runs.
   const last = useRef<ItemSummary | null>(summary);
@@ -221,7 +222,9 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
   const addTag = () => {
     if (!item) return;
-    const t = normalizeTag(tagDraft);
+    // The server's matching: a label of an AI tag (any language) is its ID, so "modo escuro" restores a hidden
+    // "dark mode" instead of adding a second tag.
+    const t = canonicalTag(tagDraft);
     setTagDraft("");
     if (!t) return;
     if (item.user.hiddenAiTags.includes(t)) void save({ hiddenAiTags: item.user.hiddenAiTags.filter((x) => x !== t) });
@@ -439,9 +442,9 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                             <span key={tag.tag} className="tag-chip" data-origin={tag.origin}>
                               <button type="button" onClick={() => onTag(tag.tag)} title={tag.origin === "ai" ? t("detail.aiTag") : t("detail.yourTag")}>
                                 {tag.origin === "ai" && <span className="origin-dot" data-origin="ai" />}
-                                {tag.tag}
+                                {tagLabel(tag.tag)}
                               </button>
-                              <button type="button" onClick={() => removeTag(tag.tag, tag.origin)} aria-label={t("detail.removeTag", { tag: tag.tag })} className="tag-chip-x">
+                              <button type="button" onClick={() => removeTag(tag.tag, tag.origin)} aria-label={t("detail.removeTag", { tag: tagLabel(tag.tag) })} className="tag-chip-x">
                                 <CloseIcon width={12} height={12} />
                               </button>
                             </span>
@@ -469,7 +472,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                                   title={t("detail.restoreTag")}
                                   onClick={() => save({ hiddenAiTags: item.user.hiddenAiTags.filter((x) => x !== tag) })}
                                 >
-                                  {tag}
+                                  {tagLabel(tag)}
                                 </button>
                               </span>
                             ))}

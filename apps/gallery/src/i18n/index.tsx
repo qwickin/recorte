@@ -9,8 +9,9 @@ import {
   type Locale,
   type Primitive,
   type Translator,
+  tagLabel,
 } from "@recorte/shared";
-import { createContext, Fragment, use, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, Fragment, use, useCallback, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { DICTIONARIES, type MessageKey } from "./dictionaries";
 import { getDetected, getLocale, getPreference, setPreference, subscribe } from "./store";
 
@@ -97,6 +98,12 @@ export const useFormat = (): Format => useI18n().fmt;
 export function useLocale(): Pick<Ctx, "locale" | "preference" | "browser" | "setPreference"> {
   const { locale, preference, browser, setPreference } = useI18n();
   return { locale, preference, browser, setPreference };
+}
+
+/** Labels a tag for display: an AI tag ID in the current language, a tag the person typed verbatim. */
+export function useTagLabel(): (tag: string) => string {
+  const { locale } = useI18n();
+  return useCallback((tag: string) => tagLabel(tag, locale), [locale]);
 }
 
 /** A message kept in state as a key (not a translated string), so it follows a live language switch. */

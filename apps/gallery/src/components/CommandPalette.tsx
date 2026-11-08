@@ -4,7 +4,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { ApiError, api } from "../api";
 import { PHONE, useMedia } from "../hooks/useMedia";
 import { gridMove, isGridKey, paletteCols } from "../lib/grid";
-import { type MessageKey, useFormat, useT } from "../i18n";
+import { type MessageKey, useFormat, useT, useTagLabel } from "../i18n";
 import { LinkIcon, SearchIcon } from "./icons";
 
 type Props = {
@@ -34,6 +34,7 @@ function Highlight({ html, fallback }: { html?: string; fallback: string }) {
 
 export function CommandPalette({ open, onOpenChange, tags, onPick, onTag }: Props) {
   const t = useT();
+  const label = useTagLabel();
   const fmt = useFormat();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<SearchHit[] | null>(null);
@@ -260,7 +261,7 @@ export function CommandPalette({ open, onOpenChange, tags, onPick, onTag }: Prop
                     {tags.slice(0, 12).map((tag) => (
                       <button key={tag.tag} type="button" onClick={() => onTag(tag.tag)} className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-white/70">
                         <Chip size="sm" variant="secondary" className="cursor-pointer bg-white/[0.06] text-[12.5px] text-white/80 transition-colors hover:bg-white/[0.12]">
-                          {tag.tag}
+                          {label(tag.tag)}
                         </Chip>
                       </button>
                     ))}
