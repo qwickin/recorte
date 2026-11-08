@@ -1,0 +1,525 @@
+{
+ "approach": "lexical-visual",
+ "threads": 2,
+ "platform": "darwin-arm64",
+ "node": "v24.22.2",
+ "loadMs": 245,
+ "rssBaseMB": 248,
+ "rssLoadedMB": 408,
+ "rssPeakMB": 593,
+ "perItem": [
+  {
+   "id": "ff-surfaces",
+   "tags": [
+    "documentação",
+    "sombras",
+    "modo escuro"
+   ],
+   "ms": 484,
+   "extra": [
+    "documentação:8.9",
+    "sombras:3.6",
+    "dropdown:3.3",
+    "modo escuro:3.3",
+    "dialog:2.6",
+    "email:1.9",
+    "componentes ui:1.7",
+    "cor:1.1",
+    "design system:0.8",
+    "repositório:0.5",
+    "dashboard:0.4",
+    "ui design:0.3"
+   ]
+  },
+  {
+   "id": "gh-readability",
+   "tags": [
+    "repositório",
+    "documentação",
+    "javascript",
+    "biblioteca",
+    "github",
+    "mozilla",
+    "node.js"
+   ],
+   "ms": 78,
+   "extra": [
+    "repositório:12.9",
+    "documentação:12.4",
+    "javascript:12.0",
+    "biblioteca:11.5",
+    "github:10.0",
+    "mozilla:9.1",
+    "node.js:8.2",
+    "git:4.8",
+    "código:4.0",
+    "browser:3.9",
+    "html:3.3",
+    "navegação:2.5"
+   ]
+  },
+  {
+   "id": "mdn-flexbox",
+   "tags": [
+    "flexbox",
+    "css",
+    "layout",
+    "documentação",
+    "mozilla",
+    "programação"
+   ],
+   "ms": 92,
+   "extra": [
+    "flexbox:22.5",
+    "css:12.0",
+    "layout:10.8",
+    "documentação:8.5",
+    "tutorial:5.6",
+    "mozilla:3.0",
+    "programação:3.0",
+    "cor:2.5",
+    "emprego:2.2",
+    "acessibilidade:1.8",
+    "smartphone:1.5",
+    "tipo de letra:1.5"
+   ]
+  },
+  {
+   "id": "tailwind-docs",
+   "tags": [
+    "flexbox",
+    "documentação",
+    "tailwind css",
+    "layout",
+    "css",
+    "modo escuro"
+   ],
+   "ms": 60,
+   "extra": [
+    "flexbox:21.6",
+    "documentação:10.4",
+    "tailwind css:8.8",
+    "layout:4.6",
+    "css:4.0",
+    "animação:1.6",
+    "svg:1.6",
+    "responsivo:1.5",
+    "moda:1.2",
+    "aplicação:1.0",
+    "arquitetura:1.0",
+    "design:1.0"
+   ]
+  },
+  {
+   "id": "shadcn-combobox",
+   "tags": [
+    "documentação",
+    "combobox",
+    "ui design",
+    "react",
+    "componentes ui",
+    "next.js",
+    "javascript"
+   ],
+   "ms": 66,
+   "extra": [
+    "documentação:16.7",
+    "combobox:16.1",
+    "ui design:14.0",
+    "react:10.2",
+    "componentes ui:6.8",
+    "next.js:5.8",
+    "javascript:4.9",
+    "lista:4.9",
+    "vercel:4.8",
+    "input:4.7",
+    "botão:4.1",
+    "design:4.0"
+   ]
+  },
+  {
+   "id": "motion-docs",
+   "tags": [
+    "react",
+    "animação",
+    "motion design",
+    "documentação",
+    "componentes ui",
+    "ui design",
+    "javascript"
+   ],
+   "ms": 71,
+   "extra": [
+    "react:21.6",
+    "animação:20.5",
+    "motion design:20.5",
+    "documentação:10.5",
+    "componentes ui:8.0",
+    "tutorial:6.1",
+    "ui design:5.4",
+    "javascript:5.1",
+    "svg:3.2",
+    "tokens de design:3.1",
+    "programação:3.0",
+    "design:2.7"
+   ]
+  },
+  {
+   "id": "news-guardian",
+   "tags": [
+    "ciência",
+    "conversa",
+    "psicologia"
+   ],
+   "ms": 62,
+   "extra": [
+    "ciência:17.9",
+    "conversa:14.3",
+    "artigo:10.3",
+    "psicologia:4.4",
+    "google:2.0",
+    "investigação:1.8",
+    "preços:1.4",
+    "casa:1.0",
+    "estados unidos:0.7",
+    "reino unido:0.7",
+    "artigo científico:0.7",
+    "vídeo:0.6"
+   ]
+  },
+  {
+   "id": "news-publico",
+   "tags": [
+    "medicina",
+    "diabetes",
+    "medicamentos",
+    "saúde",
+    "notícia",
+    "artigo",
+    "obesidade"
+   ],
+   "ms": 66,
+   "extra": [
+    "medicina:18.1",
+    "diabetes:17.8",
+    "medicamentos:17.7",
+    "saúde:12.7",
+    "notícia:10.4",
+    "artigo:9.7",
+    "obesidade:7.1",
+    "investigação:4.6",
+    "ciência:4.1",
+    "portugal:3.0",
+    "direito:1.8",
+    "preços:1.2"
+   ]
+  },
+  {
+   "id": "recipe-allrecipes",
+   "tags": [
+    "receita",
+    "bolachas",
+    "chocolate",
+    "culinária",
+    "doces"
+   ],
+   "ms": 65,
+   "extra": [
+    "receita:25.8",
+    "bolachas:19.4",
+    "chocolate:19.0",
+    "culinária:6.5",
+    "doces:5.8",
+    "vídeo:4.7",
+    "gastronomia:2.9",
+    "tutorial:1.7",
+    "análise:1.5",
+    "fotografia:1.2",
+    "landing page:1.1",
+    "aplicação:1.0"
+   ]
+  },
+  {
+   "id": "map-osm",
+   "tags": [
+    "mapa"
+   ],
+   "ms": 59,
+   "extra": [
+    "mapa:28.5",
+    "dropdown:0.8",
+    "redes neuronais:0.8",
+    "3d:0.0",
+    "ilustração:0.0",
+    "diagrama:0.0",
+    "repositório:0.0",
+    "calendário:0.0",
+    "gráfico:0.0",
+    "resultados de pesquisa:0.0",
+    "galeria:0.0",
+    "fotografia:0.0"
+   ]
+  },
+  {
+   "id": "product-ikea",
+   "tags": [
+    "estante",
+    "preços",
+    "casa",
+    "mobiliário",
+    "design",
+    "design de interiores"
+   ],
+   "ms": 75,
+   "extra": [
+    "estante:25.8",
+    "preços:8.6",
+    "casa:5.4",
+    "mobiliário:5.3",
+    "loja:4.4",
+    "design:3.9",
+    "livro:3.6",
+    "design de interiores:3.0",
+    "landing page:2.4",
+    "dropdown:1.4",
+    "vendas:1.4",
+    "produto:1.3"
+   ]
+  },
+  {
+   "id": "product-apple",
+   "tags": [
+    "mac",
+    "apple",
+    "loja",
+    "inteligência artificial",
+    "tablet",
+    "smartphone",
+    "portátil"
+   ],
+   "ms": 72,
+   "extra": [
+    "mac:22.5",
+    "apple:19.3",
+    "loja:10.1",
+    "inteligência artificial:8.0",
+    "tablet:7.8",
+    "smartphone:6.7",
+    "vídeo:4.6",
+    "portátil:4.2",
+    "hardware:4.0",
+    "aplicação:2.9",
+    "casa:2.8",
+    "landing page:2.7"
+   ]
+  },
+  {
+   "id": "design-dribbble",
+   "tags": [
+    "inspiração",
+    "design",
+    "dribbble",
+    "landing page",
+    "inteligência artificial"
+   ],
+   "ms": 65,
+   "extra": [
+    "inspiração:16.0",
+    "design:12.0",
+    "dribbble:11.0",
+    "landing page:9.1",
+    "inteligência artificial:4.0",
+    "web design:2.4",
+    "ui design:2.0",
+    "llm:1.3",
+    "preços:1.0",
+    "aplicação:1.0",
+    "finanças:1.0",
+    "motion design:1.0"
+   ]
+  },
+  {
+   "id": "video-youtube",
+   "tags": [
+    "vídeo",
+    "redes neuronais",
+    "inteligência artificial",
+    "deep learning",
+    "youtube",
+    "matemática",
+    "portugal"
+   ],
+   "ms": 66,
+   "extra": [
+    "vídeo:22.3",
+    "redes neuronais:21.4",
+    "inteligência artificial:15.5",
+    "deep learning:14.1",
+    "youtube:7.6",
+    "matemática:6.7",
+    "portugal:5.2",
+    "loja:4.8",
+    "gradiente:4.8",
+    "tutorial:4.8",
+    "machine learning:4.3",
+    "smartphone:4.0"
+   ]
+  },
+  {
+   "id": "x-post",
+   "tags": [
+    "publicação",
+    "rede social",
+    "x"
+   ],
+   "ms": 53,
+   "extra": [
+    "publicação:8.8",
+    "rede social:8.2",
+    "x:3.0",
+    "fotografia:1.4",
+    "vídeo:0.8",
+    "3d:0.6",
+    "conversa:0.2",
+    "repositório:0.2",
+    "ilustração:0.1",
+    "resultados de pesquisa:0.1",
+    "loja:0.0",
+    "apresentação:0.0"
+   ]
+  },
+  {
+   "id": "wiki-nata",
+   "tags": [
+    "pastelaria",
+    "enciclopédia",
+    "portugal",
+    "doces",
+    "lisboa",
+    "religião",
+    "wikipedia"
+   ],
+   "ms": 72,
+   "extra": [
+    "pastelaria:12.3",
+    "enciclopédia:12.1",
+    "portugal:10.8",
+    "doces:9.4",
+    "receita:8.5",
+    "lisboa:7.5",
+    "religião:7.1",
+    "wikipedia:7.0",
+    "culinária:6.1",
+    "gastronomia:2.1",
+    "vendas:2.1",
+    "energia:1.8"
+   ]
+  },
+  {
+   "id": "stripe-pricing",
+   "tags": [
+    "preços",
+    "pagamentos",
+    "negócios",
+    "finanças",
+    "vendas",
+    "api",
+    "culinária"
+   ],
+   "ms": 87,
+   "extra": [
+    "preços:29.1",
+    "pagamentos:16.5",
+    "negócios:14.8",
+    "finanças:11.8",
+    "cartão:11.1",
+    "receita:7.2",
+    "produto:4.9",
+    "vendas:4.6",
+    "loja:4.2",
+    "api:4.2",
+    "culinária:3.6",
+    "economia:3.2"
+   ]
+  },
+  {
+   "id": "arxiv-attention",
+   "tags": [
+    "artigo científico",
+    "transformers",
+    "tradução automática",
+    "ciência",
+    "inteligência artificial",
+    "machine learning",
+    "arxiv"
+   ],
+   "ms": 56,
+   "extra": [
+    "artigo científico:22.0",
+    "transformers:17.3",
+    "tradução automática:5.4",
+    "documentação:5.3",
+    "blogue:5.3",
+    "ciência:5.3",
+    "inteligência artificial:4.0",
+    "machine learning:3.6",
+    "arxiv:3.0",
+    "google:3.0",
+    "artigo:2.4",
+    "email:2.0"
+   ]
+  },
+  {
+   "id": "hn-front",
+   "tags": [
+    "hacker news",
+    "lista de links",
+    "ciência",
+    "github",
+    "inteligência artificial",
+    "microsoft",
+    "windows"
+   ],
+   "ms": 60,
+   "extra": [
+    "hacker news:9.0",
+    "lista de links:8.6",
+    "ciência:4.0",
+    "github:4.0",
+    "inteligência artificial:4.0",
+    "microsoft:4.0",
+    "windows:4.0",
+    "linux:3.0",
+    "programação:3.0",
+    "aplicação:2.0",
+    "apple:2.0",
+    "direito:2.0"
+   ]
+  },
+  {
+   "id": "fonts-inter",
+   "tags": [
+    "tipo de letra",
+    "google fonts",
+    "tipografia",
+    "design",
+    "sans-serif"
+   ],
+   "ms": 56,
+   "extra": [
+    "tipo de letra:9.5",
+    "google fonts:9.0",
+    "tipografia:4.1",
+    "design:4.0",
+    "sans-serif:3.0",
+    "google:2.0",
+    "resultados de pesquisa:1.6",
+    "privacidade:1.3",
+    "arquitetura:1.0",
+    "bolachas:1.0",
+    "web design:1.0",
+    "religião:0.9"
+   ]
+  }
+ ]
+}

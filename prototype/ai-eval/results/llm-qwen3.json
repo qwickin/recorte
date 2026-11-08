@@ -1,0 +1,792 @@
+{
+ "approach": "llm-qwen3",
+ "threads": 2,
+ "platform": "darwin-arm64",
+ "node": "v24.22.2",
+ "loadMs": 1338,
+ "rssBaseMB": 245,
+ "rssLoadedMB": 2178,
+ "rssPeakMB": 5669,
+ "perItem": [
+  {
+   "id": "ff-surfaces",
+   "tags": [
+    "documentação",
+    "diagrama",
+    "componentes ui",
+    "design system",
+    "ui design",
+    "gradiente",
+    "css grid"
+   ],
+   "ms": 3901,
+   "extra": {
+    "raw": "- documentação  \n- diagrama  \n- componentes ui  \n- design system  \n- ui design  \n- gradiente  \n- 3d  \n- css grid",
+    "candidates": [
+     "documentação",
+     "sombras",
+     "modo escuro",
+     "dropdown",
+     "dialog",
+     "iluminação",
+     "cor",
+     "diagrama",
+     "email",
+     "galeria",
+     "design system",
+     "mobiliário",
+     "design de interiores",
+     "design gráfico",
+     "layout",
+     "componentes ui",
+     "ui design",
+     "gradiente",
+     "3d",
+     "css grid"
+    ]
+   }
+  },
+  {
+   "id": "gh-readability",
+   "tags": [
+    "biblioteca",
+    "npm",
+    "documentação",
+    "javascript",
+    "node.js",
+    "git",
+    "open source"
+   ],
+   "ms": 5694,
+   "extra": {
+    "raw": "biblioteca, npm, documentação, javascript, node.js, git, open source, acesso, navegador, internet, repositório, software, openstreetmap, animais, redes, automação.",
+    "candidates": [
+     "biblioteca",
+     "github",
+     "documentação",
+     "javascript",
+     "repositório",
+     "mozilla",
+     "node.js",
+     "git",
+     "html",
+     "código",
+     "browser",
+     "navegação",
+     "segurança informática",
+     "internet",
+     "npm",
+     "software",
+     "openstreetmap",
+     "acessibilidade",
+     "cli",
+     "gitlab",
+     "open source",
+     "animais de estimação",
+     "input",
+     "redes",
+     "automação"
+    ]
+   }
+  },
+  {
+   "id": "mdn-flexbox",
+   "tags": [
+    "flexbox",
+    "css",
+    "layout",
+    "documentação",
+    "tutorial",
+    "mozilla",
+    "programação"
+   ],
+   "ms": 5037,
+   "extra": {
+    "raw": "- flexbox\n- css\n- layout\n- documentação\n- tutorial\n- mozilla\n- programação\n- frontend\n- cor\n- emprego\n- acessibilidade\n- smartphone\n- tipo de letra\n- moda",
+    "candidates": [
+     "flexbox",
+     "css",
+     "layout",
+     "documentação",
+     "tutorial",
+     "mozilla",
+     "programação",
+     "frontend",
+     "cor",
+     "emprego",
+     "acessibilidade",
+     "smartphone",
+     "tipo de letra",
+     "moda",
+     "mobiliário",
+     "vendas",
+     "ambiente",
+     "api",
+     "framework",
+     "wireframe",
+     "psicologia",
+     "internet",
+     "lista",
+     "template",
+     "diagrama"
+    ]
+   }
+  },
+  {
+   "id": "tailwind-docs",
+   "tags": [
+    "flexbox",
+    "tailwind css",
+    "documentação",
+    "layout",
+    "css"
+   ],
+   "ms": 4566,
+   "extra": {
+    "raw": "- flexbox\n- tailwind css\n- documentação\n- layout\n- css\n- grid\n- flex-direction\n- utilities\n- direction\n- flex\n- row\n- on this page\n- layout\n- responsive",
+    "candidates": [
+     "flexbox",
+     "tailwind css",
+     "documentação",
+     "layout",
+     "css",
+     "css grid",
+     "animação",
+     "svg",
+     "responsivo",
+     "carrossel",
+     "moda",
+     "tipografia",
+     "aplicação",
+     "arquitetura",
+     "design",
+     "acessibilidade",
+     "tabela",
+     "mobiliário",
+     "markdown",
+     "motion design",
+     "componentes ui",
+     "frontend",
+     "blogue",
+     "command palette",
+     "inspiração"
+    ]
+   }
+  },
+  {
+   "id": "shadcn-combobox",
+   "tags": [
+    "combobox",
+    "documentação",
+    "ui design",
+    "react",
+    "componentes ui",
+    "next.js",
+    "javascript"
+   ],
+   "ms": 3572,
+   "extra": {
+    "raw": "combobox  \ndocumentação  \nui design  \nreact  \ncomponentes ui  \nnext.js  \njavascript  \nlista  \ninput  \nbotão  \ndesign  \naplicação  \ndevops  \ntailwind css  \nframework  \ndialog  \ndropdown",
+    "candidates": [
+     "combobox",
+     "documentação",
+     "ui design",
+     "react",
+     "componentes ui",
+     "next.js",
+     "javascript",
+     "lista",
+     "vercel",
+     "input",
+     "botão",
+     "design",
+     "aplicação",
+     "devops",
+     "tailwind css",
+     "framework",
+     "dialog",
+     "dropdown",
+     "npm",
+     "navegação",
+     "openai",
+     "inteligência artificial",
+     "automação",
+     "template",
+     "cartão"
+    ]
+   }
+  },
+  {
+   "id": "motion-docs",
+   "tags": [
+    "animação",
+    "react",
+    "motion design",
+    "documentação",
+    "componentes ui",
+    "tutorial",
+    "ui design"
+   ],
+   "ms": 4210,
+   "extra": {
+    "raw": "- animação  \n- react  \n- motion design  \n- documentação  \n- componentes ui  \n- tutorial  \n- ui design  \n- javascript  \n- svg  \n- tokens de design  \n- programação  \n- design  \n- html",
+    "candidates": [
+     "animação",
+     "react",
+     "motion design",
+     "documentação",
+     "componentes ui",
+     "tutorial",
+     "ui design",
+     "javascript",
+     "svg",
+     "tokens de design",
+     "programação",
+     "design",
+     "html",
+     "cor",
+     "css",
+     "moda",
+     "inteligência artificial",
+     "arquitetura",
+     "biblioteca",
+     "layout",
+     "3d",
+     "família",
+     "ios",
+     "tailwind css",
+     "botão"
+    ]
+   }
+  },
+  {
+   "id": "news-guardian",
+   "tags": [
+    "ciência",
+    "conversa",
+    "artigo",
+    "psicologia",
+    "google",
+    "investigação",
+    "dialog"
+   ],
+   "ms": 4957,
+   "extra": {
+    "raw": "ciência, conversa, artigo, psicologia, google, investigação, dialog, preços, vercel, rust, sintra, casa, podcast, estados unidos, swift, artigo científico, inteligência artificial",
+    "candidates": [
+     "ciência",
+     "conversa",
+     "artigo",
+     "psicologia",
+     "comunicação",
+     "linguística",
+     "google",
+     "investigação",
+     "dialog",
+     "preços",
+     "vercel",
+     "rust",
+     "sintra",
+     "casa",
+     "podcast",
+     "estados unidos",
+     "reino unido",
+     "swift",
+     "artigo científico",
+     "inteligência artificial",
+     "vídeo",
+     "braga",
+     "tiktok",
+     "behance",
+     "alterações climáticas"
+    ]
+   }
+  },
+  {
+   "id": "news-publico",
+   "tags": [
+    "diabetes",
+    "medicamentos",
+    "medicina",
+    "saúde",
+    "notícia",
+    "artigo",
+    "obesidade"
+   ],
+   "ms": 5775,
+   "extra": {
+    "raw": "diabetes, medicamentos, medicina, saúde, notícia, artigo, obesidade, investigação, ciência, resultados, preços, análise, publicação, navegação, template, comparação, email,",
+    "candidates": [
+     "diabetes",
+     "medicamentos",
+     "medicina",
+     "saúde",
+     "notícia",
+     "artigo",
+     "obesidade",
+     "investigação",
+     "ciência",
+     "portugal",
+     "opinião",
+     "direito",
+     "estatística",
+     "artigo científico",
+     "resultados de pesquisa",
+     "preços",
+     "análise",
+     "publicação",
+     "navegação",
+     "template",
+     "comparação",
+     "email",
+     "facebook",
+     "linkedin",
+     "documentação"
+    ]
+   }
+  },
+  {
+   "id": "recipe-allrecipes",
+   "tags": [
+    "receita",
+    "bolachas",
+    "chocolate"
+   ],
+   "ms": 2346,
+   "extra": {
+    "raw": "- receita  \n- bolachas  \n- chocolate",
+    "candidates": [
+     "receita",
+     "bolachas",
+     "chocolate",
+     "culinária",
+     "doces",
+     "vídeo",
+     "sobremesa",
+     "gastronomia",
+     "pão",
+     "tutorial",
+     "bolo",
+     "análise",
+     "fotografia",
+     "toast",
+     "aplicação",
+     "go",
+     "nutrição",
+     "privacidade",
+     "emprego",
+     "email",
+     "estados unidos",
+     "notícia",
+     "casa",
+     "medium"
+    ]
+   }
+  },
+  {
+   "id": "map-osm",
+   "tags": [
+    "mapa",
+    "openstreetmap",
+    "open source",
+    "geografia",
+    "cartografia"
+   ],
+   "ms": 1779,
+   "extra": {
+    "raw": "- mapa  \n- openstreetmap  \n- open source  \n- geografia  \n- cartografia",
+    "candidates": [
+     "mapa",
+     "openstreetmap",
+     "open source",
+     "openai",
+     "dropdown",
+     "redes neuronais",
+     "cartografia",
+     "espaço",
+     "cloudflare",
+     "geografia"
+    ]
+   }
+  },
+  {
+   "id": "product-ikea",
+   "tags": [
+    "estante",
+    "preços",
+    "casa",
+    "mobiliário",
+    "loja",
+    "design",
+    "livro"
+   ],
+   "ms": 4778,
+   "extra": {
+    "raw": "- estante\n- preços\n- casa\n- mobiliário\n- loja\n- design\n- livro\n- design de interiores\n- ícones\n- lista\n- produto\n- frontend\n- dropdown",
+    "candidates": [
+     "estante",
+     "preços",
+     "casa",
+     "mobiliário",
+     "loja",
+     "design",
+     "livro",
+     "design de interiores",
+     "ícones",
+     "lista",
+     "produto",
+     "frontend",
+     "dropdown",
+     "vendas",
+     "tabela",
+     "lista de links",
+     "conversa",
+     "curso",
+     "formulário",
+     "biblioteca",
+     "e-commerce",
+     "amazon",
+     "séries",
+     "tooltip",
+     "emprego"
+    ]
+   }
+  },
+  {
+   "id": "product-apple",
+   "tags": [
+    "mac",
+    "apple",
+    "tablet",
+    "smartphone"
+   ],
+   "ms": 2609,
+   "extra": {
+    "raw": "- mac\n- apple\n- macbook air\n- tablet\n- smartphone",
+    "candidates": [
+     "mac",
+     "apple",
+     "loja",
+     "inteligência artificial",
+     "tablet",
+     "smartphone",
+     "portátil",
+     "vídeo",
+     "hardware",
+     "aplicação",
+     "casa",
+     "design",
+     "cor",
+     "performance",
+     "pagamentos",
+     "macos",
+     "aviação",
+     "privacidade",
+     "ios",
+     "cloud",
+     "toggle",
+     "produto",
+     "educação",
+     "emprego",
+     "fotografia"
+    ]
+   }
+  },
+  {
+   "id": "design-dribbble",
+   "tags": [
+    "inspiração",
+    "dribbble",
+    "design",
+    "web design",
+    "inteligência artificial",
+    "ui design",
+    "llm"
+   ],
+   "ms": 4602,
+   "extra": {
+    "raw": "- inspiração  \n- dribbble  \n- design  \n- web design  \n- inteligência artificial  \n- ui design  \n- llm  \n- aplicação  \n- finanças  \n- motion design  \n- negócios  \n- pag",
+    "candidates": [
+     "inspiração",
+     "dribbble",
+     "landing page",
+     "design",
+     "web design",
+     "inteligência artificial",
+     "ui design",
+     "llm",
+     "aplicação",
+     "finanças",
+     "motion design",
+     "negócios",
+     "pagamentos",
+     "preços",
+     "saas",
+     "saúde",
+     "turismo",
+     "ux",
+     "visão computacional",
+     "kubernetes",
+     "animação",
+     "branding",
+     "design de produto",
+     "formulário",
+     "ilustração"
+    ]
+   }
+  },
+  {
+   "id": "video-youtube",
+   "tags": [],
+   "ms": 5339,
+   "extra": {
+    "raw": "| redes neuronais | vídeo | deep learning | inteligência artificial | youtube | matemática | redes | tutorial | machine learning | português | gradiente | loja | smartphone | curso | séries | llm | transformers",
+    "candidates": [
+     "redes neuronais",
+     "vídeo",
+     "deep learning",
+     "inteligência artificial",
+     "youtube",
+     "matemática",
+     "redes",
+     "tutorial",
+     "machine learning",
+     "portugal",
+     "gradiente",
+     "loja",
+     "smartphone",
+     "curso",
+     "séries",
+     "llm",
+     "transformers",
+     "hardware",
+     "comparação",
+     "música",
+     "openai",
+     "open source",
+     "formulário",
+     "tipo de letra",
+     "animais"
+    ]
+   }
+  },
+  {
+   "id": "x-post",
+   "tags": [
+    "publicação",
+    "rede social",
+    "x",
+    "iot",
+    "git",
+    "github",
+    "toggle"
+   ],
+   "ms": 2186,
+   "extra": {
+    "raw": "- publicação\n- rede social\n- x\n- iot\n- git\n- github\n- toggle\n- botão\n- tutorial\n- tecnologia",
+    "candidates": [
+     "publicação",
+     "rede social",
+     "x",
+     "iot",
+     "git",
+     "github",
+     "node.js",
+     "toggle",
+     "kotlin",
+     "bootstrap",
+     "tiktok",
+     "deno",
+     "botão",
+     "tutorial",
+     "tecnologia"
+    ]
+   }
+  },
+  {
+   "id": "wiki-nata",
+   "tags": [
+    "pastelaria"
+   ],
+   "ms": 4343,
+   "extra": {
+    "raw": "- pastelaria  \n- pastel  \n- pastel de nata  \n- pastel de nata em Portugal  \n- pastel de nata (Wikipedia)  \n- pastel de nata (Lusosphere)",
+    "candidates": [
+     "enciclopédia",
+     "pastelaria",
+     "portugal",
+     "wikipedia",
+     "doces",
+     "lisboa",
+     "religião",
+     "receita",
+     "culinária",
+     "vendas",
+     "história",
+     "gastronomia",
+     "frança",
+     "documentação",
+     "energia",
+     "europa",
+     "moda",
+     "negócios",
+     "sobremesa",
+     "cor",
+     "curso",
+     "deno",
+     "açores",
+     "produtividade",
+     "livro"
+    ]
+   }
+  },
+  {
+   "id": "stripe-pricing",
+   "tags": [],
+   "ms": 8305,
+   "extra": {
+    "raw": "Título: Preços e tarifas  \nDescrição: Encontram informações sobre tarifas e preços da Stripe. Veja as tarifas de processamento para cartões de crédito, os modelos de preços e",
+    "candidates": [
+     "preços",
+     "pagamentos",
+     "negócios",
+     "finanças",
+     "cartão",
+     "receita",
+     "produto",
+     "vendas",
+     "api",
+     "ciência de dados",
+     "loja",
+     "economia",
+     "culinária",
+     "bolachas",
+     "documento",
+     "criptomoedas",
+     "biblioteca",
+     "reino unido",
+     "bricolage",
+     "inteligência artificial",
+     "família",
+     "física",
+     "automação",
+     "doces",
+     "estados unidos"
+    ]
+   }
+  },
+  {
+   "id": "arxiv-attention",
+   "tags": [],
+   "ms": 5682,
+   "extra": {
+    "raw": "[1706.03762] Attention Is All You Need  \n[1706.03762] Attention Is All You Need  \n[1706.03762]",
+    "candidates": [
+     "artigo científico",
+     "transformers",
+     "tradução automática",
+     "blogue",
+     "ciência",
+     "documentação",
+     "inteligência artificial",
+     "machine learning",
+     "produtividade",
+     "redes neuronais",
+     "arxiv",
+     "google",
+     "alemanha",
+     "arquitetura",
+     "arte",
+     "comboios",
+     "documento",
+     "email",
+     "frança",
+     "html",
+     "literatura",
+     "redes",
+     "componentes ui",
+     "bricolage",
+     "algoritmos"
+    ]
+   }
+  },
+  {
+   "id": "hn-front",
+   "tags": [],
+   "ms": 3711,
+   "extra": {
+    "raw": "- Título: Hacker News  \n- URL: https://news.ycombinator.com/  \n- Texto: 1.The end of Microsoft Research's AI Frontiers group (hunch.net) 345 points by s",
+    "candidates": [
+     "hacker news",
+     "lista de links",
+     "ciência",
+     "github",
+     "inteligência artificial",
+     "microsoft",
+     "windows",
+     "linux",
+     "programação",
+     "aplicação",
+     "apple",
+     "direito",
+     "git",
+     "mac",
+     "react",
+     "kubernetes",
+     "swift",
+     "redes neuronais",
+     "frontend",
+     "tooltip",
+     "3d",
+     "alemanha",
+     "animais de estimação",
+     "biologia",
+     "blogue"
+    ]
+   }
+  },
+  {
+   "id": "fonts-inter",
+   "tags": [
+    "google fonts",
+    "tipo de letra",
+    "google",
+    "design",
+    "tipografia",
+    "sans-serif",
+    "web design"
+   ],
+   "ms": 4157,
+   "extra": {
+    "raw": "- google fonts\n- tipo de letra\n- google\n- design\n- tipografia\n- sans-serif\n- web design\n- privacidade\n- direito\n- religião\n- browser\n- serif\n- mon",
+    "candidates": [
+     "google fonts",
+     "tipo de letra",
+     "google",
+     "design",
+     "tipografia",
+     "sans-serif",
+     "web design",
+     "privacidade",
+     "direito",
+     "religião",
+     "browser",
+     "serif",
+     "monospace",
+     "arquitetura",
+     "bolachas",
+     "moda",
+     "seo",
+     "opinião",
+     "desenvolvimento web",
+     "educação",
+     "tecnologia",
+     "ícones",
+     "casa",
+     "behance",
+     "landing page"
+    ]
+   }
+  }
+ ]
+}

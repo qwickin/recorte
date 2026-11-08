@@ -1,0 +1,152 @@
+{
+ "approach": "current",
+ "threads": 2,
+ "platform": "darwin-arm64",
+ "node": "v24.22.2",
+ "loadMs": 174,
+ "rssBaseMB": 244,
+ "rssLoadedMB": 405,
+ "rssPeakMB": 604,
+ "perItem": [
+  {
+   "id": "ff-surfaces",
+   "tags": [
+    "componentes ui",
+    "modo escuro"
+   ],
+   "ms": 70
+  },
+  {
+   "id": "gh-readability",
+   "tags": [
+    "repositório",
+    "modo escuro"
+   ],
+   "ms": 61
+  },
+  {
+   "id": "mdn-flexbox",
+   "tags": [],
+   "ms": 57
+  },
+  {
+   "id": "tailwind-docs",
+   "tags": [
+    "modo escuro"
+   ],
+   "ms": 52
+  },
+  {
+   "id": "shadcn-combobox",
+   "tags": [
+    "componentes ui",
+    "modo escuro"
+   ],
+   "ms": 50
+  },
+  {
+   "id": "motion-docs",
+   "tags": [],
+   "ms": 50
+  },
+  {
+   "id": "news-guardian",
+   "tags": [
+    "artigo"
+   ],
+   "ms": 51
+  },
+  {
+   "id": "news-publico",
+   "tags": [
+    "artigo"
+   ],
+   "ms": 54
+  },
+  {
+   "id": "recipe-allrecipes",
+   "tags": [
+    "receita"
+   ],
+   "ms": 51
+  },
+  {
+   "id": "map-osm",
+   "tags": [
+    "mapa"
+   ],
+   "ms": 57
+  },
+  {
+   "id": "product-ikea",
+   "tags": [
+    "landing page"
+   ],
+   "ms": 53
+  },
+  {
+   "id": "product-apple",
+   "tags": [
+    "landing page"
+   ],
+   "ms": 53
+  },
+  {
+   "id": "design-dribbble",
+   "tags": [
+    "imagens"
+   ],
+   "ms": 52
+  },
+  {
+   "id": "video-youtube",
+   "tags": [
+    "vídeo",
+    "modo escuro"
+   ],
+   "ms": 52
+  },
+  {
+   "id": "x-post",
+   "tags": [
+    "fotografia"
+   ],
+   "ms": 54
+  },
+  {
+   "id": "wiki-nata",
+   "tags": [
+    "receita"
+   ],
+   "ms": 60
+  },
+  {
+   "id": "stripe-pricing",
+   "tags": [
+    "gradiente"
+   ],
+   "ms": 53
+  },
+  {
+   "id": "arxiv-attention",
+   "tags": [
+    "artigo"
+   ],
+   "ms": 50
+  },
+  {
+   "id": "hn-front",
+   "tags": [
+    "wiki"
+   ],
+   "ms": 52
+  },
+  {
+   "id": "fonts-inter",
+   "tags": [
+    "resultados de pesquisa"
+   ],
+   "ms": 52
+  }
+ ]
+}

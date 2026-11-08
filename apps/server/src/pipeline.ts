@@ -1,4 +1,5 @@
-import { type Classifier, type KeywordInput, MODEL_ID, extractColors, extractKeywords } from "@recorte/ai";
+import { type Classifier, MODEL_ID, extractColors, extractKeywords } from "@recorte/ai";
+import { keywordInput } from "./ai-input";
 import { type Item, UPLOAD_LIMITS } from "@recorte/shared";
 import { makeImages } from "./items/images";
 import { type FetchedLink, fetchImage, fetchLink } from "./links/fetch-link";
@@ -70,20 +71,6 @@ export function mergeLink(m: Item, f: FetchedLink | null, error: string | null, 
   const clientTitle = m.source.pageTitle.trim() && m.source.pageTitle !== m.source.url ? m.source.pageTitle : "";
   const pageTitle = (m.kind === "link" ? f?.title || clientTitle : clientTitle || link.title) || link.title || m.source.pageTitle;
   return { ...m, link, text, source: { ...m.source, pageTitle } };
-}
-
-/** Keyword sources, by weight: the captured area and its headings, then the page's title/headings, then the rest of the page. */
-export function keywordInput(m: Item): KeywordInput {
-  return {
-    title: m.user.title || m.link?.title || m.source.pageTitle,
-    selection: m.text.selection,
-    nearHeadings: m.text.page?.nearHeadings,
-    headings: m.text.headings,
-    description: m.link?.description ?? m.text.meta.description,
-    keywords: m.text.page?.keywords,
-    site: m.source.site,
-    pageText: m.text.page?.text,
-  };
 }
 
 /** Steps 1-5 of the processing spec. Never touches `user`; the ai block is merged into a fresh read of meta.json. */
