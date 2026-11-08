@@ -1,5 +1,5 @@
-import { type Classifier, MODEL_ID, extractColors, extractKeywords } from "@recorte/ai";
-import { keywordInput } from "./ai-input";
+import { type Classifier, MODEL_ID, TAGGER_ID, createTopicTagger, extractColors, extractKeywords, tagItem } from "@recorte/ai";
+import { keywordInput, topicInput } from "./ai-input";
 import { type Item, UPLOAD_LIMITS } from "@recorte/shared";
 import { makeImages } from "./items/images";
 import { type FetchedLink, fetchImage, fetchLink } from "./links/fetch-link";
@@ -77,6 +77,8 @@ export function mergeLink(m: Item, f: FetchedLink | null, error: string | null, 
 export function createPipeline(p: PipelineDeps) {
   const { deps } = p;
   const svc = itemService(deps);
+  // Lexical text tagger (no embedding model): the winner of prototype/ai-eval on quality per cost.
+  const tagger = createTopicTagger();
 
   /**
    * A saved link: fetch the page (SSRF-guarded), merge, and download its OG image as the tile's media. Persisted
@@ -154,9 +156,11 @@ export function createPipeline(p: PipelineDeps) {
 
     const colors = thumb ? await extractColors(thumb) : { dominant: "#000000", names: [] as string[] };
     const classifier = original ? await classifierOrNull() : null;
-    const cls = classifier && original ? await classifier.classify(original) : { tipo: [] as string[], visual: [] as string[] };
+    const cls = classifier && original ? await classifier.classify(original) : null;
     const aiSkipped = !!original && !classifier;
     const keys = extractKeywords(keywordInput(m0));
+    // Runs without an image or a model too (a link without an OG image, a missing model): text-only tags.
+    const topics = await tagItem(tagger, topicInput(m0), cls);
 
     let cloud: { title?: string; description?: string; keys: string[] } | null = null;
     const cloudAi = p.cloudFrom ? p.cloudFrom() : (p.cloud ?? null);
@@ -179,11 +183,12 @@ export function createPipeline(p: PipelineDeps) {
     if (!fresh) return;
     const now = new Date().toISOString();
     const ai: Item["ai"] = {
-      tipo: cls.tipo,
-      visual: cls.visual,
+      tipo: cls?.tipo ?? [],
+      visual: cls?.visual ?? [],
+      topics,
       keys: [...new Set([...keys, ...(cloud?.keys ?? [])])],
       colors: colors.names,
-      model: cloud ? `${MODEL_ID}+cloud` : MODEL_ID,
+      model: `${MODEL_ID}+${TAGGER_ID}${cloud ? "+cloud" : ""}`,
       processedAt: now,
     };
     if (aiSkipped) ai.skipped = "classifier_unavailable";

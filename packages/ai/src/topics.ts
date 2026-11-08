@@ -163,6 +163,7 @@ const FIELDS = {
 type Field = keyof typeof FIELDS;
 
 const DEFAULT_THRESHOLD = 3;
+const COMPONENT_SHARE = 0.8;
 const DEFAULT_MAX = 7;
 /** Embedding similarity: z-score above Z0 starts to count; SEM_W per unit of z. */
 const Z0 = 2;
@@ -327,12 +328,16 @@ export function selectTopics(input: TopicInput, sem: Map<string, number> = new M
     })
     .sort((a, b) => b.score - a.score || (a.tag < b.tag ? -1 : 1));
 
-  const passed = ranked.filter((x) => x.score >= threshold);
-  const has = (pt: string) => passed.some((x) => x.tag === pt);
+  const isComponent = (x: RankedTopic) => BY_PT.get(x.tag)!.group === "componente" && x.tag !== "componentes ui";
   // UI component names (dialog, dropdown…) are page chrome everywhere; they are a topic only on a page about UI
-  // components: one that says so, or one where two or more component names are strong.
-  const strong = passed.filter((x) => BY_PT.get(x.tag)!.group === "componente" && x.tag !== "componentes ui");
-  const uiPage = has("componentes ui") || has("design system") || has("ui kit") || strong.length >= 2;
+  // components: one that says so, or one where two or more component names are (nearly) strong. On such a page a
+  // component name needs a little less evidence (COMPONENT_SHARE of the threshold).
+  const near = (x: RankedTopic) => x.score >= threshold * COMPONENT_SHARE;
+  const strong = ranked.filter((x) => isComponent(x) && near(x));
+  const sayUi = ranked.some((x) => x.score >= threshold && ["componentes ui", "design system", "ui kit"].includes(x.tag));
+  const uiPage = sayUi || strong.length >= 2;
+  const passed = ranked.filter((x) => x.score >= threshold || (uiPage && isComponent(x) && near(x)));
+  const has = (pt: string) => passed.some((x) => x.tag === pt);
   if (uiPage && !has("componentes ui") && strong.length) {
     passed.splice(passed.indexOf(strong[0]!), 0, { ...strong[0]!, tag: "componentes ui", lex: 0, sem: 0, rule: 0, parent: strong[0]!.score });
   }

@@ -1,6 +1,6 @@
 import { Button, Modal, Spinner } from "@heroui/react";
 import { buttonVariants } from "@heroui/styles";
-import { API, type Category, type Item, type ItemPatch, type ItemSummary, normalizeTag } from "@recorte/shared";
+import { API, type Category, type Item, type ItemPatch, type ItemSummary, aiTags, normalizeTag } from "@recorte/shared";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { api, originalUrl } from "../api";
 import { displayTags, displayTitle, hiddenAiTags } from "../lib/item";
@@ -201,7 +201,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
 
   const removeTag = (tag: string, origin: "user" | "ai") => {
     if (!item) return;
-    const fromAi = [...item.ai.tipo, ...item.ai.visual].includes(tag);
+    const fromAi = aiTags(item.ai).includes(tag);
     const hide = fromAi && !item.user.hiddenAiTags.includes(tag) ? { hiddenAiTags: [...item.user.hiddenAiTags, tag] } : {};
     // A tag can be both the user's and the AI's: one × removes it from both, or it would come back as an AI tag.
     if (origin === "user") void save({ tags: item.user.tags.filter((t) => t !== tag), ...hide });

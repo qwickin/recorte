@@ -1,14 +1,14 @@
-import { type Item, type ItemPage, type ItemSummary, type ListQuery, type TagCount, normalizeTags } from "@recorte/shared";
+import { type Item, type ItemPage, type ItemSummary, type ListQuery, type TagCount, aiTags, normalizeTags } from "@recorte/shared";
 import type { Db } from "../db";
 
 export class BadCursor extends Error {}
 
-/** Shown tags = (user ∪ ai.tipo ∪ ai.visual) − hiddenAiTags, user first. */
+/** Shown tags = (user ∪ AI tags) − hiddenAiTags, user first. */
 export function displayedTags(meta: Item): { tag: string; origin: "user" | "ai" }[] {
   const hidden = new Set(meta.user.hiddenAiTags);
   const out: { tag: string; origin: "user" | "ai" }[] = [];
   for (const tag of meta.user.tags) out.push({ tag, origin: "user" });
-  for (const tag of [...meta.ai.tipo, ...meta.ai.visual]) if (!hidden.has(tag)) out.push({ tag, origin: "ai" });
+  for (const tag of aiTags(meta.ai)) if (!hidden.has(tag)) out.push({ tag, origin: "ai" });
   return out;
 }
 

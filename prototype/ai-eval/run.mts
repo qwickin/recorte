@@ -11,7 +11,7 @@
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { AutoModelForCausalLM, AutoTokenizer, env } from "@huggingface/transformers";
-import { createClassifier, createEmbedder, createTopicTagger, TOPICS, VOCAB, type Embedder, type TopicInput } from "../../packages/ai/src/index.ts";
+import { createClassifier, createEmbedder, createTopicTagger, tagItem, TOPICS, VOCAB, type Embedder, type TopicInput } from "../../packages/ai/src/index.ts";
 import type { Item } from "../../packages/shared/src/index.ts";
 import { topicInput } from "../../apps/server/src/ai-input.ts";
 
@@ -107,18 +107,9 @@ for (const r of data) {
       tags = [...c.tipo, ...c.visual];
     }
   } else if (approach.endsWith("-visual")) {
+    // exactly what the server runs (packages/ai tagItem)
     const im = img(r);
-    let visual: Record<string, number> = {};
-    let vtags: string[] = [];
-    if (im) {
-      const c = await classifier!.classify(im);
-      visual = Object.fromEntries(Object.entries(c.scores).filter(([k]) => VISUAL_TIPO.has(k) && NAMES.has(k)));
-      vtags = c.visual.filter((v) => NAMES.has(v));
-    }
-    const res = await tagger.tag(input, { visual });
-    tags = [...res.tags];
-    for (const v of vtags) if (!tags.includes(v) && tags.length < 7) tags.push(v);
-    extra = res.ranked.slice(0, 12).map((x) => `${x.tag}:${x.score.toFixed(1)}`);
+    tags = await tagItem(tagger, input, im ? await classifier!.classify(im) : null);
   } else if (approach.startsWith("llm-")) {
     const res = await tagger.tag(input);
     const cands = res.ranked.slice(0, 25).map((x) => x.tag);

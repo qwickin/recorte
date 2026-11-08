@@ -8,3 +8,4 @@ export { TOPICS, TOPIC_PARENTS, selectTopics, topicByName, topicSynonyms, create
 export type { RankedTopic, Topic, TopicInput, TopicOptions, TopicResult, TopicTagger, Embedder } from "./topics";
 export { createEmbedder, TEXT_MODEL_ID, TEXT_MODEL_FILE } from "./embed";
 export type { EmbedderOptions } from "./embed";
+export { tagItem, TAGGER_ID } from "./tag-item";

@@ -6,7 +6,7 @@ import { createWorker, backoffMs } from "../src/jobs";
 import { createPipeline } from "../src/pipeline";
 import { SqliteQueue } from "../src/queue";
 import { resolveDeps } from "../src/deps";
-import { ensureIndexWithRetry, lazyClassifier } from "../src/runtime";
+import { ensureIndexWithRetry, lazyClassifier, retagOutdated } from "../src/runtime";
 import { buildFilter, filterValue, safeHighlight, toMeiliDoc } from "../src/search/meili";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -60,8 +60,11 @@ describe("pipeline", () => {
     await createPipeline({ deps: d, classifier: async () => classifier }).process(userId, a.id);
     const m = d.storage.readMeta(userId, a.id)!;
     expect(m.user).toMatchObject({ title: "O meu título", note: "nota", tags: ["viagem", "novo"] });
+    // raw screenshot output is kept; the shown AI tags are the text tagger's + the visual tags
     expect(m.ai.tipo).toEqual(["mapa"]);
     expect(m.ai.visual).toEqual(["modo escuro"]);
+    expect(m.ai.topics).toEqual(expect.arrayContaining(["lisboa", "mapa", "modo escuro"]));
+    expect(m.ai.model).toContain("topics-v1");
     expect(m.ai.keys.length).toBeGreaterThan(0);
     expect(m.ai.keys.some((k) => k.includes("lisboa"))).toBe(true);
     expect(m.ai.processedAt).not.toBeNull();
@@ -71,7 +74,7 @@ describe("pipeline", () => {
     const row = t.db.prepare("SELECT title FROM items WHERE id = ?").get(a.id) as { title: string };
     expect(row.title).toBe("O meu título");
     const tags = (t.db.prepare("SELECT tag FROM item_tags WHERE item_id = ? ORDER BY pos").all(a.id) as { tag: string }[]).map((r) => r.tag);
-    expect(tags).toEqual(["viagem", "novo", "mapa", "modo escuro"]);
+    expect(tags).toEqual(["viagem", "novo", ...m.ai.topics!]);
     expect(search.docs.get(a.id)?.tags).toContain("mapa");
     expect(events).toContain("item.updated");
   });
@@ -319,7 +322,7 @@ describe("admin", () => {
     expect(await res.json()).toEqual({ items: 2, removed: 1, indexed: true, adopted: 0, unreadable: 0 });
     const after = (await (await t.app.request("/api/items", { headers: { cookie } })).json()) as { items: ItemSummary[] };
     expect(after.items).toEqual(snapshot.items);
-    expect(after.items[0]!.tags).toEqual(["viagem", "mapa"]);
+    expect(after.items[0]!.tags).toEqual(["viagem", "lisboa", "mapa", "cidade"]);
     expect((t.db.prepare("SELECT COUNT(*) AS n FROM item_colors WHERE item_id = ?").get(a.id) as { n: number }).n).toBeGreaterThan(0);
     const trash = (await (await t.app.request("/api/items?trash=1", { headers: { cookie } })).json()) as { total: number };
     expect(trash.total).toBe(1);
@@ -582,6 +585,20 @@ describe("saved links (type link)", () => {
     }
   });
 
+  it("retags every live item once per tagger version, at startup", async () => {
+    const { t, cookie, upload } = await setup();
+    const a = await upload();
+    const b = await upload();
+    await t.app.request(`/api/items/${b.id}`, { method: "DELETE", headers: { cookie } });
+    const queue = new SqliteQueue(t.db);
+    const before = (t.db.prepare("SELECT COUNT(*) AS n FROM jobs").get() as { n: number }).n;
+    expect(retagOutdated({ db: t.db, queue })).toBe(1);
+    const jobs = t.db.prepare("SELECT payload FROM jobs ORDER BY id DESC LIMIT 1").all() as { payload: string }[];
+    expect(JSON.parse(jobs[0]!.payload)).toMatchObject({ id: a.id });
+    expect((t.db.prepare("SELECT COUNT(*) AS n FROM jobs").get() as { n: number }).n).toBe(before + 1);
+    expect(retagOutdated({ db: t.db, queue })).toBe(0); // same version: nothing
+  });
+
   it("a missing classifier model does not fail the job: ai.skipped, logged once", async () => {
     const { t, upload, deps } = await setup();
     const a = await upload();
@@ -598,6 +615,7 @@ describe("saved links (type link)", () => {
         expect(m.ai.processedAt).not.toBeNull();
         expect(m.ai.tipo).toEqual([]);
         expect(m.ai.keys.length).toBeGreaterThan(0); // keywords still run
+        expect(m.ai.topics).toEqual(expect.arrayContaining(["lisboa", "mapa"])); // and so do the text tags
       }
       expect(warn.mock.calls.filter((c) => String(c[0]).includes("classifier unavailable"))).toHaveLength(1);
     } finally {

@@ -1,4 +1,4 @@
-import { type Classifier, createClassifier } from "@recorte/ai";
+import { type Classifier, TAGGER_ID, createClassifier } from "@recorte/ai";
 import { type CloudAi, type CloudConfig, createCloudAi } from "./cloud";
 import type { Deps } from "./deps";
 import { createWorker } from "./jobs";
@@ -53,6 +53,22 @@ export async function ensureIndexWithRetry(search: Search, opts: { signal?: Abor
   return false;
 }
 
+/**
+ * Once per tagger version: queue every live item for processing (the AI step only, links are not fetched again),
+ * so items saved before an upgrade get the new tags. Returns the number of items queued.
+ */
+export function retagOutdated(deps: Pick<Deps, "db"> & { queue: SqliteQueue }): number {
+  const row = deps.db.prepare("SELECT value FROM settings WHERE key = 'taggerVersion'").get() as { value: string } | undefined;
+  if (row?.value === TAGGER_ID) return 0;
+  const items = deps.db.prepare("SELECT id, user_id AS userId FROM items WHERE deleted_at IS NULL ORDER BY created_at DESC").all() as { id: string; userId: string }[];
+  for (const { id, userId } of items) deps.queue.enqueue("process", { id, userId });
+  deps.db
+    .prepare("INSERT INTO settings (key, value, updated_at) VALUES ('taggerVersion', ?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at")
+    .run(TAGGER_ID, new Date().toISOString());
+  if (items.length) console.log(`tagger ${TAGGER_ID}: re-tagging ${items.length} item(s) in the background`);
+  return items.length;
+}
+
 export interface Runtime {
   stop(): Promise<void>;
 }
@@ -78,6 +94,7 @@ export function startRuntime(deps: Deps & { queue: SqliteQueue }, opts: { classi
       },
     },
   });
+  retagOutdated(deps);
   worker.start();
 
   const abort = new AbortController();

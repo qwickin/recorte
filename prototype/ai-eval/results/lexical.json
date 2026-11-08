@@ -4,16 +4,19 @@
  "platform": "darwin-arm64",
  "node": "v24.22.2",
  "loadMs": 0,
- "rssBaseMB": 259,
- "rssLoadedMB": 259,
- "rssPeakMB": 303,
+ "rssBaseMB": 236,
+ "rssLoadedMB": 237,
+ "rssPeakMB": 296,
  "perItem": [
   {
    "id": "ff-surfaces",
    "tags": [
     "documentação",
     "sombras",
-    "modo escuro"
+    "componentes ui",
+    "dropdown",
+    "modo escuro",
+    "dialog"
    ],
    "ms": 343,
    "extra": [
@@ -40,7 +43,7 @@
     "mozilla",
     "node.js"
    ],
-   "ms": 13,
+   "ms": 12,
    "extra": [
     "documentação:12.0(l12.0 s0.0 r0)",
     "javascript:12.0(l8.0 s0.0 r0)",
@@ -66,7 +69,7 @@
     "mozilla",
     "programação"
    ],
-   "ms": 34,
+   "ms": 39,
    "extra": [
     "flexbox:22.5(l22.5 s0.0 r0)",
     "css:12.0(l8.0 s0.0 r0)",
@@ -91,7 +94,7 @@
     "layout",
     "css"
    ],
-   "ms": 10,
+   "ms": 9,
    "extra": [
     "flexbox:21.6(l21.6 s0.0 r0)",
     "documentação:9.9(l1.9 s0.0 r8)",
@@ -169,7 +172,7 @@
     "artigo",
     "psicologia"
    ],
-   "ms": 10,
+   "ms": 11,
    "extra": [
     "ciência:17.9(l15.7 s0.0 r0)",
     "conversa:14.3(l14.3 s0.0 r0)",
@@ -259,7 +262,7 @@
     "design",
     "design de interiores"
    ],
-   "ms": 22,
+   "ms": 21,
    "extra": [
     "estante:25.8(l25.8 s0.0 r0)",
     "preços:8.6(l8.6 s0.0 r0)",
@@ -286,7 +289,7 @@
     "smartphone",
     "portátil"
    ],
-   "ms": 21,
+   "ms": 20,
    "extra": [
     "mac:22.5(l22.5 s0.0 r0)",
     "apple:19.3(l15.3 s0.0 r0)",
@@ -311,7 +314,7 @@
     "landing page",
     "inteligência artificial"
    ],
-   "ms": 4,
+   "ms": 3,
    "extra": [
     "inspiração:16.0(l4.0 s0.0 r8)",
     "design:12.0(l8.0 s0.0 r0)",
@@ -338,7 +341,7 @@
     "matemática",
     "portugal"
    ],
-   "ms": 17,
+   "ms": 15,
    "extra": [
     "redes neuronais:21.4(l21.4 s0.0 r0)",
     "vídeo:19.2(l7.4 s0.0 r8)",
@@ -379,7 +382,7 @@
     "religião",
     "wikipedia"
    ],
-   "ms": 11,
+   "ms": 10,
    "extra": [
     "pastelaria:12.3(l12.3 s0.0 r0)",
     "enciclopédia:12.1(l0.6 s0.0 r8)",
@@ -406,7 +409,7 @@
     "api",
     "culinária"
    ],
-   "ms": 35,
+   "ms": 34,
    "extra": [
     "preços:28.5(l20.5 s0.0 r8)",
     "pagamentos:16.5(l16.5 s0.0 r0)",

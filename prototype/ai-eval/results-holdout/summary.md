@@ -5,8 +5,8 @@
 | lex-e5 | 42% | 49% | 46% | 5.5 | 113 | 1278 | 1278 | 551 | 477 | 945 | darwin-arm64/2t |
 | lex-minilm-visual | 43% | 51% | 47% | 5.6 | 164 | 1036 | 1036 | 667 | 620 | 1228 | darwin-arm64/2t |
 | lex-minilm | 42% | 47% | 44% | 5.4 | 111 | 979 | 979 | 536 | 524 | 1008 | darwin-arm64/2t |
-| lexical-visual | 44% | 51% | 47% | 5.5 | 71 | 390 | 390 | 135 | 149 | 566 | darwin-arm64/2t |
-| lexical | 42% | 47% | 45% | 5.3 | 17 | 321 | 321 | 0 | 0 | 276 | darwin-arm64/2t |
+| lexical-visual | 42% | 51% | 46% | 5.8 | 84 | 521 | 521 | 215 | 159 | 591 | darwin-arm64/2t |
+| lexical | 40% | 47% | 44% | 5.6 | 16 | 311 | 311 | 0 | 0 | 276 | darwin-arm64/2t |
 | llm-qwen3 | 34% | 39% | 36% | 5.4 | 4242 | 4994 | 4994 | 985 | 1866 | 6557 | darwin-arm64/2t |
 
 Per page (bold = matches the ground truth):
@@ -127,6 +127,6 @@ Per page (bold = matches the ground truth):
 - lex-e5: **python**, **documentação**, llm, inteligência artificial
 - lex-minilm-visual: **python**, **documentação**, llm, inteligência artificial
 - lex-minilm: **python**, **documentação**, llm, inteligência artificial
-- lexical-visual: **python**, **documentação**, llm, inteligência artificial
-- lexical: **python**, **documentação**, llm, inteligência artificial
+- lexical-visual: **python**, **documentação**, llm, componentes ui, input, inteligência artificial, command palette
+- lexical: **python**, **documentação**, llm, componentes ui, input, inteligência artificial, command palette
 - llm-qwen3: —

@@ -93,8 +93,11 @@ export const Item = z.object({
     hiddenAiTags: z.array(z.string()),
   }),
   ai: z.object({
+    /** Raw screenshot-model output (kept for reference; shown only on items processed before `topics`). */
     tipo: z.array(z.string()),
     visual: z.array(z.string()),
+    /** The tags the AI shows: text tagger over the whole page + screenshot evidence (packages/ai tagItem). */
+    topics: z.array(z.string()).optional(),
     keys: z.array(z.string()),
     colors: z.array(z.string()),
     title: z.string().optional(),
