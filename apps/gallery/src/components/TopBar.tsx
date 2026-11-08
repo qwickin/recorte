@@ -57,6 +57,19 @@ export function TopBar({ chips = [], onClear, onSearch }: Props) {
   // The search button is on every page (same bar, same widths: no shift between sections). Away from the
   // gallery it goes there and opens the palette.
   const search = onSearch ?? (() => (requestPalette(), navigate("/")));
+  // ⌘K / Ctrl+K works on every page: away from the gallery it goes there with the palette open.
+  useEffect(() => {
+    if (onSearch) return; // the gallery owns the shortcut
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        requestPalette();
+        navigate("/");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onSearch]);
   return (
     <header className="topbar">
       <div className="mx-auto flex h-[72px] max-w-[1680px] items-center gap-2 pb-2 sm:gap-4">
@@ -72,14 +85,14 @@ export function TopBar({ chips = [], onClear, onSearch }: Props) {
               type="button"
               onClick={c.onRemove}
               aria-label={`Remover filtro ${c.label}`}
-              className="fade-in flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] py-1 pr-2 pl-3 text-[13px] text-white shadow-[0_0_16px_-6px_rgb(255_255_255/0.3)] transition-colors outline-none hover:bg-white/[0.12] focus-visible:ring-2 focus-visible:ring-white/70 max-sm:min-h-9"
+              className="fade-in flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] py-1 pr-2 pl-3 text-[13px] text-white shadow-[0_0_16px_-6px_rgb(255_255_255/0.3)] transition-colors outline-none hover:bg-white/[0.12] focus-visible:ring-2 focus-visible:ring-white/70 max-sm:min-h-11"
             >
               {c.label}
               <CloseIcon width={13} height={13} className="text-white/60" />
             </button>
           ))}
           {chips.length > 1 && onClear && (
-            <button type="button" onClick={onClear} className="fade-in shrink-0 rounded-md px-2 py-1 text-[13px] text-[var(--ink-3)] transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/70">
+            <button type="button" onClick={onClear} className="fade-in shrink-0 rounded-md px-2 py-1 text-[13px] text-[var(--ink-3)] max-sm:min-h-11 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/70">
               Limpar
             </button>
           )}

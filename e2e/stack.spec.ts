@@ -335,8 +335,13 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download
   await option.waitFor({ state: "visible", timeout: 30_000 });
   // Results are a grid of image cards: the card has its thumbnail, cards share rows, arrows move across.
   assert.equal(await option.locator("img").count(), 1, "result card without its image");
+  // The grid has several columns at 1440 px whatever the number of hits (JS owns the column count).
+  const cols = await page.getByRole("listbox").locator(":scope > div").first().evaluate((e) => getComputedStyle(e).gridTemplateColumns.split(" ").length);
+  assert.ok(cols >= 2, `palette grid has ${cols} column(s)`);
   const cards = page.getByRole("option");
-  if ((await cards.count()) >= 2) {
+  const many = (await cards.count()) >= 2;
+  console.log(`palette: ${await cards.count()} result(s), ${cols} columns, arrow-key check ${many ? "ran" : "skipped"}`);
+  if (many) {
     const [a, b] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
     assert.ok(a && b && Math.abs(a.y - b.y) < 2 && b.x > a.x, "first two results should sit side by side");
     await page.keyboard.press("ArrowDown"); // into the grid

@@ -796,12 +796,22 @@ body {
   .dock {
     padding: 5px;
   }
-  .filter-chip,
+  .filter-chip {
+    height: auto;
+  }
+  .filter-chip-main,
+  .filter-chip-x {
+    min-height: 44px;
+  }
   .dock-action,
   .dock-link,
   .dock-field,
   .dock-danger {
     height: 44px;
+  }
+  .dock-action {
+    min-width: 44px;
+    justify-content: center;
   }
   .filter-chip-main {
     padding: 0 12px;
@@ -949,10 +959,41 @@ body {
   background: rgb(230 50 50 / 0.85);
 }
 
+/* Touch screens: every control is at least 44 px in both directions (C8). */
 @media (pointer: coarse) {
   .detail-icon {
     width: 44px;
     min-width: 44px;
+    height: 44px;
+  }
+  .detail-aside .button,
+  .detail-aside select,
+  .detail-aside .title-edit {
+    min-height: 44px;
+  }
+  .detail-aside dd .link-quiet {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .tag-chip {
+    height: 44px;
+    font-size: 14px;
+  }
+  .tag-chip > button:first-child {
+    padding-left: 14px;
+    min-width: 44px;
+  }
+  .tag-chip-x {
+    padding: 0 14px 0 8px;
+    min-width: 44px;
+  }
+  .detail-aside input[aria-label="Adicionar etiqueta"] {
+    height: 44px;
+    font-size: 16px;
+  }
+  .detail-dialog .close-button {
+    width: 44px;
     height: 44px;
   }
 }
