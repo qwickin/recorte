@@ -1,11 +1,13 @@
-import { Button, Modal, Spinner } from "@heroui/react";
+import { Button, Modal, Spinner, Tooltip } from "@heroui/react";
 import { buttonVariants } from "@heroui/styles";
 import { API, type Category, type Item, type ItemPatch, type ItemSummary, aiTags, normalizeTag } from "@recorte/shared";
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 import { api, originalUrl } from "../api";
+import { PHONE, useMedia } from "../hooks/useMedia";
 import { displayTags, displayTitle, hiddenAiTags } from "../lib/item";
 import { fullDate, kindLabel, timeAgo, typeLabel } from "../lib/text";
 import { CheckIcon, ChevronIcon, CloseIcon, CopyIcon, ExternalIcon, TrashIcon } from "./icons";
+import { ZoomImage } from "./ZoomImage";
 
 type Props = {
   summary: ItemSummary | null;
@@ -39,6 +41,28 @@ const extractedText = (m: Item) =>
   m.text.selection.trim() ||
   (m.type === "link" ? (m.text.page?.text.trim() ?? "") : "") ||
   [...m.text.headings, m.link?.description ?? m.text.meta.description ?? ""].filter(Boolean).join("\n");
+
+/** An icon-only action with a tooltip that names it (touch screens get the aria-label only). */
+function IconAction({ label, onPress, isDisabled, danger, children }: { label: string; onPress: () => void; isDisabled?: boolean; danger?: boolean; children: ReactNode }) {
+  return (
+    <Tooltip delay={250} closeDelay={0}>
+      <Button
+        isIconOnly
+        size="sm"
+        variant={danger ? "danger-soft" : "ghost"}
+        aria-label={label}
+        onPress={onPress}
+        isDisabled={isDisabled}
+        className={danger ? "detail-icon detail-icon--danger" : "detail-icon text-[var(--ink-2)] hover:text-white"}
+      >
+        {children}
+      </Button>
+      <Tooltip.Content placement="top" offset={8} className="tooltip-quiet">
+        {label}
+      </Tooltip.Content>
+    </Tooltip>
+  );
+}
 
 /** A link's video (x.com): a poster with a play button until clicked, then the embed iframe. */
 function LinkEmbed({ url, title }: { url: string; title: string }) {
@@ -110,6 +134,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [related, setRelated] = useState<ItemSummary[]>([]);
+  const phone = useMedia(PHONE);
 
   useEffect(() => {
     if (!id) return;
@@ -259,15 +284,16 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
   return (
     <Modal isOpen={!!summary} onOpenChange={(open) => !open && onClose()}>
       <Modal.Backdrop variant="blur" className="bg-black/70">
-        <Modal.Container placement="center" className="sm:p-8">
+        {/* Phones: a full-screen sheet, the image on top and the details scrolling below it. */}
+        <Modal.Container placement={phone ? "bottom" : "center"} size={phone ? "full" : undefined} className="sm:p-8">
           <Modal.Dialog
             aria-label={s?.title ?? "Captura"}
-            className="w-[min(1180px,calc(100vw-2rem))] max-w-none overflow-hidden p-0"
+            className="detail-dialog max-w-none overflow-hidden p-0"
             style={{ "--glow": s?.color } as CSSProperties}
           >
             {s && (
-              <div className="flex max-h-[min(86vh,880px)] flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_320px] md:grid-cols-[minmax(0,1fr)_360px]">
-                <div className="relative flex max-h-[45vh] min-h-0 shrink-0 flex-col overflow-y-auto bg-black [scrollbar-width:thin] sm:max-h-none">
+              <div className="detail-layout">
+                <div className="detail-media">
                   {/* Light bleeding from the capture's dominant colour. */}
                   <div
                     aria-hidden="true"
@@ -275,13 +301,12 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                     style={{ background: `radial-gradient(50% 80% at 50% 0%, ${s.color}, transparent)` }}
                   />
                   {s.thumb ? (
-                    <img
+                    <ZoomImage
                       key={s.id}
                       src={item?.media[0] ? API.itemFile(s.id, item.media[0].file) : originalUrl(s.id)}
                       alt={s.title}
                       width={s.width || undefined}
                       height={s.height || undefined}
-                      className="fade-in relative my-auto block h-auto w-full"
                     />
                   ) : (
                     // A link without an image.
@@ -293,7 +318,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                   )}
                   {item?.link?.embedUrl && <LinkEmbed key={item.id} url={item.link.embedUrl} title={s.title} />}
                   {(onPrev || onNext) && (
-                    <div className="pointer-events-none sticky bottom-3 mt-auto flex justify-between px-3">
+                    <div className="pointer-events-none absolute inset-x-0 bottom-3 z-[2] flex justify-between px-3">
                       <button type="button" disabled={!onPrev} onClick={onPrev} aria-label="Captura anterior" className="nav-arrow pointer-events-auto">
                         <ChevronIcon className="rotate-180" />
                       </button>
@@ -304,7 +329,7 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                   )}
                 </div>
 
-                <aside className="flex min-h-0 flex-col gap-5 overflow-y-auto border-t border-white/[0.07] p-6 sm:border-t-0 sm:border-l">
+                <aside className="detail-aside">
                   {!item && !loadError && (
                     <div className="flex flex-1 items-center justify-center py-16">
                       <Spinner size="sm" color="current" className="text-white/50" />
@@ -332,16 +357,16 @@ export function ItemModal({ summary, categories, onCategoryCreated, onClose, onP
                         )}
                       </header>
 
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <a href={item.source.url} target="_blank" rel="noreferrer noopener" className={buttonVariants({ size: "sm", variant: "primary" })}>
                           <ExternalIcon /> {item.type === "link" ? "Abrir link" : "Abrir página"}
                         </a>
-                        <Button size="sm" variant="ghost" onPress={copy} isDisabled={!text} className="text-[var(--ink-2)]">
-                          {copied ? <CheckIcon /> : <CopyIcon />} {copied ? "Texto copiado" : "Copiar texto"}
-                        </Button>
-                        <Button size="sm" variant="ghost" onPress={remove} className="text-[var(--ink-2)] hover:text-white">
-                          <TrashIcon /> Apagar
-                        </Button>
+                        <IconAction label={copied ? "Texto copiado" : "Copiar texto"} onPress={copy} isDisabled={!text}>
+                          {copied ? <CheckIcon /> : <CopyIcon />}
+                        </IconAction>
+                        <IconAction label="Apagar (vai para o lixo)" onPress={remove} danger>
+                          <TrashIcon />
+                        </IconAction>
                       </div>
 
                       <dl className="grid grid-cols-[88px_minmax(0,1fr)] gap-x-3 gap-y-2 text-[13px]">

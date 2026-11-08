@@ -1,12 +1,13 @@
-import { Button, Kbd } from "@heroui/react";
-import type { ReactNode } from "react";
-import { Link, usePath } from "../lib/router";
+import { Kbd } from "@heroui/react";
+import { useEffect, useRef, useState } from "react";
+import { Link, navigate, usePath } from "../lib/router";
+import { requestPalette } from "../lib/palette";
 import { isMac } from "../lib/text";
-import { CloseIcon, CropMark, SearchIcon } from "./icons";
+import { CloseIcon, CropMark, MenuIcon, SearchIcon } from "./icons";
 
 export type FilterChip = { key: string; label: string; onRemove: () => void };
 
-type Props = { chips?: FilterChip[]; onClear?: () => void; onSearch?: () => void; actions?: ReactNode };
+type Props = { chips?: FilterChip[]; onClear?: () => void; onSearch?: () => void };
 
 const NAV = [
   { href: "/lixo", label: "Lixo" },
@@ -14,14 +15,54 @@ const NAV = [
   { href: "/definicoes", label: "Definições" },
 ];
 
-export function TopBar({ chips = [], onClear, onSearch, actions }: Props) {
+/** Phones: the sections fold into a menu, so the bar keeps one row (and one height) everywhere. */
+function NavMenu({ path }: { path: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [open]);
+  useEffect(() => setOpen(false), [path]);
+  return (
+    <div ref={ref} className="relative md:hidden">
+      <button type="button" aria-label="Secções" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="topbar-icon">
+        {open ? <CloseIcon width={18} height={18} /> : <MenuIcon width={18} height={18} />}
+      </button>
+      {open && (
+        <nav className="nav-sheet" aria-label="Secções">
+          <Link href="/" aria-current={path === "/" ? "page" : undefined} className="nav-sheet-link nav-link">
+            Galeria
+          </Link>
+          {NAV.map((n) => (
+            <Link key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined} className="nav-sheet-link nav-link">
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+      )}
+    </div>
+  );
+}
+
+export function TopBar({ chips = [], onClear, onSearch }: Props) {
   const path = usePath();
+  // The search button is on every page (same bar, same widths: no shift between sections). Away from the
+  // gallery it goes there and opens the palette.
+  const search = onSearch ?? (() => (requestPalette(), navigate("/")));
   return (
     <header className="topbar">
-      <div className="mx-auto flex h-[72px] max-w-[1680px] items-center gap-4 pb-2">
-        <Link href="/" className="flex shrink-0 items-center gap-2 rounded-md text-[17px] font-light tracking-[-0.01em] text-white outline-none focus-visible:ring-2 focus-visible:ring-white/70">
+      <div className="mx-auto flex h-[72px] max-w-[1680px] items-center gap-2 pb-2 sm:gap-4">
+        <Link href="/" className="flex h-11 shrink-0 items-center gap-2 rounded-md text-[17px] font-light tracking-[-0.01em] text-white outline-none focus-visible:ring-2 focus-visible:ring-white/70">
           <CropMark width={18} height={18} className="text-white/80" />
-          Recorte
+          <span className="max-[380px]:sr-only">Recorte</span>
         </Link>
 
         <div className="-my-4 flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto px-2 py-4 [scrollbar-width:none]" aria-live="polite">
@@ -31,7 +72,7 @@ export function TopBar({ chips = [], onClear, onSearch, actions }: Props) {
               type="button"
               onClick={c.onRemove}
               aria-label={`Remover filtro ${c.label}`}
-              className="fade-in flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] py-1 pr-2 pl-3 text-[13px] text-white shadow-[0_0_16px_-6px_rgb(255_255_255/0.3)] transition-colors outline-none hover:bg-white/[0.12] focus-visible:ring-2 focus-visible:ring-white/70"
+              className="fade-in flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] py-1 pr-2 pl-3 text-[13px] text-white shadow-[0_0_16px_-6px_rgb(255_255_255/0.3)] transition-colors outline-none hover:bg-white/[0.12] focus-visible:ring-2 focus-visible:ring-white/70 max-sm:min-h-9"
             >
               {c.label}
               <CloseIcon width={13} height={13} className="text-white/60" />
@@ -57,31 +98,17 @@ export function TopBar({ chips = [], onClear, onSearch, actions }: Props) {
           ))}
         </nav>
 
-        {actions}
+        <button type="button" onClick={search} aria-label="Pesquisar capturas" className="search-pill">
+          <SearchIcon />
+          <span className="hidden text-[14px] sm:inline">Pesquisar</span>
+          <Kbd variant="light" className="hidden sm:inline-flex">
+            {isMac ? <Kbd.Abbr keyValue="command" /> : <Kbd.Abbr keyValue="ctrl" />}
+            <Kbd.Content>K</Kbd.Content>
+          </Kbd>
+        </button>
 
-        {onSearch && (
-          <Button
-            variant="outline"
-            onPress={onSearch}
-            aria-label="Pesquisar capturas"
-            className="h-10 shrink-0 gap-2.5 rounded-full border-white/12 bg-white/[0.03] pr-2 pl-3.5 font-light text-[var(--ink-2)] shadow-[inset_0_1px_0_rgb(255_255_255/0.06),0_0_40px_-12px_rgb(255_255_255/0.18)] hover:bg-white/[0.07] hover:text-white"
-          >
-            <SearchIcon />
-            <span className="hidden text-[14px] sm:inline">Pesquisar</span>
-            <Kbd variant="light" className="hidden sm:inline-flex">
-              {isMac ? <Kbd.Abbr keyValue="command" /> : <Kbd.Abbr keyValue="ctrl" />}
-              <Kbd.Content>K</Kbd.Content>
-            </Kbd>
-          </Button>
-        )}
+        <NavMenu path={path} />
       </div>
-      <nav className="flex gap-1 pb-2 md:hidden" aria-label="Secções">
-        {NAV.map((n) => (
-          <Link key={n.href} href={n.href} aria-current={path === n.href ? "page" : undefined} className="nav-link rounded-md px-2 py-1 text-[13px] text-[var(--ink-3)]">
-            {n.label}
-          </Link>
-        ))}
-      </nav>
     </header>
   );
 }

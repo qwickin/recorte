@@ -67,3 +67,9 @@ export const LinkIcon = (p: SVGProps<SVGSVGElement>) => (
     <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
   </svg>
 );
+
+export const MenuIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p} aria-hidden="true">
+    <path d="M4 8h16M4 16h16" />
+  </svg>
+);

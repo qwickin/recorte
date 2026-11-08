@@ -12,6 +12,7 @@
 @import "@heroui/styles/components/close-button.css" layer(components);
 @import "@heroui/styles/components/surface.css" layer(components);
 @import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/tooltip.css" layer(components);
 @import "@heroui/styles/utilities";
 @import "@heroui/styles/variants";
 
@@ -20,15 +21,16 @@
 }
 
 /* Albert Sans (SIL OFL 1.1, public/fonts/OFL.txt), from @fontsource/albert-sans 5.3.0. Served by the app itself:
-   no third-party font host (CSP font-src 'self'). */
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 200; src: url("/fonts/albert-sans-latin-ext-200-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 200; src: url("/fonts/albert-sans-latin-200-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 300; src: url("/fonts/albert-sans-latin-ext-300-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 300; src: url("/fonts/albert-sans-latin-300-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 400; src: url("/fonts/albert-sans-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 400; src: url("/fonts/albert-sans-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 500; src: url("/fonts/albert-sans-latin-ext-500-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: "Albert Sans"; font-style: normal; font-display: swap; font-weight: 500; src: url("/fonts/albert-sans-latin-500-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+   no third-party font host (CSP font-src 'self'). `block` + the preloads in index.html: the first paint is
+   already in Albert Sans (no swap from the fallback face and the reflow it causes). */
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 200; src: url("/fonts/albert-sans-latin-ext-200-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 200; src: url("/fonts/albert-sans-latin-200-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 300; src: url("/fonts/albert-sans-latin-ext-300-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 300; src: url("/fonts/albert-sans-latin-300-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 400; src: url("/fonts/albert-sans-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 400; src: url("/fonts/albert-sans-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 500; src: url("/fonts/albert-sans-latin-ext-500-normal.woff2") format("woff2"); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: "Albert Sans"; font-style: normal; font-display: block; font-weight: 500; src: url("/fonts/albert-sans-latin-500-normal.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 
 /* Pure black canvas, white type. Elevation comes from light (hairlines, glows), not from grey boxes. */
 .dark,
@@ -58,6 +60,12 @@
 html,
 body {
   background: #000;
+}
+
+/* The scrollbar's room is always reserved: short pages (Lixo, Extensão) and long ones (the gallery) have
+   the same width, and React Aria's scroll lock keeps it too (it sets scrollbar-gutter instead of padding). */
+html {
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -93,10 +101,22 @@ body {
   mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%);
 }
 
+/* Only `transform` animates, on its own layer; durations come from the run's width (TagMarquee.tsx), so
+   each lane drifts at a steady, slow pixel speed. Paused until measured, so it never jumps at the start. */
+.marquee-row {
+  contain: layout paint;
+}
+
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee var(--dur, 60s) linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  animation: marquee var(--dur, 240s) linear infinite;
+}
+
+.marquee-row:not([data-ready]) .marquee-track {
+  animation-play-state: paused;
 }
 
 .marquee-row[data-dir="rtl"] .marquee-track {
@@ -116,9 +136,27 @@ body {
 }
 
 @keyframes marquee {
-  to {
-    transform: translateX(-50%);
+  from {
+    transform: translate3d(0, 0, 0);
   }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* First visit: example words, barely there, with light sweeping across them. */
+.marquee-ghost .tag-ghost {
+  cursor: default;
+  color: transparent;
+  background: linear-gradient(100deg, rgb(255 255 255 / 0.08) 30%, rgb(255 255 255 / 0.26) 50%, rgb(255 255 255 / 0.08) 70%) 0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: ghost-shimmer 6s ease-in-out infinite;
+}
+
+@keyframes ghost-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
 }
 
 .tag {
@@ -176,6 +214,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .marquee-ghost .tag-ghost { animation: none; }
   .marquee { mask-image: none; }
   .marquee-track { animation: none; width: auto; }
   .marquee-run { flex-wrap: wrap; row-gap: 0.4rem; }
@@ -317,6 +356,11 @@ body {
 .tile:focus-visible .tile-caption {
   opacity: 1;
   transform: none;
+}
+
+/* A text card already shows its title and site. */
+.tile-media[data-text] .tile-caption {
+  display: none;
 }
 
 @media (hover: none) {
@@ -527,18 +571,52 @@ body {
 
 .filter-chip {
   display: inline-flex;
+  flex: none;
   align-items: center;
+  height: 36px;
   border-radius: 999px;
-  border: 1px solid rgb(255 255 255 / 0.09);
-  background: rgb(255 255 255 / 0.02);
-  font-size: 13px;
+  border: 1px solid transparent;
+  font-size: 13.5px;
   color: var(--ink-2);
-  transition: border-color 200ms ease, background 200ms ease, color 200ms ease;
+  transition: border-color 200ms ease, background 200ms ease, color 200ms ease, box-shadow 300ms ease;
+}
+
+.filter-chip-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 14px;
+  border-radius: 999px;
+  outline: none;
+}
+
+.filter-chip[data-active] .filter-chip-main {
+  padding-right: 4px;
+}
+
+.filter-chip-main:focus-visible,
+.filter-chip-x:focus-visible {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.7);
+}
+
+.filter-chip-x {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 0 10px 0 4px;
+  border-radius: 0 999px 999px 0;
+  color: rgb(255 255 255 / 0.55);
+  outline: none;
+}
+
+.filter-chip-x:hover {
+  color: #fff;
 }
 
 .filter-chip:hover,
 .filter-chip[data-open] {
-  border-color: rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.06);
   color: #fff;
 }
 
@@ -548,37 +626,614 @@ body {
   box-shadow: 0 0 16px -6px rgb(255 255 255 / 0.3);
 }
 
-.filter-panel {
-  position: absolute;
-  z-index: 40;
-  top: calc(100% + 8px);
-  left: 0;
-  min-width: 220px;
-  padding: 6px;
-  border-radius: 14px;
-  background: #0b0b0b;
-  box-shadow: var(--overlay-shadow);
-}
+/* ---------- Dock ---------- */
 
-/* ---------- Bulk bar ---------- */
-
-.bulk-bar {
+.dock {
   position: fixed;
   z-index: 35;
-  left: 50%;
-  bottom: 20px;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px));
+  margin: 0 auto;
+  width: fit-content;
+  max-width: calc(100vw - 24px);
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: min(880px, calc(100vw - 2rem));
-  padding: 10px 12px 10px 18px;
-  border-radius: 999px;
-  background: rgb(11 11 11 / 0.92);
-  backdrop-filter: blur(14px);
-  box-shadow: var(--overlay-shadow);
+  gap: 4px;
+  padding: 6px;
+  border-radius: 28px;
+  background: rgb(10 10 10 / 0.94);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 1px 0 0 rgb(255 255 255 / 0.07) inset, 0 24px 60px -18px rgb(0 0 0 / 0.95),
+    0 0 70px -28px rgb(255 255 255 / 0.22);
+  view-transition-name: dock;
+  animation: dock-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+.dock-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 2px;
   overflow-x: auto;
   scrollbar-width: none;
+}
+
+.dock-sep {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.dock-action {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  color: #000;
+  background: rgb(255 255 255 / 0.92);
+  outline: none;
+  transition: background 200ms ease, box-shadow 300ms ease;
+}
+
+.dock-action:hover {
+  background: #fff;
+  box-shadow: 0 0 24px -6px rgb(255 255 255 / 0.5);
+}
+
+.dock-action:focus-visible {
+  box-shadow: 0 0 0 2px #000, 0 0 0 4px rgb(255 255 255 / 0.8);
+}
+
+.dock-selection {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding-left: 6px;
+}
+
+.dock-link {
+  flex: none;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--ink-2);
+  outline: none;
+  transition: color 200ms ease, background 200ms ease;
+}
+
+.dock-link:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.dock-link:focus-visible {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.7);
+}
+
+.dock-field {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.04);
+  font-size: 13px;
+  color: #fff;
+  outline: none;
+}
+
+.dock-field::placeholder {
+  color: rgb(255 255 255 / 0.35);
+}
+
+.dock-field:focus {
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+.dock-field:disabled {
+  opacity: 0.4;
+}
+
+.dock-danger {
+  height: 36px;
+  border-radius: 999px;
+}
+
+/* Filter panels grow up out of the Dock. */
+.dock-panel {
+  position: absolute;
+  z-index: 1;
+  bottom: calc(100% + 10px);
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 18px;
+  background: #0b0b0b;
+  box-shadow: var(--overlay-shadow);
+  transform-origin: 50% 100%;
+  animation: panel-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.dock-panel[data-closing] {
+  animation: panel-out 150ms ease-in both;
+  pointer-events: none;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.96);
+  }
+}
+
+@keyframes panel-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0) scale(0.98);
+  }
+}
+
+/* Phones: the selection Dock stacks in two rows, panels take the Dock's width. */
+@media (max-width: 639.98px) {
+  .dock {
+    padding: 5px;
+  }
+  .filter-chip,
+  .dock-action,
+  .dock-link,
+  .dock-field,
+  .dock-danger {
+    height: 44px;
+  }
+  .filter-chip-main {
+    padding: 0 12px;
+  }
+  .dock-action {
+    padding: 0 13px;
+  }
+  .dock-field {
+    font-size: 16px; /* no iOS zoom on focus */
+  }
+  .dock-selection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding-left: 0;
+    width: calc(100vw - 34px);
+  }
+  .dock-panel {
+    left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* The filters ⇄ selection morph (View Transitions): only the Dock animates, the page stays put. The box
+   morphs between both sizes; each snapshot keeps its own size (no stretched text) and they crossfade,
+   clipped to the moving pill. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(dock) {
+  animation-duration: 440ms;
+  animation-timing-function: cubic-bezier(0.25, 0.9, 0.25, 1);
+  /* A solid pill that morphs under the crossfade (snapshots lose the backdrop blur, and two half-faded
+     snapshots would let the grid show through mid-way). */
+  border-radius: 28px;
+  background: rgb(10 10 10 / 0.97);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 24px 60px -18px rgb(0 0 0 / 0.95);
+}
+
+::view-transition-image-pair(dock) {
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+::view-transition-old(dock),
+::view-transition-new(dock) {
+  height: 100%;
+  width: auto;
+  inset: 0;
+  margin: auto;
+  object-fit: none;
+  animation-duration: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .dock-panel {
+    animation: none;
+  }
+}
+
+/* ---------- Detail ---------- */
+
+.detail-dialog {
+  width: min(1180px, calc(100vw - 2rem));
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  height: min(86vh, 880px);
+}
+
+.detail-media {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #000;
+}
+
+.detail-aside {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  padding: 24px;
+  border-left: 1px solid rgb(255 255 255 / 0.07);
+  scrollbar-width: thin;
+}
+
+@media (max-width: 900px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+/* Phones: a full-screen sheet; the image on top, the details scroll below it. */
+@media (max-width: 639.98px) {
+  .detail-dialog {
+    width: 100vw;
+    height: var(--visual-viewport-height, 100dvh);
+    border-radius: 0;
+  }
+  .detail-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .detail-media {
+    flex: none;
+    height: 46dvh;
+  }
+  .detail-aside {
+    flex: 1;
+    border-left: 0;
+    border-top: 1px solid rgb(255 255 255 / 0.07);
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+  .nav-arrow {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.detail-icon {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.detail-icon--danger {
+  color: #ff6b6b;
+  background: rgb(255 70 70 / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(255 90 90 / 0.18);
+}
+
+.detail-icon--danger:hover {
+  color: #fff;
+  background: rgb(230 50 50 / 0.85);
+}
+
+@media (pointer: coarse) {
+  .detail-icon {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+.tooltip-quiet {
+  padding: 5px 10px;
+  font-size: 12px;
+  color: #fff;
+  border-radius: 8px;
+  word-break: normal;
+  white-space: nowrap;
+}
+
+/* Zoomable image: one transform on one element (ZoomImage.tsx). */
+.zoom-box {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: zoom-in;
+  outline: none;
+}
+
+.zoom-box[data-pannable] {
+  cursor: grab;
+}
+
+.zoom-box[data-dragging][data-pannable] {
+  cursor: grabbing;
+}
+
+.zoom-box:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.6);
+}
+
+.zoom-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  -webkit-user-drag: none;
+}
+
+.zoom-img[data-loaded] {
+  opacity: 1;
+}
+
+.zoom-hint {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  translate: -50% 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 0.75);
+  background: rgb(0 0 0 / 0.55);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  pointer-events: none;
+  animation: fade-in 600ms 500ms ease both;
+  transition: opacity 600ms ease, translate 600ms ease;
+}
+
+.zoom-hint[data-hidden] {
+  opacity: 0;
+  translate: -50% -4px;
+}
+
+/* ---------- Palette ---------- */
+
+.palette-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(920px, calc(100vw - 2rem));
+}
+
+.palette-list {
+  max-height: min(62vh, 640px);
+  overflow-y: auto;
+  padding: 10px;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 639.98px) {
+  .palette-dialog {
+    width: 100vw;
+    height: var(--visual-viewport-height, 100dvh);
+    border-radius: 0;
+  }
+  .palette-list {
+    flex: 1;
+    max-height: none;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+}
+
+.palette-card {
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 6px 6px 8px;
+  transition: background 250ms ease;
+}
+
+.palette-thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--glow) 16%, #050505);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.07);
+  transition: box-shadow 300ms ease, transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.palette-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  filter: brightness(0.88);
+  transition: filter 300ms ease;
+}
+
+.palette-textcard {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 12px;
+  background: radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 0.07), transparent 60%), #070707;
+}
+
+.palette-snippet {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 28px 10px 9px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: rgb(255 255 255 / 0.78);
+  background: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.8) 45%, rgb(0 0 0 / 0.92));
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 250ms ease, transform 300ms ease;
+}
+
+.palette-snippet mark {
+  background: none;
+  color: #fff;
+  font-weight: 400;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.4);
+  text-underline-offset: 2px;
+}
+
+.palette-card mark {
+  background: none;
+  color: #fff;
+  font-weight: 400;
+}
+
+.palette-card[aria-selected="true"] {
+  background: rgb(255 255 255 / 0.045);
+}
+
+.palette-card[aria-selected="true"] .palette-thumb {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.75), 0 18px 50px -20px color-mix(in srgb, var(--glow) 85%, transparent);
+}
+
+.palette-card[aria-selected="true"] .palette-thumb img {
+  filter: none;
+}
+
+.palette-card[aria-selected="true"] .palette-snippet {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: none) {
+  .palette-snippet {
+    display: none;
+  }
+}
+
+/* ---------- Top bar ---------- */
+
+.search-pill {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 8px 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.03);
+  font-weight: 300;
+  color: var(--ink-2);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 0 40px -12px rgb(255 255 255 / 0.18);
+  outline: none;
+  transition: background 200ms ease, color 200ms ease;
+}
+
+.search-pill:hover {
+  background: rgb(255 255 255 / 0.07);
+  color: #fff;
+}
+
+.search-pill:focus-visible {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.7);
+}
+
+.topbar-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  color: var(--ink-2);
+  outline: none;
+}
+
+.topbar-icon:focus-visible {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.7);
+}
+
+@media (max-width: 639.98px) {
+  .search-pill {
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+}
+
+.nav-sheet {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 16px;
+  background: #0b0b0b;
+  box-shadow: var(--overlay-shadow);
+  transform-origin: 100% 0;
+  animation: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0) scale(0.97);
+  }
+}
+
+.nav-sheet-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.nav-sheet-link:hover {
+  background: rgb(255 255 255 / 0.05);
 }
 
 /* ---------- Secondary pages ---------- */

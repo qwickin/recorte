@@ -1,7 +1,16 @@
-import { useMemo, type CSSProperties } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import type { TagCount } from "@recorte/shared";
+import { Link } from "../lib/router";
 
-type Props = { tags: TagCount[]; selected: string[]; onToggle: (tag: string) => void; rows?: number };
+type Props = {
+  /** null while the first request is in flight. */
+  tags: TagCount[] | null;
+  selected: string[];
+  onToggle: (tag: string) => void;
+  /** Captures in the library (null = unknown): picks the empty-state copy. */
+  libraryTotal?: number | null;
+  rows?: number;
+};
 
 const hash = (s: string) => [...s].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
 
@@ -15,29 +24,106 @@ function levels(tags: TagCount[]) {
   return map;
 }
 
-export function TagMarquee({ tags, selected, onToggle, rows = 3 }: Props) {
-  const lv = useMemo(() => levels(tags), [tags]);
+/** Lane speeds in px/s: slow enough to read, different enough that the rows drift apart. */
+const SPEEDS = [16, 12, 19];
+
+/**
+ * The run's width decides the duration, so every lane moves at a steady pixel speed whatever its
+ * length. Measured once per content change (no per-frame work): the track itself only animates
+ * `transform: translate3d`, on its own compositor layer.
+ */
+function useLaneDurations(deps: unknown) {
+  const root = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const apply = () =>
+      el.querySelectorAll<HTMLElement>(".marquee-row").forEach((row, i) => {
+        const run = row.querySelector<HTMLElement>(".marquee-run");
+        if (!run?.offsetWidth) return;
+        row.style.setProperty("--dur", `${(run.offsetWidth / SPEEDS[i % SPEEDS.length]).toFixed(1)}s`);
+        row.dataset.ready = "true";
+      });
+    apply();
+    // Fonts settling can change widths: measure again once they are in.
+    document.fonts?.ready.then(apply, () => {});
+  }, [deps]);
+  return root;
+}
+
+const EXAMPLES = [
+  ["design system", "receitas", "mapa", "tipografia", "react", "inspiração", "dashboard", "fotografia"],
+  ["artigo", "componente web", "paleta de cores", "viagens", "documentação", "animação", "produto"],
+  ["modo escuro", "ilustração", "código", "notícias", "arquitetura", "landing page", "ux"],
+];
+
+/** First visit: a ghost of what the hero will look like, and how to get there. */
+function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
+  const root = useLaneDurations(EXAMPLES);
+  const waiting = !!libraryTotal; // captures exist, the AI has not tagged them yet
+  return (
+    <div className="flex flex-col items-center">
+      <div ref={root} className="marquee marquee-ghost flex w-full flex-col gap-2.5 py-2" aria-hidden="true">
+        {EXAMPLES.map((lane, i) => (
+          <div key={i} className="marquee-row overflow-hidden py-1" data-dir={i % 2 ? "rtl" : "ltr"}>
+            <div className="marquee-track">
+              {[0, 1].map((copy) => (
+                <div key={copy} className="marquee-run">
+                  {[...lane, ...lane].map((w, j) => (
+                    <span key={j} className="tag tag-ghost" data-level={[4, 2, 3, 1, 5, 2, 3, 1][(j + i) % 8]}>
+                      {w}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="fade-in mt-6 flex max-w-[52ch] flex-col items-center gap-2 text-center">
+        {waiting ? (
+          <>
+            <p className="text-[16px] font-light text-white/85">As etiquetas estão a caminho.</p>
+            <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">Aparecem aqui assim que a IA acabar de ver as tuas capturas.</p>
+          </>
+        ) : (
+          <>
+            <p className="text-[16px] font-light text-white/85">Ainda não há etiquetas.</p>
+            <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">
+              Instala a{" "}
+              <Link href="/extensao" className="link-quiet text-white">
+                extensão
+              </Link>{" "}
+              e guarda a primeira captura: as etiquetas aparecem aqui.
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function TagMarquee({ tags, selected, onToggle, libraryTotal, rows = 3 }: Props) {
+  const list = tags ?? [];
+  const lv = useMemo(() => levels(list), [list]);
   const lanes = useMemo(() => {
     const out: TagCount[][] = Array.from({ length: rows }, () => []);
-    tags.forEach((t, i) => out[i % rows].push(t));
+    list.forEach((t, i) => out[i % rows].push(t));
     return out.map((lane) => ({
       tags: [...lane].sort((a, b) => hash(a.tag) - hash(b.tag)),
       // Short lanes are repeated so one run is always wider than the screen.
       reps: Math.max(1, Math.ceil(10 / Math.max(1, lane.length))),
     }));
-  }, [tags, rows]);
+  }, [list, rows]);
+  const root = useLaneDurations(lanes);
 
-  if (!tags.length) return <div className="h-[168px]" aria-hidden="true" />;
+  if (tags === null) return <div className="h-[168px]" aria-hidden="true" />;
+  if (!tags.length) return <EmptyHero libraryTotal={libraryTotal} />;
 
   return (
-    <div className="marquee flex flex-col gap-2.5 py-2" role="group" aria-label="Etiquetas">
+    <div ref={root} className="marquee flex flex-col gap-2.5 py-2" role="group" aria-label="Etiquetas">
       {lanes.map((lane, i) => (
-        <div
-          key={i}
-          className="marquee-row overflow-hidden py-1"
-          data-dir={i % 2 ? "rtl" : "ltr"}
-          style={{ "--dur": `${Math.max(45, lane.tags.length * lane.reps * 3.6) + i * 9}s` } as CSSProperties}
-        >
+        <div key={i} className="marquee-row overflow-hidden py-1" data-dir={i % 2 ? "rtl" : "ltr"}>
           <div className="marquee-track">
             {/* Two identical runs; the track slides by exactly one run (-50%) for a seamless loop. */}
             {[0, 1].map((copy) => (

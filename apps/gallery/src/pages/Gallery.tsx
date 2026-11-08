@@ -1,36 +1,44 @@
 import { Button } from "@heroui/react";
-import { type Category, type Item, type ItemSummary, type TagCount, normalizeTags } from "@recorte/shared";
+import type { Category, Item, ItemSummary, TagCount } from "@recorte/shared";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { api, EMPTY_FILTERS, hasFilters, type Filters } from "../api";
 import { CaptureTile } from "../components/CaptureTile";
 import { CommandPalette } from "../components/CommandPalette";
-import { FilterBar } from "../components/FilterBar";
+import { FilterDock, plural, SelectionDock } from "../components/Dock";
 import { isTyping, ItemModal } from "../components/ItemModal";
 import { Masonry } from "../components/Masonry";
 import { Sentinel } from "../components/Sentinel";
 import { TagMarquee } from "../components/TagMarquee";
 import { TopBar, type FilterChip } from "../components/TopBar";
-import { SelectIcon } from "../components/icons";
 import { useEvents } from "../hooks/useEvents";
 import { useItemFeed } from "../hooks/useItemFeed";
 import { displayTags, displayTitle, matchesFilters } from "../lib/item";
 import { inLoadedRange } from "../api/feed";
-import { Link } from "../lib/router";
+import { takePaletteRequest } from "../lib/palette";
 import { isMac, typeLabel } from "../lib/text";
 
 const ratio = (c: ItemSummary) => (c.width > 0 ? c.height / c.width : 0.62);
 const keyOf = (c: ItemSummary) => c.id;
 const andList = new Intl.ListFormat("pt-PT", { type: "conjunction" });
-/** The server's /api/items/bulk limit; larger selections go in several requests. */
-const BULK_MAX = 200;
-const chunks = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/**
+ * Swaps the filters Dock and the selection Dock as one shared-layout morph: both carry
+ * `view-transition-name: dock`, so the browser animates the box between their sizes and crossfades the
+ * contents (styles.css). Instant where View Transitions are missing or motion is reduced.
+ */
+function morph(update: () => void) {
+  const start = (document as Document & { startViewTransition?: (cb: () => void) => unknown }).startViewTransition;
+  if (!start || matchMedia("(prefers-reduced-motion: reduce)").matches) return update();
+  start.call(document, () => flushSync(update));
+}
 
 export function GalleryPage() {
-  const [tags, setTags] = useState<TagCount[]>([]);
+  // null until the first response: the empty hero must not flash on every load.
+  const [tags, setTags] = useState<TagCount[] | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
-  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(takePaletteRequest);
   const [detail, setDetail] = useState<ItemSummary | null>(null);
   const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -42,7 +50,7 @@ export function GalleryPage() {
   filtersRef.current = filters;
 
   const refreshTags = useCallback(() => {
-    api.listTags().then(setTags, () => {});
+    api.listTags().then(setTags, () => setTags((t) => t ?? []));
   }, []);
 
   useEffect(() => {
@@ -113,8 +121,10 @@ export function GalleryPage() {
         e.preventDefault();
         setPaletteOpen(true);
       } else if (e.key === "Escape" && selecting && !detail && !paletteOpen) {
-        setSelecting(false);
-        setSelected(new Set());
+        morph(() => {
+          setSelecting(false);
+          setSelected(new Set());
+        });
       }
     };
     window.addEventListener("keydown", onKey);
@@ -201,10 +211,12 @@ export function GalleryPage() {
       else n.add(it.id);
       return n;
     });
-  const stopSelecting = () => {
-    setSelecting(false);
-    setSelected(new Set());
-  };
+  const stopSelecting = () =>
+    morph(() => {
+      setSelecting(false);
+      setSelected(new Set());
+    });
+  const startSelecting = () => morph(() => setSelecting(true));
 
   const initial = feed.items.length === 0 && (feed.loading || feed.total === null);
   const ghosts = feed.loading && !feed.stale ? (feed.items.length ? 6 : 12) : 0;
@@ -212,45 +224,29 @@ export function GalleryPage() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-10">
-      <TopBar
-        chips={chips}
-        onClear={() => changeFilters(EMPTY_FILTERS)}
-        onSearch={() => setPaletteOpen(true)}
-        actions={
-          <Button
-            size="sm"
-            variant={selecting ? "secondary" : "ghost"}
-            onPress={() => (selecting ? stopSelecting() : setSelecting(true))}
-            aria-pressed={selecting}
-            className="shrink-0 text-[var(--ink-2)]"
-          >
-            <SelectIcon /> <span className="hidden lg:inline">{selecting ? "Terminar" : "Selecionar"}</span>
-          </Button>
-        }
-      />
+      <TopBar chips={chips} onClear={() => changeFilters(EMPTY_FILTERS)} onSearch={() => setPaletteOpen(true)} />
 
-      <main className="mx-auto max-w-[1680px]">
+      <main className="mx-auto max-w-[1680px] pb-28">
         <section className="hero-light -mx-4 px-4 pt-6 pb-6 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10" aria-label="Etiquetas">
-          <TagMarquee tags={tags} selected={filters.tags} onToggle={toggleTag} />
-          <p className="mx-auto mt-6 max-w-[62ch] text-center text-[14px] leading-relaxed text-[var(--ink-3)]">
-            {libraryTotal === null ? "…" : plural(libraryTotal, "captura", "capturas")} e {plural(tags.length, "etiqueta", "etiquetas")}. Clica numa etiqueta para filtrar
-            <span className="kbd-hint">
-              , ou carrega em <span className="text-[var(--ink-2)]">{isMac ? "⌘K" : "Ctrl K"}</span> para pesquisar pelo que te lembras da imagem
-            </span>
-            .
-          </p>
+          <TagMarquee tags={tags} selected={filters.tags} onToggle={toggleTag} libraryTotal={libraryTotal} />
+          {tags !== null && tags.length > 0 && (
+            <p className="fade-in mx-auto mt-6 max-w-[62ch] text-center text-[14px] leading-relaxed text-[var(--ink-3)]">
+              {libraryTotal === null ? "…" : plural(libraryTotal, "captura", "capturas")} e {plural(tags.length, "etiqueta", "etiquetas")}. Clica numa etiqueta para filtrar
+              <span className="kbd-hint">
+                , ou carrega em <span className="text-[var(--ink-2)]">{isMac ? "⌘K" : "Ctrl K"}</span> para pesquisar pelo que te lembras da imagem
+              </span>
+              .
+            </p>
+          )}
         </section>
 
         <div ref={gridTop} />
-        <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 py-2">
-          <FilterBar filters={filters} onChange={changeFilters} categories={categories} sites={sites} />
-          <div className="text-[13px] text-[var(--ink-3)]" aria-live="polite">
-            {hasFilters(filters) && feed.total !== null && !feed.stale && (
-              <span className="fade-in">
-                {plural(feed.total, "captura", "capturas")} {describe()}
-              </span>
-            )}
-          </div>
+        <div className="flex min-h-10 items-center py-2 text-[13px] text-[var(--ink-3)]" aria-live="polite">
+          {hasFilters(filters) && feed.total !== null && !feed.stale && (
+            <span className="fade-in">
+              {plural(feed.total, "captura", "capturas")} {describe()}
+            </span>
+          )}
         </div>
 
         <Masonry
@@ -283,14 +279,6 @@ export function GalleryPage() {
               </Button>
             </>
           )}
-          {!feed.error && emptyLibrary && (
-            <>
-              <p className="text-[15px] text-white/80">Ainda não tens capturas.</p>
-              <p className="text-[13.5px] text-[var(--ink-3)]">
-                Instala a <Link href="/extensao" className="text-white underline decoration-white/30 underline-offset-4">extensão</Link> e guarda o primeiro recorte.
-              </p>
-            </>
-          )}
           {!feed.error && !feed.loading && !feed.stale && feed.total === 0 && hasFilters(filters) && (
             <>
               <p className="text-[15px] text-white/80">Nenhuma captura corresponde a estes filtros.</p>
@@ -309,8 +297,8 @@ export function GalleryPage() {
         </footer>
       </main>
 
-      {selecting && (
-        <BulkBar
+      {selecting ? (
+        <SelectionDock
           ids={[...selected]}
           categories={categories}
           onDone={(removed, refresh) => {
@@ -322,9 +310,11 @@ export function GalleryPage() {
           onSelectAll={() => setSelected(new Set(feed.items.map((i) => i.id)))}
           onCancel={stopSelecting}
         />
+      ) : (
+        !emptyLibrary && <FilterDock filters={filters} onChange={changeFilters} categories={categories} sites={sites} onSelect={startSelecting} />
       )}
 
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} tags={tags} onPick={pick} onTag={showTag} />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} tags={tags ?? []} onPick={pick} onTag={showTag} />
       <ItemModal
         summary={detail}
         categories={categories}
@@ -338,117 +328,6 @@ export function GalleryPage() {
         onDeleted={onDeleted}
         onOpen={setDetail}
       />
-    </div>
-  );
-}
-
-type BulkProps = {
-  ids: string[];
-  categories: Category[];
-  onDone: (removedIds: string[], refresh?: boolean) => void;
-  onSelectAll: () => void;
-  onCancel: () => void;
-};
-
-function BulkBar({ ids, categories, onDone, onSelectAll, onCancel }: BulkProps) {
-  const [tag, setTag] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-  const none = ids.length === 0;
-
-  const run = async (fn: () => Promise<string[]>, ok: (n: number) => string, refresh = false) => {
-    setBusy(true);
-    setMsg(null);
-    try {
-      const removed = await fn();
-      setMsg(ok(ids.length));
-      onDone(removed, refresh);
-    } catch {
-      setMsg("Algo falhou. Tenta de novo.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const del = () =>
-    run(async () => {
-      const done: string[] = [];
-      for (const part of chunks(ids, BULK_MAX)) done.push(...(await api.bulk({ ids: part, action: "delete" })).ids);
-      return done;
-    }, (n) => `${plural(n, "captura movida", "capturas movidas")} para o lixo`);
-
-  // PATCH replaces user.tags, so each item is merged on its own (summary tags also hold AI tags).
-  const addTag = () => {
-    const add = normalizeTags([tag]);
-    if (!add.length) return;
-    setTag("");
-    return run(async () => {
-      for (const id of ids) {
-        const m = await api.getItem(id);
-        const merged = normalizeTags([...m.user.tags, ...add]);
-        const unhide = m.user.hiddenAiTags.filter((t) => !add.includes(t));
-        await api.patchItem(id, { tags: merged, ...(unhide.length !== m.user.hiddenAiTags.length ? { hiddenAiTags: unhide } : {}) });
-      }
-      return [];
-    }, (n) => `“${add[0]}” juntada a ${plural(n, "captura", "capturas")}`);
-  };
-
-  const setCategory = (categoryId: string) =>
-    run(async () => {
-      for (const part of chunks(ids, BULK_MAX)) await api.bulk({ ids: part, action: "patch", patch: { categoryId: categoryId || null } });
-      return [];
-    }, (n) => `Categoria mudada em ${plural(n, "captura", "capturas")}`, true);
-
-  return (
-    <div className="bulk-bar fade-in" role="toolbar" aria-label="Ações para as capturas selecionadas">
-      <span className="shrink-0 text-[13.5px] text-white">{none ? "Escolhe capturas" : plural(ids.length, "selecionada", "selecionadas")}</span>
-      <button type="button" onClick={onSelectAll} className="shrink-0 text-[13px] text-[var(--ink-3)] hover:text-white">
-        Todas
-      </button>
-      <span className="h-5 w-px bg-white/10" />
-      <form
-        className="flex items-center"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!none && !busy) void addTag();
-        }}
-      >
-        <input
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-          placeholder="Juntar etiqueta"
-          aria-label="Juntar etiqueta"
-          maxLength={40}
-          disabled={none || busy}
-          className="h-8 w-36 rounded-full border border-white/10 bg-white/[0.04] px-3 text-[13px] text-white outline-none placeholder:text-white/35 focus:border-white/30 disabled:opacity-40"
-        />
-      </form>
-      <select
-        aria-label="Mudar categoria"
-        value="__"
-        disabled={none || busy}
-        onChange={(e) => setCategory(e.target.value)}
-        className="h-8 rounded-full border border-white/10 bg-white/[0.04] px-3 text-[13px] text-[var(--ink-2)] outline-none disabled:opacity-40 [color-scheme:dark]"
-      >
-        <option value="__" disabled>
-          Categoria…
-        </option>
-        <option value="">Sem categoria</option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-      <Button size="sm" variant="danger-soft" isDisabled={none || busy} onPress={del}>
-        Apagar
-      </Button>
-      <span className="hidden min-w-0 truncate text-[12.5px] text-[var(--ink-3)] sm:inline" aria-live="polite">
-        {msg}
-      </span>
-      <Button size="sm" variant="ghost" onPress={onCancel} className="ml-auto text-[var(--ink-2)]">
-        Cancelar
-      </Button>
     </div>
   );
 }
