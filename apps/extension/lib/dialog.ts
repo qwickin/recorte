@@ -21,17 +21,31 @@ export interface DialogOptions {
 export const DIALOG_CSS = `
 .backdrop { position: fixed; inset: 0; background: rgb(0 0 0 / .62); backdrop-filter: blur(6px);
   display: grid; place-items: center; padding: 24px; animation: rc-dim .18s ease-out; }
-.panel { position: relative; width: min(920px, 100%); max-height: min(640px, calc(100vh - 48px)); display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 1fr); background: #000; border-radius: 18px; overflow: hidden;
+/* The panel always fits the viewport, whatever the capture size: the preview is contained, the form body scrolls
+   and the footer (Cancelar / Guardar) stays visible. */
+.panel { position: relative; width: min(920px, 100%); height: min(640px, calc(100vh - 48px)); display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 1fr); grid-template-rows: minmax(0, 1fr);
+  background: #000; border-radius: 18px; overflow: hidden;
   box-shadow: 0 0 0 1px rgb(255 255 255 / .08), 0 1px 0 0 rgb(255 255 255 / .06) inset,
     0 50px 120px -30px rgb(0 0 0 / .95), 0 0 120px -40px rgb(255 255 255 / .14);
   animation: rc-fade .22s cubic-bezier(.2,.7,.2,1); }
-@media (max-width: 720px) { .panel { grid-template-columns: 1fr; } .preview { max-height: 32vh; } }
-.preview { position: relative; background: #050505; border-right: 1px solid var(--hair); overflow: auto;
-  display: flex; align-items: flex-start; justify-content: center; padding: 20px; }
-.preview img { display: block; max-width: 100%; height: auto; border-radius: 8px;
-  box-shadow: 0 0 0 1px var(--hair), 0 20px 60px -20px rgb(255 255 255 / .12); }
-form { display: flex; flex-direction: column; gap: 16px; padding: 22px 22px 18px; overflow: auto; min-height: 0; }
+.preview { position: relative; min-height: 0; background: #050505; border-right: 1px solid var(--hair); overflow: hidden;
+  display: flex; align-items: center; justify-content: center; padding: 20px; }
+.preview img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;
+  border-radius: 8px; box-shadow: 0 0 0 1px var(--hair), 0 20px 60px -20px rgb(255 255 255 / .12); }
+.preview .tall { position: absolute; left: 50%; bottom: 10px; translate: -50% 0; font-size: 11px; color: var(--ink-3);
+  background: rgb(0 0 0 / .7); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+form { display: flex; flex-direction: column; min-height: 0; }
+.body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; display: flex; flex-direction: column;
+  gap: 16px; padding: 22px 22px 16px; }
+@media (max-width: 720px), (max-height: 520px) {
+  .backdrop { padding: 10px; }
+  .panel { height: calc(100vh - 20px); }
+}
+@media (max-width: 720px) {
+  .panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 32vh) minmax(0, 1fr); }
+  .preview { border-right: 0; border-bottom: 1px solid var(--hair); padding: 12px; }
+}
 header { display: flex; align-items: baseline; gap: 10px; }
 .brand { font-weight: 500; font-size: 15px; letter-spacing: .01em; }
 .site { color: var(--ink-3); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -69,7 +83,8 @@ option { background: #0b0b0b; color: #fff; }
 .btn.ghost { background: transparent; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--hair-2); }
 .btn.ghost:hover { color: #fff; background: var(--fill); }
 .btn:disabled { opacity: .5; cursor: default; }
-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: auto; padding-top: 4px; }
+footer { flex: none; display: flex; justify-content: flex-end; gap: 8px; padding: 12px 22px 16px;
+  border-top: 1px solid var(--hair); background: #000; }
 .note { margin: 0; font-size: 12px; color: var(--ink-3); }
 .error { margin: 0; font-size: 12px; color: #ff8a8a; }
 `;
@@ -263,16 +278,25 @@ export function renderSaveDialog(container: HTMLElement, o: DialogOptions): Prom
     const form = h(
       "form",
       {},
-      h("header", {}, h("span", { class: "brand" }, "Recorte"), h("span", { class: "site" }, o.site)),
-      h("label", { class: "field" }, h("span", { class: "label" }, "Título"), titleInput),
-      h("label", { class: "field" }, h("span", { class: "label" }, "Nota"), noteInput),
-      h("div", { class: "field" }, h("span", { class: "label" }, "Etiquetas"), chips, suggest),
-      h("div", { class: "field" }, h("span", { class: "label" }, "Categoria"), select, newRow),
-      o.truncated && h("p", { class: "note" }, "A página é muito alta: foram guardados os primeiros 12 000 px."),
-      error,
+      h(
+        "div",
+        { class: "body" },
+        h("header", {}, h("span", { class: "brand" }, "Recorte"), h("span", { class: "site" }, o.site)),
+        h("label", { class: "field" }, h("span", { class: "label" }, "Título"), titleInput),
+        h("label", { class: "field" }, h("span", { class: "label" }, "Nota"), noteInput),
+        h("div", { class: "field" }, h("span", { class: "label" }, "Etiquetas"), chips, suggest),
+        h("div", { class: "field" }, h("span", { class: "label" }, "Categoria"), select, newRow),
+        o.truncated && h("p", { class: "note" }, "A página é muito alta: foram guardados os primeiros 12 000 px."),
+        error,
+      ),
       h("footer", {}, cancel, save),
     );
-    const panel = h("div", { class: "panel", role: "dialog", "aria-modal": "true", "aria-label": "Guardar no Recorte" }, h("div", { class: "preview" }, img), form);
+    const preview = h("div", { class: "preview" }, img);
+    // A very tall capture is shrunk to fit: say it is whole.
+    img.addEventListener("load", () => {
+      if (img.naturalHeight > img.naturalWidth * 3) preview.append(h("span", { class: "tall" }, "Página inteira (reduzida para caber)"));
+    });
+    const panel = h("div", { class: "panel", role: "dialog", "aria-modal": "true", "aria-label": "Guardar no Recorte" }, preview, form);
     const backdrop = h("div", { class: "backdrop" }, panel);
     container.append(backdrop);
 
