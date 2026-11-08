@@ -139,8 +139,11 @@ export function createPipeline(p: PipelineDeps) {
     }
   }
 
-  /** `refetch`: fetch a saved link again (Reprocessar); otherwise a link is fetched once and retries only redo the AI. */
-  async function process(userId: string, id: string, opts: { refetch?: boolean } = {}): Promise<void> {
+  /**
+   * `refetch`: fetch a saved link again (Reprocessar); otherwise a link is fetched once and retries only redo the AI.
+   * `retag` (a tagger upgrade): only the local tagging is redone; no cloud call, and its earlier output is kept.
+   */
+  async function process(userId: string, id: string, opts: { refetch?: boolean; retag?: boolean } = {}): Promise<void> {
     let m0 = deps.storage.readMeta(userId, id);
     if (!m0) return; // item gone (purged): nothing to do
     if (m0.type === "link" && (opts.refetch || !m0.link?.fetchedAt)) {
@@ -164,7 +167,7 @@ export function createPipeline(p: PipelineDeps) {
 
     let cloud: { title?: string; description?: string; keys: string[] } | null = null;
     const cloudAi = p.cloudFrom ? p.cloudFrom() : (p.cloud ?? null);
-    if (cloudAi && original) {
+    if (cloudAi && original && !opts.retag) {
       try {
         cloud = await cloudAi({
           image: original,
@@ -183,12 +186,13 @@ export function createPipeline(p: PipelineDeps) {
     if (!fresh) return;
     const now = new Date().toISOString();
     const ai: Item["ai"] = {
-      tipo: cls?.tipo ?? [],
-      visual: cls?.visual ?? [],
+      // Without the model, keep what it produced before rather than erasing it.
+      tipo: cls?.tipo ?? fresh.ai.tipo,
+      visual: cls?.visual ?? fresh.ai.visual,
       topics,
-      keys: [...new Set([...keys, ...(cloud?.keys ?? [])])],
+      keys: opts.retag ? [...new Set([...keys, ...fresh.ai.keys])] : [...new Set([...keys, ...(cloud?.keys ?? [])])],
       colors: colors.names,
-      model: `${MODEL_ID}+${TAGGER_ID}${cloud ? "+cloud" : ""}`,
+      model: `${MODEL_ID}+${TAGGER_ID}${cloud || (opts.retag && fresh.ai.model.endsWith("+cloud")) ? "+cloud" : ""}`,
       processedAt: now,
     };
     if (aiSkipped) ai.skipped = "classifier_unavailable";

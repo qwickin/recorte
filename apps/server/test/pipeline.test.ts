@@ -585,6 +585,36 @@ describe("saved links (type link)", () => {
     }
   });
 
+  it("a retag job redoes only the local tags: no cloud call, cloud output and earlier screenshot tags kept", async () => {
+    const { t, upload, deps } = await setup();
+    const a = await upload();
+    const d = deps();
+    const userId = userIdOf(t);
+    let calls = 0;
+    const ok: typeof fetch = async () => {
+      calls++;
+      return new Response(JSON.stringify({ choices: [{ message: { content: '{"title":"Mapa da cidade","description":"Um mapa.","keys":["cartografia"]}' } }] }), { status: 200 });
+    };
+    const cloud = createCloudAi({ url: "https://llm.test/v1/", key: "k", model: "m" }, ok);
+    await createPipeline({ deps: d, classifier: async () => fakeClassifier(), cloud }).process(userId, a.id);
+    expect(calls).toBe(1);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      // tagger upgrade while the visual model is missing
+      const pipe = createPipeline({ deps: d, classifier: async () => { throw new Error("no model"); }, cloud });
+      await pipe.process(userId, a.id, { retag: true });
+    } finally {
+      warn.mockRestore();
+    }
+    expect(calls).toBe(1);
+    const m = d.storage.readMeta(userId, a.id)!;
+    expect(m.ai.title).toBe("Mapa da cidade");
+    expect(m.ai.keys).toContain("cartografia");
+    expect(m.ai.model).toMatch(/\+cloud$/);
+    expect(m.ai.tipo).toEqual(["mapa"]);
+    expect(m.ai.topics).toEqual(expect.arrayContaining(["lisboa", "mapa"]));
+  });
+
   it("retags every live item once per tagger version, at startup", async () => {
     const { t, cookie, upload } = await setup();
     const a = await upload();
@@ -594,7 +624,7 @@ describe("saved links (type link)", () => {
     const before = (t.db.prepare("SELECT COUNT(*) AS n FROM jobs").get() as { n: number }).n;
     expect(retagOutdated({ db: t.db, queue })).toBe(1);
     const jobs = t.db.prepare("SELECT payload FROM jobs ORDER BY id DESC LIMIT 1").all() as { payload: string }[];
-    expect(JSON.parse(jobs[0]!.payload)).toMatchObject({ id: a.id });
+    expect(JSON.parse(jobs[0]!.payload)).toMatchObject({ id: a.id, retag: true });
     expect((t.db.prepare("SELECT COUNT(*) AS n FROM jobs").get() as { n: number }).n).toBe(before + 1);
     expect(retagOutdated({ db: t.db, queue })).toBe(0); // same version: nothing
   });
