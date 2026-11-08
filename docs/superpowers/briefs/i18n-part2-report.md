@@ -98,6 +98,36 @@ Branch `feat/zero-config`. Status: **DONE_WITH_CONCERNS** (see "Concerns"). Noth
   - The template *string* did not change, so the settings change does not force a global re-embed.
   - Documents are re-sent by the migration's `index` jobs, and by the retag jobs, which also sync search. A document whose rendered template changed is re-embedded once, as its `tagWords` went from pt+synonyms to English labels.
 
+### Real upgrade check (existing install → this branch)
+
+Run on a throwaway volume and port; `recorte-app-1` was not touched.
+
+1. Built `recorte:pre` from `65e48c0` (just before Part 2) and ran it.
+2. Uploaded two captures:
+   - the map, with user tags `modo escuro` and `viagem`;
+   - the pastel de nata.
+3. Waited for the `topics-v1` tags: `mapa, lisboa`, and `doces, pastelaria, receita`.
+4. Hid the AI tag `lisboa`, and waited until search had indexed the documents.
+   - At this point the old index had `searchableAttributes = [title, note, tagWords, …]`.
+5. Replaced the container with `recorte:e2e` (this branch) on **the same volume**.
+
+Results:
+- **Logs**: `tag IDs v1: migrated 2 item(s), 2 changed`, then `tagger topics-v2: re-tagging 2 item(s)`.
+- **Map item**:
+  - `ai.topics` = `map, lisbon`;
+  - `ai.tipo` = `["mapa"]` (raw);
+  - `user.tags` = `["dark mode", "viagem"]`;
+  - `hiddenAiTags` = `["lisbon"]`;
+  - the item shows `dark mode, viagem, map`. After the retag, `lisbon` is back in `ai.topics` and still hidden.
+- **`/api/tags`**: `dark mode, map, pastry, recipe, sweets, viagem`, with no pt-PT names.
+- **Search**: "recette" (fr) and "receta" (es) find the pastel de nata.
+- **Meilisearch itself**, checked through `docker exec`:
+  - the existing index now has `searchableAttributes = [title, note, tagLabels, …]`;
+  - `tags` is still filterable;
+  - the documents carry `tagLabels`, e.g. `dark mode, modo escuro, modo oscuro, mode sombre, modalità scura, viagem…`, and the English `tagWords`.
+
+The containers, the volume, the `recorte:pre` image and the worktree were removed afterwards.
+
 ## 4. Display
 
 - **Gallery**: `useTagLabel()` reads the locale from the i18n provider. It labels:
@@ -179,7 +209,10 @@ Branch `feat/zero-config`. Status: **DONE_WITH_CONCERNS** (see "Concerns"). Noth
 - **Localized shots** (looked at all of them) are in `/private/tmp/claude-501/-Users-kali--t3-projects-screenshotextension/d3c8a733-043b-454f-a611-a92428db1d30/scratchpad/i18n2/`:
   - `{es,pt-BR,en-US}-1440-{gallery,detail,filtered,palette}.png`;
   - `{es,pt-BR,en-US}-390-{gallery,detail}.png`;
-  - `ext-options-{en,es}.png`.
+  - `ext-options-es.png`;
+  - `ext-options-auto-ptBR.png`: "Automatic", which resolved to pt-BR because this Chrome's UI language is pt-BR even with `--lang=en-US`.
+
+  I opened every file.
 
   The marquee read, in each language:
   - es: "modo oscuro, cómic, pastelería, artículo científico, componentes de UI, Lisboa, IA…";
@@ -202,6 +235,7 @@ Branch `feat/zero-config`. Status: **DONE_WITH_CONCERNS** (see "Concerns"). Noth
 | Gallery build | ✓. Main JS 545 KB → 567 KB (the label table, ~26 KB of source); Vite's >500 KB warning as before |
 | Extension build + zip (Chrome MV3 + Firefox MV2) | ✓ |
 | E2E (`pnpm --filter @recorte/e2e e2e`) | **12/12 pass**, run twice, the second on the final HEAD |
+| Upgrade from `65e48c0` on the same volume (real Meilisearch) | all checks pass (§3) |
 
 The E2E additions:
 - `ai.topics` contains `map` and not `mapa`, while `ai.tipo` stays `["mapa"]`.
