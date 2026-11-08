@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import type { Context, Hono } from "hono";
+import { LEGACY_PAGES } from "@recorte/shared";
 import type { AppEnv } from "./auth/middleware";
 
 /** Spec §8. Fonts are bundled with the gallery (no third-party host); frame-src is for phase 2 (X embeds). */
@@ -72,6 +73,13 @@ export function galleryRoutes(app: Hono<AppEnv>, dir: string): void {
     }
     if (isServerPath(path)) return c.json({ error: "not_found" }, 404);
     if (path.includes("\0")) return c.json({ error: "not_found" }, 404);
+    // Old pt-PT page slugs (/extensao, /definicoes, /lixo) → the English ones, query string kept.
+    const moved = LEGACY_PAGES[path.length > 1 ? path.replace(/\/+$/, "") : path];
+    if (moved) {
+      const q = new URL(c.req.url).search;
+      c.header("cache-control", "no-cache");
+      return c.redirect(`${moved}${q}`, 301);
+    }
 
     const target = resolve(root, `.${path}`);
     const inside = target === root || target.startsWith(root + sep);

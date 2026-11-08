@@ -27,3 +27,23 @@ export const API = {
   mePassword: "/api/me/password",
   settings: "/api/settings",
 } as const;
+
+/** Gallery pages (client-side routes). */
+export const PAGE = {
+  gallery: "/",
+  extension: "/extension",
+  settings: "/settings",
+  trash: "/trash",
+  login: "/login",
+  setup: "/setup",
+} as const;
+
+/**
+ * The gallery's old pt-PT slugs → the current ones. Kept forever: installed extensions (and bookmarks) link to
+ * /extensao. The server answers them with a 301; the gallery also maps them itself (an offline PWA shell).
+ */
+export const LEGACY_PAGES: Readonly<Record<string, string>> = {
+  "/extensao": PAGE.extension,
+  "/definicoes": PAGE.settings,
+  "/lixo": PAGE.trash,
+};

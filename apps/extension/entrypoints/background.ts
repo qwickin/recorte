@@ -518,7 +518,7 @@ async function getStatus(): Promise<Status> {
         }
       }
     }
-    if (latest && compareVersions(latest, version) > 0) update = { version: latest, url: `${conn.server}/extensao` };
+    if (latest && compareVersions(latest, version) > 0) update = { version: latest, url: `${conn.server}/extension` };
   }
   return {
     configured: !!conn,

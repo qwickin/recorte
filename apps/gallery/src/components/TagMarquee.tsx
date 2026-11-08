@@ -97,7 +97,7 @@ function EmptyHero({ libraryTotal }: { libraryTotal?: number | null }) {
             <p className="text-[13.5px] leading-relaxed text-[var(--ink-3)]">
               {t.node("marquee.emptyBody", {
                 extension: (
-                  <Link href="/extensao" className="link-quiet text-white">
+                  <Link href="/extension" className="link-quiet text-white">
                     {t("marquee.extension")}
                   </Link>
                 ),

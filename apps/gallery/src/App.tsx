@@ -7,22 +7,23 @@ import { GalleryPage } from "./pages/Gallery";
 import { SettingsPage } from "./pages/Settings";
 import { TrashPage } from "./pages/Trash";
 import { type MessageKey, useT } from "./i18n";
+import { PAGE } from "@recorte/shared";
 import { navigate, usePath } from "./lib/router";
 
+// The old pt-PT slugs (/extensao, /definicoes, /lixo) still work: the server redirects them and usePath maps them.
 const PAGES: Record<string, () => React.JSX.Element> = {
-  "/": GalleryPage,
-  "/extensao": ExtensionPage,
-  "/definicoes": SettingsPage,
-  "/lixo": TrashPage,
+  [PAGE.gallery]: GalleryPage,
+  [PAGE.extension]: ExtensionPage,
+  [PAGE.settings]: SettingsPage,
+  [PAGE.trash]: TrashPage,
 };
 
-// The URL slugs stay as they were: installed extensions link to /extensao.
 const TITLES: Record<string, MessageKey> = {
-  "/extensao": "title.extension",
-  "/definicoes": "title.settings",
-  "/lixo": "title.trash",
-  "/login": "title.login",
-  "/setup": "title.setup",
+  [PAGE.extension]: "title.extension",
+  [PAGE.settings]: "title.settings",
+  [PAGE.trash]: "title.trash",
+  [PAGE.login]: "title.login",
+  [PAGE.setup]: "title.setup",
 };
 
 /** Signed-in pages: first-run goes to /setup, no session goes to /login (the client redirects on 401). */

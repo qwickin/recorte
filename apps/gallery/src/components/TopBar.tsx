@@ -11,9 +11,9 @@ export type FilterChip = { key: string; label: string; onRemove: () => void };
 type Props = { chips?: FilterChip[]; onClear?: () => void; onSearch?: () => void };
 
 const NAV: { href: string; label: MessageKey }[] = [
-  { href: "/lixo", label: "nav.trash" },
-  { href: "/extensao", label: "nav.extension" },
-  { href: "/definicoes", label: "nav.settings" },
+  { href: "/trash", label: "nav.trash" },
+  { href: "/extension", label: "nav.extension" },
+  { href: "/settings", label: "nav.settings" },
 ];
 
 /** Phones: the sections fold into a menu, so the bar keeps one row (and one height) everywhere. */

@@ -21,9 +21,22 @@ afterAll(() => rmSync(base, { recursive: true, force: true }));
 describe("gallery static serving", () => {
   const make = (user = false) => makeApp({ user, env: { GALLERY_DIR: gallery } });
 
+  it("old pt-PT page slugs redirect (301) to the English ones, query kept; installed extensions link to /extensao", async () => {
+    const t = await make();
+    for (const [from, to] of [["/extensao", "/extension"], ["/definicoes", "/settings"], ["/lixo", "/trash"], ["/extensao/", "/extension"]]) {
+      const r = await t.app.request(from!);
+      expect(r.status, from).toBe(301);
+      expect(r.headers.get("location")).toBe(to);
+    }
+    const q = await t.app.request("/definicoes?tab=server");
+    expect(q.headers.get("location")).toBe("/settings?tab=server");
+    // Not a prefix match: other paths are the SPA as before.
+    expect((await t.app.request("/lixo-x")).status).toBe(200);
+  });
+
   it("serves index.html with the CSP for the app routes (SPA fallback)", async () => {
     const t = await make();
-    for (const path of ["/", "/lixo", "/extensao", "/definicoes", "/login", "/setup", "/some/deep/link"]) {
+    for (const path of ["/", "/trash", "/extension", "/settings", "/login", "/setup", "/some/deep/link"]) {
       const r = await t.app.request(path);
       expect(r.status, path).toBe(200);
       expect(r.headers.get("content-type")).toContain("text/html");
