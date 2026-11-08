@@ -72,6 +72,10 @@ Em `http://<IP>` a sessão funciona (o cookie só é `Secure` em HTTPS). Para us
 
 Com este override, a porta 8080 deixa de estar publicada e só o Caddy (80/443) fica exposto.
 
+### Instalar a galeria como app (PWA)
+
+A galeria é uma PWA: no Android (Chrome) usa **Instalar app**, no iOS (Safari) **Partilhar → Adicionar ao ecrã principal**. Os navegadores só permitem instalar (e só ativam o service worker) em **HTTPS**, ou em `http://localhost`; em `http://<IP>:8080` a galeria funciona na mesma, mas não se instala. O service worker guarda só a "casca" da app e os ficheiros estáticos: as capturas e a API vêm sempre do servidor.
+
 Se usares outro reverse proxy, ele tem de passar `X-Forwarded-Proto` e `Host`/`X-Forwarded-Host`, e não pode fazer buffering de `/api/events` (SSE). Indica o endereço público em **Definições → Servidor** (ou `PUBLIC_URL`).
 
 ### Avançado: Meilisearch noutro serviço

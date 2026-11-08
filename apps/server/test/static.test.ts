@@ -13,6 +13,8 @@ writeFileSync(join(gallery, "assets", "index-abc.js"), "console.log(1)");
 writeFileSync(join(gallery, "assets", "index-abc.css"), "body{}");
 mkdirSync(join(gallery, "fonts"), { recursive: true });
 writeFileSync(join(gallery, "fonts", "albert-sans-latin-300-normal.woff2"), "wOF2");
+writeFileSync(join(gallery, "manifest.webmanifest"), '{"name":"Recorte"}');
+writeFileSync(join(gallery, "sw.js"), "self.addEventListener('fetch', () => {})");
 writeFileSync(join(base, "secret.txt"), "nope"); // outside the gallery dir
 afterAll(() => rmSync(base, { recursive: true, force: true }));
 
@@ -54,6 +56,20 @@ describe("gallery static serving", () => {
     const r = await t.app.request("/fonts/albert-sans-latin-300-normal.woff2");
     expect(r.status).toBe(200);
     expect(r.headers.get("content-type")).toBe("font/woff2");
+  });
+
+  it("PWA: the manifest has its type, the service worker is JS and always revalidated, the CSP allows both", async () => {
+    const t = await make();
+    const m = await t.app.request("/manifest.webmanifest");
+    expect(m.status).toBe(200);
+    expect(m.headers.get("content-type")).toBe("application/manifest+json");
+    const sw = await t.app.request("/sw.js");
+    expect(sw.status).toBe(200);
+    expect(sw.headers.get("content-type")).toContain("text/javascript");
+    expect(sw.headers.get("cache-control")).toBe("no-cache"); // a new deploy reaches clients at once
+    // worker-src and manifest-src fall back to default-src 'self'.
+    expect(GALLERY_CSP).toContain("default-src 'self'");
+    expect(GALLERY_CSP).not.toMatch(/worker-src|manifest-src/);
   });
 
   it("does not answer missing assets with HTML", async () => {
