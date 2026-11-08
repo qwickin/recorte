@@ -353,6 +353,7 @@ code { font-family: var(--mono); font-size: 0.86em; }
 @media (max-width: 960px) {
   .problem { grid-template-columns: 1fr; }
   .problem h2 { max-width: 20ch; }
+  .c-links { grid-template-columns: 1fr; }
   .bento {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
