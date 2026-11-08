@@ -7,7 +7,8 @@
 // - Completes /setup through the API with email + password (inside the 15-minute window), saves the
 //   public URL, gets a device token, uploads two captures, waits for the AI tags, then drives the gallery in
 //   Chromium (en-US): login (email + password), tiles, ⌘K/Ctrl+K "doce português" (grid of image cards, arrow keys), ZIP download,
-//   then the language: a French browser gets French copy, and switching to pt-BR in Settings changes the UI. Ends with reset-password.
+//   then the language: a French browser gets French copy, and switching to pt-BR in Settings changes the UI and the
+//   AI tag labels (tags are stored as language-neutral IDs). The old /extensao link redirects. Ends with reset-password.
 // - Always removes the container and the volume (set E2E_KEEP=1 to leave them).
 // - Chromium: $CHROMIUM_PATH, else the newest Chromium in the Playwright cache, else playwright-core's default.
 // The first run needs internet: Meilisearch downloads its embedding model on first start.
@@ -255,11 +256,14 @@ test("AI processing: tipo 'mapa' on the OpenStreetMap capture", { timeout: 10 * 
   const t = Date.now();
   const item = await until("AI tags", 8 * 60_000, async () => {
     const r = await api(`/api/items/${ids.map}`);
-    const m = (await r.json()) as { ai: { processedAt: string | null; tipo: string[]; colors: string[] } };
+    const m = (await r.json()) as { ai: { processedAt: string | null; tipo: string[]; topics?: string[]; colors: string[] } };
     return m.ai.processedAt ? m : null;
   });
   mark("processing", t);
+  // The screenshot model's raw key stays as it is; the shown tags are language-neutral IDs.
   assert.deepEqual(item.ai.tipo, ["mapa"]);
+  assert.ok(item.ai.topics?.includes("map"), `topics: ${item.ai.topics?.join(", ")}`);
+  assert.ok(!item.ai.topics?.includes("mapa"));
   assert.ok(item.ai.colors.length > 0);
 });
 
@@ -330,6 +334,11 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download
   for (const key of ["map", "nata"] as const) {
     await page.locator(`[aria-label^="${CAPTURES[key].title},"]`).first().waitFor({ state: "visible", timeout: 30_000 });
   }
+  // The tag cloud: the label of each (focusable) tag, without its count.
+  const marquee = () => page.$$eval(".marquee button.tag:not([aria-hidden])", (bs) => bs.map((b) => b.firstChild?.textContent?.trim() ?? ""));
+  await page.locator(".marquee button.tag").first().waitFor({ timeout: 15_000 });
+  const enTags = await marquee();
+  assert.ok(enTags.includes("map") && !enTags.includes("mapa"), `English tags: ${enTags.join(", ")}`);
 
   await page.keyboard.press("ControlOrMeta+k");
   const input = page.getByPlaceholder("Describe the capture you’re looking for");
@@ -365,8 +374,13 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download
   const anon = await fetch(base + "/downloads/recorte-chrome.zip");
   assert.equal(anon.status, 401, "ZIPs need a session");
 
+  // Installed extensions link to the old pt-PT slug: it redirects to the English page.
+  await page.goto(base + "/extensao");
+  await page.waitForURL(/\/extension$/);
+  await page.getByRole("heading", { name: "Extension", level: 1 }).waitFor();
+
   // Switching to pt-BR in Settings changes the UI at once, and the choice survives a reload.
-  await page.goto(base + "/definicoes");
+  await page.goto(base + "/settings");
   await page.getByRole("heading", { name: "Settings", level: 1 }).waitFor();
   await page.getByLabel("Language").selectOption("pt-BR");
   await page.getByRole("heading", { name: "Configurações", level: 1 }).waitFor();
@@ -379,6 +393,10 @@ test("gallery in Chromium: login, tiles, ⌘K / Ctrl+K search grid, ZIP download
   await page.getByRole("button", { name: "Pesquisar capturas" }).waitFor();
   // The hero line appears once the tag counts arrive.
   await page.getByText(/2 capturas e \d+ tags?\. Clique numa tag para filtrar/).waitFor({ timeout: 15_000 });
+  // …and the AI tags follow the language: the same tag IDs, pt-BR labels.
+  const ptTags = await marquee();
+  assert.ok(ptTags.includes("mapa") && !ptTags.includes("map"), `pt-BR tags: ${ptTags.join(", ")}`);
+  assert.equal(ptTags.length, enTags.length);
   assert.deepEqual(errors, []);
 
   // A browser in French gets French copy without choosing anything.
