@@ -14,11 +14,13 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.0",
+    "@mozilla/readability": "^0.6.0",
     "@node-rs/argon2": "^2.0.2",
     "@recorte/ai": "workspace:*",
     "@recorte/shared": "workspace:*",
     "archiver": "^8.0.0",
     "hono": "^4.9.0",
+    "linkedom": "^0.18.15",
     "meilisearch": "^0.62.0",
     "sharp": "0.35.5",
     "tsx": "^4.20.0",

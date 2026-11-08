@@ -2,21 +2,16 @@ import { extractColors } from "@recorte/ai";
 import { type Item, ItemPatch, ListQuery, UploadMeta, normalizeTags } from "@recorte/shared";
 import type { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
-import sharp from "sharp";
 import { z } from "zod";
 import { type AppEnv, requireUser } from "../auth/middleware";
 import type { Deps } from "../deps";
 import { ULID_RE, captureTime, ulidAt } from "../ids";
 import { BadCursor, itemsRepo } from "../items/repo";
+import { ImageTooLarge, makeImages } from "../items/images";
 import { itemService } from "../items/service";
 import { FILE_NAME_RE } from "../storage";
 
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
-const MAX_ORIGINAL_WIDTH = 3200;
-const THUMB_WIDTH = 640;
-const WEBP_MAX_DIM = 16383;
-// Full page max 12 000 CSS px x DPR 2 x ~2880 px wide ~ 69M pixels.
-const MAX_INPUT_PIXELS = 120_000_000;
 
 const Bulk = z.object({
   ids: z.array(z.string()).min(1).max(200),
@@ -55,44 +50,31 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
       }
       const image = form.image;
       const rawMeta = form.meta;
-      if (!(image instanceof File) || typeof rawMeta !== "string") return c.json({ error: "invalid_body" }, 400);
-      if (image.size > MAX_UPLOAD_BYTES) return c.json({ error: "payload_too_large" }, 413);
+      if (typeof rawMeta !== "string" || (image !== undefined && !(image instanceof File))) return c.json({ error: "invalid_body" }, 400);
+      if (image instanceof File && image.size > MAX_UPLOAD_BYTES) return c.json({ error: "payload_too_large" }, 413);
       let parsed: UploadMeta;
       try {
         parsed = UploadMeta.parse(JSON.parse(rawMeta));
       } catch {
         return c.json({ error: "invalid_meta" }, 400);
       }
+      // Screenshots carry their image; a saved link may not (the server fetches its OG image in the job).
+      if (!(image instanceof File) && parsed.type !== "link") return c.json({ error: "invalid_body" }, 400);
       if (parsed.categoryId && !categoryOk(userId, parsed.categoryId)) {
         // A category deleted (or never ours) while the capture waited in the queue: keep the capture, drop the link.
         console.warn(`upload: unknown category ${parsed.categoryId.slice(0, 64)} for user ${userId}; saving without category`);
         parsed.categoryId = null;
       }
 
-      let original: Buffer, thumb: Buffer;
-      let width: number, height: number;
-      const input = Buffer.from(await image.arrayBuffer());
-      try {
-        // Header-only check, before any pixel decoding.
-        const head = await sharp(input, { limitInputPixels: false }).metadata();
-        if ((head.width ?? 0) * (head.height ?? 0) > MAX_INPUT_PIXELS) return c.json({ error: "image_too_large" }, 413);
-      } catch {
-        return c.json({ error: "invalid_image" }, 400);
+      let img: Awaited<ReturnType<typeof makeImages>> | null = null;
+      if (image instanceof File) {
+        try {
+          img = await makeImages(Buffer.from(await image.arrayBuffer()));
+        } catch (e) {
+          return e instanceof ImageTooLarge ? c.json({ error: "image_too_large" }, 413) : c.json({ error: "invalid_image" }, 400);
+        }
       }
-      try {
-        const base = () => sharp(input, { limitInputPixels: MAX_INPUT_PIXELS }).rotate();
-        const o = await base()
-          .resize({ width: MAX_ORIGINAL_WIDTH, height: WEBP_MAX_DIM, fit: "inside", withoutEnlargement: true })
-          .webp({ quality: 90 })
-          .toBuffer({ resolveWithObject: true });
-        original = o.data;
-        width = o.info.width;
-        height = o.info.height;
-        thumb = await sharp(original).resize({ width: THUMB_WIDTH, withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
-      } catch {
-        return c.json({ error: "invalid_image" }, 400);
-      }
-      const colors = await extractColors(thumb).catch(() => ({ dominant: "#000000", names: [] as string[] }));
+      const colors = img ? await extractColors(img.thumb).catch(() => ({ dominant: "#000000", names: [] as string[] })) : { dominant: "#000000", names: [] as string[] };
 
       // Ordered by capture time (keyset: createdAt DESC, id DESC), so a capture that waited in the offline queue
       // lands where it was taken. Normalised ISO string: the keyset compares created_at as text.
@@ -110,7 +92,7 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
         createdAt,
         updatedAt: nowIso,
         deletedAt: null,
-        media: [{ file: "original.webp", thumb: "thumb.webp", width, height, color: colors.dominant, role: "main" }],
+        media: img ? [{ file: "original.webp", thumb: "thumb.webp", width: img.width, height: img.height, color: colors.dominant, role: "main" }] : [],
         user: {
           ...(parsed.title?.trim() ? { title: parsed.title.trim() } : {}),
           ...(parsed.note?.trim() ? { note: parsed.note.trim() } : {}),
@@ -120,11 +102,14 @@ export function itemRoutes(app: Hono<AppEnv>, deps: Deps): void {
         },
         ai: { tipo: [], visual: [], keys: [], colors: colors.names, model: "", processedAt: null },
         text: parsed.text,
+        ...(parsed.type === "link" ? { link: {} } : {}),
         ...(parsed.truncated ? { truncated: true } : {}),
       };
       try {
-        deps.storage.writeFile(userId, id, "original.webp", original);
-        deps.storage.writeFile(userId, id, "thumb.webp", thumb);
+        if (img) {
+          deps.storage.writeFile(userId, id, "original.webp", img.original);
+          deps.storage.writeFile(userId, id, "thumb.webp", img.thumb);
+        }
         return c.json(await svc.create(meta), 201);
       } catch (e) {
         // Do not leave an orphan directory (files without a row) behind.

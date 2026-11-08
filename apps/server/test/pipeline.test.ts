@@ -470,3 +470,94 @@ describe("runtime helpers", () => {
     expect(n).toBe(3);
   });
 });
+
+describe("saved links (type link)", () => {
+  async function linkServer(html: string) {
+    const { createServer } = await import("node:http");
+    const jpg = await sharp({ create: { width: 1200, height: 630, channels: 3, background: "#cc3322" } }).jpeg().toBuffer();
+    const s = createServer((req, res) => {
+      if (req.url === "/page") res.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(html);
+      else if (req.url === "/img/bacalhau.jpg") res.writeHead(200, { "content-type": "image/jpeg" }).end(jpg);
+      else res.writeHead(404).end();
+    });
+    await new Promise<void>((r) => s.listen(0, "127.0.0.1", r));
+    const port = (s.address() as { port: number }).port;
+    const { isBlockedAddress } = await import("../src/links/safe-fetch");
+    const linkFetch = {
+      lookup: (h: string, cb: (e: Error | null, a: { address: string; family: number }[]) => void) =>
+        h === "receitas.test" ? cb(null, [{ address: "127.0.0.1", family: 4 }]) : cb(new Error("ENOTFOUND"), []),
+      isBlocked: (ip: string) => ip !== "127.0.0.1" && isBlockedAddress(ip),
+    };
+    return { url: `http://receitas.test:${port}/page`, linkFetch, close: () => new Promise((r) => s.close(r)) };
+  }
+  const uploadLink = async (t: Awaited<ReturnType<typeof makeApp>>, cookie: string, over: Partial<UploadMeta>) => {
+    const fd = new FormData();
+    fd.set("meta", JSON.stringify(meta({ type: "link", kind: "link", pageTitle: "", text: { selection: "", meta: {}, headings: [], alts: [] }, ...over })));
+    return t.app.request("/api/items", { method: "POST", headers: { cookie }, body: fd });
+  };
+
+  it("is saved without an image, then the job fetches it, downloads the og:image and classifies", async () => {
+    const html = readFileSync(new URL("./fixtures/links/article.html", import.meta.url), "utf8");
+    const srv = await linkServer(html);
+    try {
+      const { t, cookie, upload: _u, deps } = await setup();
+      const res = await uploadLink(t, cookie, { url: srv.url, tags: ["jantar"] });
+      expect(res.status).toBe(201);
+      const s0 = (await res.json()) as ItemSummary;
+      expect(s0.type).toBe("link");
+      expect(s0.thumb).toBeNull();
+      const userId = userIdOf(t);
+      const d = deps();
+      const cls = fakeClassifier(["receita"]);
+      await createPipeline({ deps: d, classifier: async () => cls, linkFetch: srv.linkFetch }).process(userId, s0.id);
+      const m = d.storage.readMeta(userId, s0.id)!;
+      expect(m.link).toMatchObject({ title: "Bacalhau com natas", siteName: "Receitas da Avó", canonicalUrl: "https://receitas.example/bacalhau-com-natas" });
+      expect(m.link?.fetchedAt).toBeTruthy();
+      expect(m.link?.fetchError).toBeUndefined();
+      expect(m.source.pageTitle).toBe("Bacalhau com natas");
+      expect(m.media[0]).toMatchObject({ file: "original.webp", width: 1200, height: 630 });
+      expect(m.text.page?.text).toMatch(/cozinha portuguesa/);
+      expect(m.text.meta.og?.["og:site_name"]).toBe("Receitas da Avó");
+      expect(m.ai.tipo).toEqual(["receita"]);
+      expect(cls.calls).toBe(1);
+      expect(m.ai.keys).toContain("bacalhau");
+      expect(m.user.tags).toEqual(["jantar"]);
+      const list = (await (await t.app.request("/api/items?type=link", { headers: { cookie } })).json()) as { items: ItemSummary[] };
+      expect(list.items[0]!.thumb).toBe(`/api/items/${s0.id}/files/thumb.webp`);
+      expect((await t.app.request(list.items[0]!.thumb!, { headers: { cookie } })).status).toBe(200);
+    } finally {
+      await srv.close();
+    }
+  });
+
+  it("keeps the extension's data when the server cannot fetch (login wall / SSRF block) and has no image", async () => {
+    const { t, cookie, deps } = await setup();
+    const res = await uploadLink(t, cookie, {
+      url: "http://127.0.0.1:9/privado",
+      kind: "page",
+      pageTitle: "Painel interno",
+      text: { selection: "", meta: { description: "Só com sessão", og: { "og:title": "Painel" } }, headings: ["Relatórios"], alts: [], page: { text: "relatórios trimestrais vendas" } },
+    });
+    expect(res.status).toBe(201);
+    const s0 = (await res.json()) as ItemSummary;
+    const userId = userIdOf(t);
+    const d = deps();
+    const cls = fakeClassifier();
+    await createPipeline({ deps: d, classifier: async () => cls }).process(userId, s0.id);
+    const m = d.storage.readMeta(userId, s0.id)!;
+    expect(m.link?.fetchError).toMatch(/not allowed/);
+    expect(m.link).toMatchObject({ title: "Painel", description: "Só com sessão" });
+    expect(m.media).toEqual([]);
+    expect(cls.calls).toBe(0); // nothing to look at
+    expect(m.ai.processedAt).not.toBeNull();
+    expect(m.ai.keys).toContain("relatórios");
+    expect(m.text.page?.text).toBe("relatórios trimestrais vendas");
+  });
+
+  it("a screenshot still needs its image", async () => {
+    const { t, cookie } = await setup();
+    const fd = new FormData();
+    fd.set("meta", JSON.stringify(meta()));
+    expect((await t.app.request("/api/items", { method: "POST", headers: { cookie }, body: fd })).status).toBe(400);
+  });
+});
